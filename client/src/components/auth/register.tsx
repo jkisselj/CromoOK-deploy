@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import supabase from "@/lib/supabaseClient";
+import { useNavigate } from "react-router";
 
 const registerSchema = z
   .object({
@@ -36,6 +37,8 @@ const registerSchema = z
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -58,6 +61,10 @@ export default function Register() {
       console.error("Registration error:", error);
     } else {
       console.log("User registered:", data.user);
+      navigate("/")
+
+
+
     }
   }
 

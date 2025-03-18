@@ -84,7 +84,7 @@ export function NavUser() {
                     {user?.user_metadata.name}
                   </span>
                   <span className="truncate text-xs">
-                    {user?.user_metadata.name}
+                    {user?.user_metadata.email}
                   </span>
                 </div>
               </div>
