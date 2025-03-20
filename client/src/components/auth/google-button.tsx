@@ -11,7 +11,7 @@ export default function GoogleButton({ redirectTo = "/" }: GoogleButtonProps) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: 'https://qebpndwpnctiisrjjbzo.supabase.co',
+          redirectTo: 'http://scenehunter.com/auth/callback',
         },
       });
 
