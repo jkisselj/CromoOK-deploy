@@ -3,13 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",             
-    "build": "vite build",      
-    "lint": "eslint .",         
-    "preview": "vite preview",  
-    "start": "vite preview --host"  
-  },
+"scripts": {
+  "build": "npm run dev",
+  "dev": "vite",
+  "lint": "eslint .",
+  "preview": "vite preview"
+},
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
     "@radix-ui/react-avatar": "^1.1.3",
