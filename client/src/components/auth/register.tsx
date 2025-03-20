@@ -15,65 +15,106 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import supabase from "@/lib/supabaseClient";
 import { useNavigate } from "react-router";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 const registerSchema = z
   .object({
     username: z
       .string()
-      .min(3, { message: "Username must be at least 3 characters" }),
-    email: z.string().email({ message: "Invalid email address" }),
+      .min(3, { message: "Username must be at least 3 characters long" }),
+    email: z.string().email({ message: "Invalid email format" }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters" }),
+      .min(8, { message: "Password must be at least 8 characters long" }),
     rePassword: z.string(),
   })
   .refine((data) => data.password === data.rePassword, {
-    message: "Passwords don't match",
+    message: "Passwords do not match",
     path: ["rePassword"],
   });
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuthContext();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
-      email: "",
+      email: user?.email || "",
       password: "",
       rePassword: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
-    const { email, password } = values;
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    setIsLoading(true);
+    setError(null);
 
-    if (error) {
-      console.error("Registration error:", error);
-    } else {
-      console.log("User registered:", data.user);
-      navigate("/")
+    try {
+      const { email, password } = values;
 
+      // Check if email matches an existing Google account
+      if (user && user.email === email) {
+        // Attempt to link accounts
+        const { error: linkError } = await supabase.auth.updateUser({
+          password,
+        });
 
+        if (linkError) throw linkError;
 
+        navigate("/");
+        return;
+      }
+
+      // Standard registration for a new user
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: values.username,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        navigate("/");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <>
       <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription>Create a new account</CardDescription>
+        <CardTitle>Sign Up</CardTitle>
+        <CardDescription>
+          {user?.email
+            ? "Link your Google account with a password"
+            : "Create a new account"}
+        </CardDescription>
       </CardHeader>
+
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -83,7 +124,7 @@ export default function Register() {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your username" {...field} />
+                  <Input placeholder="Enter username" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,7 +137,11 @@ export default function Register() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
+                  <Input 
+                    placeholder="Enter email" 
+                    {...field} 
+                    disabled={!!user?.email}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -112,7 +157,7 @@ export default function Register() {
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Enter password"
                       {...field}
                     />
                     <Button
@@ -147,7 +192,7 @@ export default function Register() {
                   <div className="relative">
                     <Input
                       type={showRePassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder="Confirm password"
                       {...field}
                     />
                     <Button
@@ -172,13 +217,13 @@ export default function Register() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Register
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Sign Up"}
           </Button>
         </form>
       </Form>
       <div className="mt-4 text-center text-sm">
-        Already have an account? <Link to="/auth/login">Login</Link>
+        Already have an account? <Link to="/auth/login">Log in</Link>
       </div>
     </>
   );

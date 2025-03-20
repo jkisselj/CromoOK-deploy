@@ -7,6 +7,7 @@ interface AuthContextProps {
   session: Session | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  linkAccounts: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextProps>({
   session: null,
   loading: true,
   signOut: async () => {},
+  linkAccounts: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -24,25 +26,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the initial session
-    async function fetchSession() {
-      try {
-        const {
-          data: { session: initialSession },
-        } = await supabase.auth.getSession();
-
-        setSession(initialSession);
-        setUser(initialSession?.user ?? null);
-      } catch (error) {
-        console.error("Error fetching session:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSession();
-
-    // Set up the auth state listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, currentSession) => {
         setSession(currentSession);
@@ -64,18 +47,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const linkAccounts = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      // Если успешно вошли, связываем аккаунты
+      if (data.user) {
+        const { error: linkError } = await supabase.auth.updateUser({
+          email,
+          password,
+        });
+
+        if (linkError) throw linkError;
+      }
+    } catch (error) {
+      console.error("Error linking accounts:", error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     session,
     loading,
     signOut,
+    linkAccounts,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext };
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuthContext = () => {
-  return useContext(AuthContext);
-};
+export const useAuthContext = () => useContext(AuthContext);

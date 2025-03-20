@@ -1,4 +1,3 @@
-import { Navigate, useLocation } from "react-router";
 import { useAuthContext } from "../../hooks/useAuthContext";
 
 export interface IPublicRouteProps {
@@ -8,11 +7,7 @@ export interface IPublicRouteProps {
 const PublicRoute: React.FunctionComponent<IPublicRouteProps> = ({
   children,
 }) => {
-  const { user, loading } = useAuthContext();
-  const location = useLocation();
-
-  // Get the redirectTo path from location state, or use '/' as default
-  const from = location.state?.from || "/";
+  const { loading } = useAuthContext();
 
   if (loading) {
     return (
@@ -22,10 +17,7 @@ const PublicRoute: React.FunctionComponent<IPublicRouteProps> = ({
     );
   }
 
-  if (user) {
-    return <Navigate to={from} replace />;
-  }
-
+  // Убираем проверку на user и перенаправление
   return <>{children}</>;
 };
 
