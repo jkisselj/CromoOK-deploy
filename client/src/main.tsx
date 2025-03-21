@@ -5,7 +5,8 @@ import { BrowserRouter } from "react-router";
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/theme-transition.css";
 
-// Инициализация темы
+document.documentElement.classList.add("no-transitions");
+
 const theme = localStorage.getItem("theme-store")
   ? JSON.parse(localStorage.getItem("theme-store")!).state.theme
   : "system";
@@ -18,6 +19,12 @@ if (theme === "system") {
 } else {
   document.documentElement.classList.add(theme);
 }
+
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    document.documentElement.classList.remove("no-transitions");
+  });
+});
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>

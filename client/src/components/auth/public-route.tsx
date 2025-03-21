@@ -17,7 +17,6 @@ const PublicRoute: React.FunctionComponent<IPublicRouteProps> = ({
     );
   }
 
-  // Убираем проверку на user и перенаправление
   return <>{children}</>;
 };
 

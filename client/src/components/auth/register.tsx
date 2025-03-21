@@ -62,9 +62,7 @@ export default function Register() {
     try {
       const { email, password } = values;
 
-      // Check if email matches an existing Google account
       if (user && user.email === email) {
-        // Attempt to link accounts
         const { error: linkError } = await supabase.auth.updateUser({
           password,
         });
@@ -75,7 +73,6 @@ export default function Register() {
         return;
       }
 
-      // Standard registration for a new user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

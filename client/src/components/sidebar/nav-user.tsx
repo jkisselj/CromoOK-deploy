@@ -5,7 +5,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom"; // Добавьте этот импорт
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,12 +21,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-// import { Button } from "@/components/ui/button";
+//import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuthContext } from "@/hooks/useAuthContext";
 
 export function NavUser() {
-  const navigate = useNavigate(); // Добавьте это
+  const navigate = useNavigate();
   const { user, signOut } = useAuthContext();
   const { isMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -35,7 +35,7 @@ export function NavUser() {
     try {
       await signOut();
       console.log("Logged out successfully");
-      navigate("/auth/login"); // Добавьте редирект после выхода
+      navigate("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);
     }

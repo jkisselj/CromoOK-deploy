@@ -15,10 +15,8 @@ export const useTheme = create<ThemeStore>()(
             setTheme: (theme) => {
                 const root = window.document.documentElement;
 
-                // Добавляем класс для отключения анимации
-                root.classList.add("no-transition");
+                root.classList.add("no-transitions");
 
-                // Удаляем существующие темы
                 root.classList.remove("light", "dark");
 
                 if (theme === "system") {
@@ -31,11 +29,13 @@ export const useTheme = create<ThemeStore>()(
                     root.classList.add(theme);
                 }
 
-                // Форсируем перерасчет стилей
                 void root.offsetHeight;
 
-                // Удаляем класс, отключающий анимацию
-                root.classList.remove("no-transition");
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        root.classList.remove("no-transitions");
+                    });
+                });
 
                 set({ theme });
             },
