@@ -6,7 +6,7 @@ export default function DashboardLayout() {
   return (
     <SidebarProvider>
       <div className="relative min-h-screen w-full">
-        <AppSidebar className="absolute right-0" />
+        <AppSidebar className="fixed right-0" />
         <SidebarInset>
           <div className="w-full max-w-7xl mx-auto">
             <Outlet />
