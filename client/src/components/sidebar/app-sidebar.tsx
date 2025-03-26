@@ -9,10 +9,7 @@ import {
   Brain,
   Settings,
   Filter,
-  Car,
-  PenTool,
   CalendarRange,
-  ShieldCheck,
   ClipboardCheck,
   ListTodo,
   BanknoteIcon,
@@ -43,7 +40,8 @@ import {
   Lock,
   HardDrive,
   Scale,
-  FileCheck
+  FileCheck,
+  Plus
 } from "lucide-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -59,14 +57,13 @@ const data = {
   navMain: [
     {
       title: "Locations",
-      url: "#",
+      url: "/locations",
       icon: MapPin,
       items: [
+        { title: "All Locations", url: "/locations", icon: Building2 },
+        { title: "Add Location", url: "/locations/new", icon: Plus },
         { title: "Search and Filters", url: "#", icon: Filter },
-        { title: "Location Card", url: "#", icon: Car },
-        { title: "Adding and Editing", url: "#", icon: PenTool },
         { title: "Availability Calendar", url: "#", icon: CalendarRange },
-        { title: "Moderation", url: "#", icon: ShieldCheck },
       ],
     },
     {
