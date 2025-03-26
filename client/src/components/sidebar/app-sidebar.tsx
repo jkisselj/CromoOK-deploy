@@ -44,6 +44,8 @@ import {
   Plus
 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
@@ -51,6 +53,8 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
+  SidebarHeader,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 const data = {
@@ -159,7 +163,19 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" side="right" defaultCollapsed {...props}>
+      <SidebarHeader>
+        <Link
+          to="/"
+          className="flex items-center justify-center w-full py-4 transition-all duration-200"
+        >
+          <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
+            <span className="group-data-[collapsible=icon]:hidden">SceneHunter</span>
+            <span className="hidden group-data-[collapsible=icon]:inline">SH</span>
+          </span>
+        </Link>
+        <SidebarSeparator className="w-full" />
+      </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>

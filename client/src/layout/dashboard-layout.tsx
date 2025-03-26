@@ -1,17 +1,18 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import NavTop from "@/components/sidebar/nav-top";
-
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <NavTop />
-        <Outlet />
-      </SidebarInset>
+      <div className="relative min-h-screen w-full">
+        <AppSidebar className="absolute right-0" />
+        <SidebarInset>
+          <div className="w-full max-w-7xl mx-auto">
+            <Outlet />
+          </div>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
