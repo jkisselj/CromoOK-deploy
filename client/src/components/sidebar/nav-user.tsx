@@ -41,15 +41,15 @@ export function NavUser() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <div className="flex items-center gap-2 w-full group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:mb-4">
+          <div className="flex items-center gap-2 w-full group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center">
             <ThemeToggle />
             <Link to="/auth/login" className="w-full">
               <SidebarMenuButton
                 size="lg"
-                className="w-full flex items-center gap-2 hover:bg-sidebar-accent"
+                className="w-full flex items-center justify-center gap-2 hover:bg-sidebar-accent"
               >
                 <LogIn className="size-4" />
-                <span className="font-medium">Log in</span>
+                <span className="group-data-[collapsible=icon]:hidden">Log in</span>
               </SidebarMenuButton>
             </Link>
           </div>

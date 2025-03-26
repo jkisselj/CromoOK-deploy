@@ -54,7 +54,7 @@ function useSidebar() {
 }
 
 function SidebarProvider({
-  defaultOpen = false, // изменено с true на false
+  defaultOpen = false,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
