@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { MapView } from './map-view';
@@ -10,9 +9,10 @@ interface LocationPickerProps {
         coordinates: { latitude: number; longitude: number };
     }) => void;
     defaultAddress?: string;
+    updateAddressOnClick?: false;
 }
 
-export function LocationPicker({ onLocationSelect, defaultAddress }: LocationPickerProps) {
+export function LocationPicker({ onLocationSelect, defaultAddress, updateAddressOnClick = false }: LocationPickerProps) {
     const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number }>({
         latitude: 55.7558,
         longitude: 37.6173
@@ -50,17 +50,24 @@ export function LocationPicker({ onLocationSelect, defaultAddress }: LocationPic
 
     const handleMapClick = (lngLat: { lng: number; lat: number }) => {
         setCoordinates({ latitude: lngLat.lat, longitude: lngLat.lng });
-        // Reverse geocoding when clicking on map
-        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.features?.length > 0) {
-                    onLocationSelect?.({
-                        address: data.features[0].place_name,
-                        coordinates: { latitude: lngLat.lat, longitude: lngLat.lng }
-                    });
-                }
+
+        if (updateAddressOnClick) {
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.features?.length > 0) {
+                        onLocationSelect?.({
+                            address: data.features[0].place_name,
+                            coordinates: { latitude: lngLat.lat, longitude: lngLat.lng }
+                        });
+                    }
+                });
+        } else {
+            onLocationSelect?.({
+                address: defaultAddress || '',
+                coordinates: { latitude: lngLat.lat, longitude: lngLat.lng }
             });
+        }
     };
 
     return (

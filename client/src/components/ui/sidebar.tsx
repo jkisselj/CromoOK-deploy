@@ -151,7 +151,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  (props, ref) => {
+  (props) => {
     const {
       side = "left",
       variant = "sidebar",

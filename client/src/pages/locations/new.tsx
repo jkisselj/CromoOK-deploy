@@ -37,7 +37,6 @@ export default function NewLocationPage() {
     const { user } = useAuthContext();
     const { mutateAsync: createLocation } = useCreateLocation();
 
-    // Redirect if not authenticated
     React.useEffect(() => {
         if (!user) {
             navigate("/auth/login", { state: { from: "/locations/new" } });
@@ -72,7 +71,6 @@ export default function NewLocationPage() {
             navigate("/locations");
         } catch (error) {
             console.error("Failed to create location:", error);
-            // Здесь можно добавить отображение ошибки пользователю
         }
     };
 
@@ -151,18 +149,7 @@ export default function NewLocationPage() {
                         <LocationPicker
                             onLocationSelect={handleLocationSelect}
                             defaultAddress={form.getValues("address")}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="address"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <Input {...field} placeholder="Address will be filled automatically" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                            updateAddressOnClick={false}
                         />
                     </div>
 
