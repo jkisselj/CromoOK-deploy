@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/useLocations";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { MapView } from '@/components/map/map-view';
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
@@ -95,6 +96,21 @@ export default function LocationDetailsPage() {
                                 <p className="text-muted-foreground">per hour</p>
                             </div>
                         </div>
+
+                        <Separator />
+
+                        {/* Map */}
+                        {location.coordinates && (
+                            <div>
+                                <h2 className="text-xl font-semibold mb-4">Location</h2>
+                                <MapView
+                                    latitude={location.coordinates.latitude}
+                                    longitude={location.coordinates.longitude}
+                                    interactive={false}
+                                    className="w-full h-[400px] rounded-lg overflow-hidden"
+                                />
+                            </div>
+                        )}
 
                         <Separator />
 

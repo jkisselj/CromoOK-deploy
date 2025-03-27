@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import React from "react";
+import { LocationPicker } from "@/components/map/location-picker";
 
 const schema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -25,6 +26,10 @@ const schema = z.object({
     address: z.string().min(1, "Address is required"),
     price: z.number().min(0, "Price must be positive"),
     area: z.number().min(0, "Area must be positive"),
+    coordinates: z.object({
+        latitude: z.number(),
+        longitude: z.number()
+    }).optional()
 });
 
 export default function NewLocationPage() {
@@ -69,6 +74,11 @@ export default function NewLocationPage() {
             console.error("Failed to create location:", error);
             // Здесь можно добавить отображение ошибки пользователю
         }
+    };
+
+    const handleLocationSelect = (location: { address: string; coordinates: { latitude: number; longitude: number } }) => {
+        form.setValue("address", location.address);
+        form.setValue("coordinates", location.coordinates);
     };
 
     if (!user) {
@@ -135,6 +145,26 @@ export default function NewLocationPage() {
                             </FormItem>
                         )}
                     />
+
+                    <div className="space-y-4">
+                        <FormLabel>Location</FormLabel>
+                        <LocationPicker
+                            onLocationSelect={handleLocationSelect}
+                            defaultAddress={form.getValues("address")}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="address"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input {...field} placeholder="Address will be filled automatically" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
 
                     <div className="grid gap-6 md:grid-cols-2">
                         <FormField

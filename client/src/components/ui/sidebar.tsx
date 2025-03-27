@@ -145,24 +145,22 @@ function SidebarProvider({
 }
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "sidebar" | "floating" | "inset";
   collapsible?: "icon" | "offcanvas" | "none";
   side?: "left" | "right";
-  defaultCollapsed?: boolean;
 }
 
 const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  ({
-    side = "left",
-    variant = "sidebar",
-    collapsible = "offcanvas",
-    className,
-    children,
-    ...props
-  }: React.ComponentProps<"div"> & {
-    side?: "left" | "right"
-    variant?: "sidebar" | "floating" | "inset"
-    collapsible?: "offcanvas" | "icon" | "none"
-  }) => {
+  (props, ref) => {
+    const {
+      side = "left",
+      variant = "sidebar",
+      collapsible = "offcanvas",
+      className,
+      children,
+      ...rest
+    } = props;
+
     const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar()
 
     if (collapsible === "none") {
@@ -173,7 +171,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             "bg-sidebar text-sidebar-foreground flex h-screen w-(--sidebar-width) flex-col sticky top-0",
             className
           )}
-          {...props}
+          {...rest}
         >
           {children}
         </div>
@@ -182,7 +180,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...rest}>
           <SheetContent
             data-sidebar="sidebar"
             data-slot="sidebar"
@@ -233,7 +231,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
               className
             )}
-            {...props}
+            {...rest}
           >
             <div
               data-sidebar="sidebar"
@@ -250,6 +248,8 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     )
   }
 )
+
+Sidebar.displayName = "Sidebar"
 
 function SidebarTrigger({
   className,
