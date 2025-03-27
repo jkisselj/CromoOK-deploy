@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { MapView } from './map-view';
+import mapboxgl from 'mapbox-gl';
 
 interface LocationPickerProps {
     onLocationSelect?: (location: {
@@ -9,7 +10,7 @@ interface LocationPickerProps {
         coordinates: { latitude: number; longitude: number };
     }) => void;
     defaultAddress?: string;
-    updateAddressOnClick?: false;
+    updateAddressOnClick?: boolean;
 }
 
 export function LocationPicker({ onLocationSelect, defaultAddress, updateAddressOnClick = false }: LocationPickerProps) {
@@ -23,9 +24,9 @@ export function LocationPicker({ onLocationSelect, defaultAddress, updateAddress
         if (!geocoderContainer.current) return;
 
         const geocoder = new MapboxGeocoder({
-            accessToken: import.meta.env.VITE_MAPBOX_TOKEN,
+            accessToken: mapboxgl.accessToken || '',
             marker: false,
-            placeholder: 'Search for address...',
+            placeholder: 'Поиск адреса...',
         });
 
         geocoder.addTo(geocoderContainer.current);
@@ -52,7 +53,7 @@ export function LocationPicker({ onLocationSelect, defaultAddress, updateAddress
         setCoordinates({ latitude: lngLat.lat, longitude: lngLat.lng });
 
         if (updateAddressOnClick) {
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`)
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.features?.length > 0) {

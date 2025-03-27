@@ -2,9 +2,7 @@ import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-const MAPBOX_TOKEN = 
-    import.meta.env.VITE_MAPBOX_TOKEN || 
-    import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 interface MapViewProps {
     latitude: number;
@@ -29,9 +27,7 @@ export function MapView({
     const initialLoad = useRef(true);
 
     useEffect(() => {
-        if (!mapContainer.current || !MAPBOX_TOKEN) return;
-
-        mapboxgl.accessToken = MAPBOX_TOKEN;
+        if (!mapContainer.current) return;
 
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
