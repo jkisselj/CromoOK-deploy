@@ -14,8 +14,8 @@ const AuthContext = createContext<AuthContextProps>({
   user: null,
   session: null,
   loading: true,
-  signOut: async () => {},
-  linkAccounts: async () => {},
+  signOut: async () => { },
+  linkAccounts: async () => { },
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -26,6 +26,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
+      setLoading(false);
+    });
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, currentSession) => {
         setSession(currentSession);
@@ -56,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      // Если успешно вошли, связываем аккаунты
       if (data.user) {
         const { error: linkError } = await supabase.auth.updateUser({
           email,

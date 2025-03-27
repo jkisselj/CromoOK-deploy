@@ -3,9 +3,11 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LocationCard } from '@/components/locations/location-card';
 import { useLocations } from '@/hooks/useLocations';
+import { useAuthContext } from '@/hooks/useAuthContext';
 
 export default function LocationsPage() {
     const { data: locations, isLoading, error } = useLocations();
+    const { user } = useAuthContext();
 
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
@@ -19,12 +21,14 @@ export default function LocationsPage() {
         <div className="container py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">Locations</h1>
-                <Button asChild>
-                    <Link to="/locations/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Location
-                    </Link>
-                </Button>
+                {user && (
+                    <Button asChild>
+                        <Link to="/locations/new">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Location
+                        </Link>
+                    </Button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

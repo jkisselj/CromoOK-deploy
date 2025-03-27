@@ -56,16 +56,19 @@ import {
   SidebarHeader,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 const data = {
-  navMain: [
+  getNavMain: (isAuthenticated: boolean) => [
     {
       title: "Locations",
       url: "/locations",
       icon: MapPin,
       items: [
         { title: "All Locations", url: "/locations", icon: Building2 },
-        { title: "Add Location", url: "/locations/new", icon: Plus },
+        ...(isAuthenticated ? [
+          { title: "Add Location", url: "/locations/new", icon: Plus }
+        ] : []),
         { title: "Search and Filters", url: "#", icon: Filter },
         { title: "Availability Calendar", url: "#", icon: CalendarRange },
       ],
@@ -162,6 +165,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthContext();
+
   return (
     <Sidebar collapsible="icon" side="right" {...props}>
       <SidebarHeader>
@@ -177,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarSeparator className="w-full" />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.getNavMain(!!user)} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
