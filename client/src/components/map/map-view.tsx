@@ -2,7 +2,15 @@ import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+const token = import.meta.env.VITE_MAPBOX_TOKEN;
+if (!token) {
+    throw new Error(
+        'Mapbox token is missing. Please ensure VITE_MAPBOX_TOKEN is set in your environment variables. ' +
+        'If you are in development, check your .env file. ' +
+        'If you are in production, make sure the environment variable is set in your deployment settings.'
+    );
+}
+mapboxgl.accessToken = token;
 
 interface MapViewProps {
     latitude: number;
