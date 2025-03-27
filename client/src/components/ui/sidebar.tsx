@@ -151,21 +151,13 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  (props) => {
-    const {
-      side = "left",
-      variant = "sidebar",
-      collapsible = "offcanvas",
-      className,
-      children,
-      ...rest
-    } = props;
-
+  ({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...rest }, ref) => {
     const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar()
 
     if (collapsible === "none") {
       return (
         <div
+          ref={ref}
           data-slot="sidebar"
           className={cn(
             "bg-sidebar text-sidebar-foreground flex h-screen w-(--sidebar-width) flex-col sticky top-0",

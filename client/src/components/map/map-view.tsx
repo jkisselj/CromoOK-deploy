@@ -2,6 +2,10 @@ import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const MAPBOX_TOKEN = 
+    import.meta.env.VITE_MAPBOX_TOKEN || 
+    import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
 interface MapViewProps {
     latitude: number;
     longitude: number;
@@ -25,60 +29,42 @@ export function MapView({
     const initialLoad = useRef(true);
 
     useEffect(() => {
-        if (!mapContainer.current) return;
+        if (!mapContainer.current || !MAPBOX_TOKEN) return;
 
-        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+        mapboxgl.accessToken = MAPBOX_TOKEN;
 
-        if (!map.current) {
-            map.current = new mapboxgl.Map({
-                container: mapContainer.current,
-                style: 'mapbox://styles/mapbox/streets-v12',
-                center: [longitude, latitude],
-                zoom: zoom,
-                interactive: interactive
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [longitude, latitude],
+            zoom: zoom,
+            interactive: interactive
+        });
+
+        marker.current = new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map.current);
+
+        if (onMapClick) {
+            map.current.on('click', (e) => {
+                onMapClick(e.lngLat);
             });
-
-            if (interactive) {
-                map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-                map.current.addControl(new mapboxgl.FullscreenControl());
-            }
-
-            marker.current = new mapboxgl.Marker()
-                .setLngLat([longitude, latitude])
-                .addTo(map.current);
-
-            if (onMapClick) {
-                map.current.on('click', (e) => {
-                    const currentZoom = map.current?.getZoom();
-                    const currentCenter = map.current?.getCenter();
-                    const currentBearing = map.current?.getBearing();
-                    const currentPitch = map.current?.getPitch();
-
-                    onMapClick(e.lngLat);
-                    marker.current?.setLngLat(e.lngLat);
-
-                    if (map.current && currentCenter) {
-                        map.current.setCenter(currentCenter);
-                        if (currentZoom) map.current.setZoom(currentZoom);
-                        if (currentBearing) map.current.setBearing(currentBearing);
-                        if (currentPitch) map.current.setPitch(currentPitch);
-                    }
-                });
-            }
-        } else if (!initialLoad.current) {
-            marker.current?.setLngLat([longitude, latitude]);
         }
 
-        initialLoad.current = false;
-
         return () => {
-            if (initialLoad.current) {
-                map.current?.remove();
-                map.current = null;
-                marker.current = null;
-            }
+            map.current?.remove();
         };
-    }, [latitude, longitude, interactive, zoom]);
+    }, []);
+
+    useEffect(() => {
+        if (!map.current || !marker.current || initialLoad.current) {
+            initialLoad.current = false;
+            return;
+        }
+
+        map.current.setCenter([longitude, latitude]);
+        marker.current.setLngLat([longitude, latitude]);
+    }, [latitude, longitude]);
 
     return <div ref={mapContainer} className={className} />;
 }

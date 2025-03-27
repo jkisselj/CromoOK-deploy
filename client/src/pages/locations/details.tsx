@@ -106,7 +106,8 @@ export default function LocationDetailsPage() {
                                 <MapView
                                     latitude={location.coordinates.latitude}
                                     longitude={location.coordinates.longitude}
-                                    interactive={false}
+                                    zoom={15}
+                                    interactive={true}
                                     className="w-full h-[400px] rounded-lg overflow-hidden"
                                 />
                             </div>
