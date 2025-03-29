@@ -5,7 +5,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Загружаем переменные окружения based on режима (development/production)
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -16,9 +15,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      // Явно определяем все необходимые переменные окружения
       'import.meta.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN),
-      // Добавляем для совместимости с process.env
       'process.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN),
     }
   };
