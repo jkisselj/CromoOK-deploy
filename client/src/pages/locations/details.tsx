@@ -8,13 +8,16 @@ import {
     Camera,
     Users,
     Shield,
-    AlertCircle
+    AlertCircle,
+    CalendarRange,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/useLocations";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { MapView } from '@/components/map/map-view';
+import { cn } from "@/lib/utils";
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
@@ -40,10 +43,10 @@ export default function LocationDetailsPage() {
                     </Button>
                     <h1 className="text-xl font-semibold truncate">{location.title}</h1>
                     <div className="ml-auto flex items-center gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" aria-label="Share location">
                             <Share2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" aria-label="Save to favorites">
                             <Heart className="h-4 w-4" />
                         </Button>
                     </div>
@@ -53,19 +56,22 @@ export default function LocationDetailsPage() {
             {/* Gallery */}
             <div className="container mt-6">
                 <div className="grid grid-cols-4 grid-rows-2 gap-2 rounded-xl overflow-hidden aspect-[2/1]">
-                    {location.images.map((image, index) => (
+                    {(location.images.length ? location.images : Array(5).fill(location.images[0])).map((image, index) => (
                         <div
                             key={index}
-                            className={`relative group cursor-pointer overflow-hidden ${index === 0 ? 'col-span-2 row-span-2' : ''}`}
+                            className={cn(
+                                "relative group cursor-pointer overflow-hidden",
+                                index === 0 && "col-span-2 row-span-2"
+                            )}
                         >
                             <img
-                                src={image || location.images[0]}
+                                src={image || 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=2940&auto=format&fit=crop'}
                                 alt={`${location.title} - photo ${index + 1}`}
-                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
                             {index === 4 && (
                                 <Button
-                                    className="absolute bottom-2 right-2 bg-white/90 hover:bg-white"
+                                    className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-foreground"
                                     size="sm"
                                 >
                                     <Camera className="h-4 w-4 mr-2" />
@@ -85,7 +91,12 @@ export default function LocationDetailsPage() {
                         {/* Title and Price */}
                         <div className="flex justify-between items-start">
                             <div>
-                                <h1 className="text-2xl font-semibold mb-1">{location.title}</h1>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h1 className="text-2xl font-semibold">{location.title}</h1>
+                                    <Badge variant="secondary" className="ml-2">
+                                        {location.status === "published" ? "Available" : location.status}
+                                    </Badge>
+                                </div>
                                 <p className="text-muted-foreground flex items-center gap-2">
                                     <MapPin className="h-4 w-4" />
                                     {location.address}
@@ -116,17 +127,42 @@ export default function LocationDetailsPage() {
                         <Separator />
 
                         {/* Features */}
-                        <div className="grid grid-cols-3 gap-4">
-                            {[
-                                { icon: Users, label: "Up to 10 people" },
-                                { icon: Camera, label: `${location.area}м² space` },
-                                { icon: Shield, label: "Verified location" },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-2 p-4 rounded-lg border">
-                                    <item.icon className="h-5 w-5 text-muted-foreground" />
-                                    <span className="font-medium">{item.label}</span>
-                                </div>
-                            ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <Card className="bg-background/50 hover:bg-background transition-colors">
+                                <CardContent className="flex items-center gap-3 p-4">
+                                    <div className="bg-primary/10 text-primary rounded-full p-2">
+                                        <Users className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">Capacity</p>
+                                        <p className="text-sm text-muted-foreground">Up to {location.features?.maxCapacity || 10} people</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background/50 hover:bg-background transition-colors">
+                                <CardContent className="flex items-center gap-3 p-4">
+                                    <div className="bg-primary/10 text-primary rounded-full p-2">
+                                        <Camera className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">Space</p>
+                                        <p className="text-sm text-muted-foreground">{location.area}м² area</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background/50 hover:bg-background transition-colors">
+                                <CardContent className="flex items-center gap-3 p-4">
+                                    <div className="bg-primary/10 text-primary rounded-full p-2">
+                                        <Shield className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">Verified</p>
+                                        <p className="text-sm text-muted-foreground">Quality checked location</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
 
                         <Separator />
@@ -134,9 +170,11 @@ export default function LocationDetailsPage() {
                         {/* Description */}
                         <div>
                             <h2 className="text-xl font-semibold mb-4">About this location</h2>
-                            <p className="text-muted-foreground whitespace-pre-line">
-                                {location.description}
-                            </p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                                <p className="text-muted-foreground whitespace-pre-line">
+                                    {location.description}
+                                </p>
+                            </div>
                         </div>
 
                         {/* Amenities */}
@@ -145,11 +183,11 @@ export default function LocationDetailsPage() {
                                 <Separator />
                                 <div>
                                     <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                                         {location.amenities.map((amenity, i) => (
-                                            <div key={i} className="flex items-center gap-2">
+                                            <div key={i} className="flex items-center gap-3">
                                                 <div className="h-2 w-2 rounded-full bg-primary" />
-                                                <span>{amenity}</span>
+                                                <span className="text-muted-foreground">{amenity}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -163,11 +201,11 @@ export default function LocationDetailsPage() {
                                 <Separator />
                                 <div>
                                     <h2 className="text-xl font-semibold mb-4">Location rules</h2>
-                                    <div className="grid gap-2">
+                                    <div className="grid gap-3 sm:grid-cols-2">
                                         {location.rules.map((rule, i) => (
                                             <div key={i} className="flex items-center gap-2">
                                                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                                                <span>{rule}</span>
+                                                <span className="text-muted-foreground">{rule}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -179,38 +217,56 @@ export default function LocationDetailsPage() {
                     {/* Booking Card */}
                     <div className="relative">
                         <div className="sticky top-24">
-                            <Card className="p-6">
-                                <div className="space-y-6">
-                                    <div>
-                                        <div className="flex items-baseline gap-1 mb-1">
-                                            <span className="text-2xl font-bold">{location.price}₽</span>
-                                            <span className="text-muted-foreground">/hour</span>
-                                        </div>
-                                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                            <Clock className="h-4 w-4" />
-                                            <span>Minimum booking: 2 hours</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div className="border rounded-lg p-3">
-                                                <div className="text-sm font-medium">Date</div>
-                                                <div className="text-muted-foreground">Select date</div>
+                            <Card>
+                                <CardContent className="pt-6">
+                                    <div className="space-y-6">
+                                        <div>
+                                            <div className="flex items-baseline gap-1 mb-1">
+                                                <span className="text-2xl font-bold">{location.price}₽</span>
+                                                <span className="text-muted-foreground">/hour</span>
                                             </div>
-                                            <div className="border rounded-lg p-3">
-                                                <div className="text-sm font-medium">Time</div>
-                                                <div className="text-muted-foreground">Select time</div>
+                                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                                <Clock className="h-4 w-4" />
+                                                <span>Minimum booking: 2 hours</span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="border rounded-lg p-3">
-                                        <div className="text-sm font-medium">Guests</div>
-                                        <div className="text-muted-foreground">Add guests</div>
-                                    </div>
-                                </div>
 
-                                <Button className="w-full">Book now</Button>
+                                        <div className="rounded-md border p-4">
+                                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                                <Button variant="outline" className="justify-start h-auto py-3">
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-xs text-muted-foreground">Date</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <CalendarRange className="h-4 w-4" />
+                                                            <span>Select date</span>
+                                                        </div>
+                                                    </div>
+                                                </Button>
+                                                <Button variant="outline" className="justify-start h-auto py-3">
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-xs text-muted-foreground">Time</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <Clock className="h-4 w-4" />
+                                                            <span>Select time</span>
+                                                        </div>
+                                                    </div>
+                                                </Button>
+                                            </div>
+                                            <Button variant="outline" className="justify-start h-auto py-3 w-full">
+                                                <div className="flex flex-col items-start">
+                                                    <span className="text-xs text-muted-foreground">Guests</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <Users className="h-4 w-4" />
+                                                        <span>Add guests</span>
+                                                    </div>
+                                                </div>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button className="w-full" size="lg">Book now</Button>
+                                </CardFooter>
                             </Card>
                         </div>
                     </div>

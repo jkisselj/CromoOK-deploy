@@ -145,7 +145,7 @@ export default function NewLocationPage() {
                     />
 
                     <div className="space-y-4">
-                        <FormLabel>Location</FormLabel>
+                        {/* <FormLabel>Location</FormLabel> */}
                         <LocationPicker
                             onLocationSelect={handleLocationSelect}
                             defaultAddress={form.getValues("address")}
