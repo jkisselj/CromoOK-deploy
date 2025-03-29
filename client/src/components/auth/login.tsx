@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +32,6 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the redirectTo path from location state, or use '/' as default
   const from = location.state?.from || "/";
 
   const form = useForm<z.infer<typeof loginSchema>>({

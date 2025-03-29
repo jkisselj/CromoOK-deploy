@@ -1,10 +1,7 @@
-* {
-    transition: none !important;
-}
-
 .no-transition * {
     transition: none !important;
 }
+
 
 [class="dark"] .google-icon {
     filter: brightness(0) invert(1);

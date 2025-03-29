@@ -1,90 +1,151 @@
-import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
+import { Link } from "react-router-dom";
+import { Camera, MapPin, Clock, Star, Users, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, Users, Heart } from 'lucide-react';
-import type { Location } from '@/types/location';
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface LocationCardProps {
-    location: Location;
+    id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    address: string;
+    rating?: number;
+    price?: number;
+    currency?: string;
+    categories?: string[];
+    availability?: string;
+    className?: string;
 }
 
-export function LocationCard({ location }: LocationCardProps) {
+export function LocationCard({
+    id,
+    title,
+    description,
+    imageUrl,
+    address,
+    rating = 0,
+    price = 0,
+    currency = "USD",
+    categories = [],
+    availability = "Available",
+    className,
+}: LocationCardProps) {
+    const [imageError, setImageError] = useState(false);
+
+    const formattedPrice = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency
+    }).format(price);
+
+    const truncatedDescription = description.length > 100
+        ? `${description.substring(0, 100)}...`
+        : description;
+
+    const handleImageError = () => {
+        setImageError(true);
+    };
+
     return (
-        <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300">
-            <div className="relative">
-                <div className="aspect-[4/3] relative overflow-hidden">
+        <Card className={cn("overflow-hidden transition-all hover:shadow-md", className)}>
+            {/* Image container with overlay for categories */}
+            <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                {!imageError ? (
                     <img
-                        src={location.images[0]}
-                        alt={location.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        src={imageUrl}
+                        alt={title}
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                        onError={handleImageError}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                </div>
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                        <ImageIcon className="h-12 w-12 text-muted-foreground/40" />
+                    </div>
+                )}
 
-                <div className="absolute top-3 left-3 flex gap-2">
-                    {location.features?.equipmentIncluded && (
-                        <Badge variant="secondary" className="bg-white/90 text-black">
-                            Equipment Included
+                {/* Categories */}
+                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                    {categories.slice(0, 2).map((category) => (
+                        <Badge key={category} variant="secondary" className="bg-black/70 hover:bg-black/80">
+                            {category}
+                        </Badge>
+                    ))}
+                    {categories.length > 2 && (
+                        <Badge variant="secondary" className="bg-black/70 hover:bg-black/80">
+                            +{categories.length - 2}
                         </Badge>
                     )}
-                    {location.status === 'published' && (
-                        <Badge variant="accent" className="bg-green-500/90 text-white">
-                            Available
-                        </Badge>
-                    )}
                 </div>
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-700"
-                >
-                    <Heart className="h-4 w-4" />
-                </Button>
+                {/* Price badge */}
+                <div className="absolute bottom-2 right-2">
+                    <Badge variant="default" className="text-xs font-medium px-2 py-1">
+                        {formattedPrice} / day
+                    </Badge>
+                </div>
+
+                {/* Availability indicator */}
+                <div className="absolute top-2 right-2">
+                    <div className="flex items-center gap-1.5 bg-black/70 rounded-md px-2 py-1">
+                        <span className={cn(
+                            "h-2 w-2 rounded-full",
+                            availability === "Available" ? "bg-green-500" : "bg-amber-500"
+                        )}></span>
+                        <span className="text-xs text-white">{availability}</span>
+                    </div>
+                </div>
             </div>
 
-            <CardContent className="p-5">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 className="font-semibold text-lg leading-tight mb-1">
-                            {location.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                            <MapPin className="h-4 w-4" />
-                            {location.address}
-                        </p>
-                    </div>
-                    {location.rating && (
+            <CardContent className="p-4">
+                {/* Title and rating */}
+                <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-lg line-clamp-1">{title}</h3>
+                    {rating > 0 && (
                         <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="font-medium">{location.rating}</span>
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                            <span className="text-sm font-medium">{rating.toFixed(1)}</span>
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                            <Users className="h-4 w-4" />
-                            <span>Up to {location.features?.maxCapacity}</span>
-                        </div>
-                        <span>{location.area}m²</span>
-                    </div>
+                {/* Address */}
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
+                    <MapPin className="h-3.5 w-3.5" />
+                    <span className="truncate">{address}</span>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="flex flex-col">
-                        <span className="text-2xl font-bold">€{location.price}</span>
-                        <span className="text-sm text-muted-foreground">/hour</span>
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+                    {truncatedDescription}
+                </p>
+
+                {/* Features */}
+                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
+                    <div className="flex items-center gap-1">
+                        <Camera className="h-3.5 w-3.5" />
+                        <span>Suitable for photography</span>
                     </div>
-                    <Button asChild>
-                        <Link to={`/locations/${location.id}`}>
-                            View Details
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>Flexible schedule</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Users className="h-3.5 w-3.5" />
+                        <span>10+ people</span>
+                    </div>
                 </div>
             </CardContent>
+
+            <CardFooter className="p-4 pt-0 flex justify-between items-center">
+                <Button variant="outline" size="sm" asChild>
+                    <Link to={`/locations/${id}`}>More details</Link>
+                </Button>
+                <Button size="sm" asChild>
+                    <Link to={`/locations/${id}`}>Book now</Link>
+                </Button>
+            </CardFooter>
         </Card>
     );
 }

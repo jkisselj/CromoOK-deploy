@@ -10,37 +10,41 @@ import LocationDetailsPage from "./pages/locations/details";
 import AuthLayout from "./layout/auth-layout";
 import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
+import { NotificationProvider } from "./context/NotificationContext";
+import { NotificationsContainer } from "./components/ui/notification";
+import { Toaster } from "./components/ui/toaster";
+import AuthCallback from "./components/auth/auth-callback";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="auth" element={<PublicRoute><AuthLayout /></PublicRoute>}>
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-      </Route>
-
-      <Route path="/" element={<DashboardLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="locations">
-          <Route index element={<LocationsPage />} />
-          <Route path=":id" element={<LocationDetailsPage />} />
+    <NotificationProvider>
+      <NotificationsContainer />
+      <Toaster />
+      <Routes>
+        <Route path="auth" element={<PublicRoute><AuthLayout /></PublicRoute>}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="callback" element={<AuthCallback />} />
         </Route>
-      </Route>
 
-      <Route
-        path="/"
-        element={
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="locations">
+            <Route index element={<LocationsPage />} />
+            <Route path=":id" element={<LocationDetailsPage />} />
+          </Route>
+        </Route>
+
+        <Route path="locations/new" element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
-        }
-      >
-        <Route path="locations">
-          <Route path="new" element={<NewLocationPage />} />
+        }>
+          <Route index element={<NewLocationPage />} />
         </Route>
-      </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </NotificationProvider>
   );
 }

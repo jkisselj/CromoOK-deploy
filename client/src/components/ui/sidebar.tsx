@@ -6,6 +6,7 @@ import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useScrollLock } from "@/hooks/use-scroll-lock"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -154,6 +155,10 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
   ({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...rest }, ref) => {
     const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar()
 
+    useScrollLock({
+      enabled: state === "expanded" && !isMobile
+    })
+
     if (collapsible === "none") {
       return (
         <div
@@ -249,15 +254,18 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
-
   return (
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn(
+        "h-7 w-7 absolute z-50 bg-background/80 backdrop-blur-sm border shadow-sm",
+        className
+      )}
       onClick={(event) => {
+        event.stopPropagation();
         onClick?.(event)
         toggleSidebar()
       }}

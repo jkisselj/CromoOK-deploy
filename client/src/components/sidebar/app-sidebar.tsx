@@ -41,7 +41,8 @@ import {
   HardDrive,
   Scale,
   FileCheck,
-  Plus
+  Plus,
+  MapPinIcon
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -123,7 +124,7 @@ const data = {
       icon: Map,
       items: [
         { title: "Map Integration", url: "#", icon: MapPinned },
-        { title: "Location Display", url: "#", icon: Map },
+        { title: "Location Display", url: "#", icon: MapPinIcon },
         { title: "Route Building", url: "#", icon: Navigation },
       ],
     },
@@ -150,7 +151,7 @@ const data = {
       ],
     },
     {
-      title: "System Capabilities",
+      title: "System",
       url: "#",
       icon: Settings,
       items: [
@@ -168,26 +169,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthContext();
 
   return (
-    <Sidebar collapsible="icon" side="right" {...props}>
-      <SidebarHeader>
+    <Sidebar
+      collapsible="icon"
+      side="right"
+      className="transition-transform duration-300 ease-in-out max-h-screen overflow-hidden will-change-transform"
+      {...props}
+    >
+      <SidebarHeader className="pb-1">
         <Link
           to="/"
-          className="flex items-center justify-center w-full py-4 transition-all duration-200"
+          className="flex items-center justify-center w-full py-3 md:py-4 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring rounded-md"
         >
-          <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
+          <span className="text-lg md:text-xl font-semibold text-sidebar-foreground transition-all text-center">
             <span className="group-data-[collapsible=icon]:hidden">SceneHunter</span>
             <span className="hidden group-data-[collapsible=icon]:inline">SH</span>
           </span>
         </Link>
         <SidebarSeparator className="w-full" />
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="scrollbar-thin scrollbar-thumb-sidebar-border scrollbar-track-transparent overscroll-contain">
         <NavMain items={data.getNavMain(!!user)} />
       </SidebarContent>
-      <SidebarFooter>
+
+      <SidebarFooter className="mt-auto">
+        <SidebarSeparator className="w-full mb-2" />
         <NavUser />
       </SidebarFooter>
-      <SidebarRail />
+
+      <SidebarRail className="opacity-0 md:opacity-100" />
     </Sidebar>
   );
 }

@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function NavTop() {
   return (
@@ -7,6 +8,9 @@ export default function NavTop() {
       <div className="flex items-center gap-2 px-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
+      </div>
+      <div className="flex items-center justify-end gap-2">
+        <ThemeToggle />
       </div>
     </header>
   );

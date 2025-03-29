@@ -24,8 +24,8 @@ const schema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
     address: z.string().min(1, "Address is required"),
-    price: z.number().min(0, "Price must be positive"),
-    area: z.number().min(0, "Area must be positive"),
+    price: z.number().min(0, "Price must be a positive number"),
+    area: z.number().min(0, "Area must be a positive number"),
     coordinates: z.object({
         latitude: z.number(),
         longitude: z.number()
@@ -80,31 +80,31 @@ export default function NewLocationPage() {
     };
 
     if (!user) {
-        return <div>Redirecting to login...</div>;
+        return <div className="flex justify-center items-center min-h-screen">Redirecting to login...</div>;
     }
 
     return (
-        <div className="container max-w-3xl py-8">
-            <div className="flex items-center gap-4 mb-8">
+        <div className="container max-w-3xl py-4 md:py-8 px-4 md:px-6">
+            <div className="flex items-center gap-4 mb-6 md:mb-8">
                 <Button variant="ghost" size="icon" asChild>
                     <Link to="/locations">
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <h1 className="text-3xl font-bold">Add New Location</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">Add New Location</h1>
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <div className="grid gap-6 md:grid-cols-2">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
                         <FormField
                             control={form.control}
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Location Name</FormLabel>
+                                    <FormLabel>Location Title</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Studio Name" {...field} />
+                                        <Input placeholder="Studio name" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -118,7 +118,7 @@ export default function NewLocationPage() {
                                 <FormItem>
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="123 Street Name" {...field} />
+                                        <Input placeholder="123 Main St." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -153,7 +153,7 @@ export default function NewLocationPage() {
                         />
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-2">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
                         <FormField
                             control={form.control}
                             name="price"
@@ -179,7 +179,7 @@ export default function NewLocationPage() {
                             name="area"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Area (м²)</FormLabel>
+                                    <FormLabel>Area (m²)</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"
@@ -195,11 +195,11 @@ export default function NewLocationPage() {
                         />
                     </div>
 
-                    <div className="flex justify-end gap-4">
-                        <Button type="button" variant="outline" asChild>
+                    <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
+                        <Button type="button" variant="outline" asChild className="order-2 sm:order-1">
                             <Link to="/locations">Cancel</Link>
                         </Button>
-                        <Button type="submit">Create Location</Button>
+                        <Button type="submit" className="order-1 sm:order-2">Create Location</Button>
                     </div>
                 </form>
             </Form>
