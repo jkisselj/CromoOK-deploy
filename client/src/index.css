@@ -39,6 +39,13 @@
   --sidebar-border: oklch(0.85 0.03 145);
   --sidebar-ring: oklch(0.7 0.03 145);
   --overlay-background: oklch(0 0 0 / 0.4);
+
+  --map-control-bg: var(--card);
+  --map-control-fg: var(--card-foreground);
+  --map-control-border: var(--border);
+  --map-control-hover: var(--secondary);
+  --map-control-active: var(--muted);
+  --map-control-marker-color: oklch(0.577 0.245 27.325);
 }
 
 .dark {
@@ -75,6 +82,13 @@
   --sidebar-border: oklch(0.3 0.03 145);
   --sidebar-ring: oklch(0.4 0.03 145);
   --overlay-background: oklch(0 0 0 / 0.6);
+
+  --map-control-bg: var(--card);
+  --map-control-fg: var(--card-foreground);
+  --map-control-border: var(--border);
+  --map-control-hover: var(--secondary);
+  --map-control-active: var(--muted);
+  --map-control-marker-color: oklch(0.577 0.245 27.325);
 }
 
 @theme inline {
@@ -142,4 +156,66 @@
   .sidebar-toggle {
     @apply absolute top-4 -right-12 transition-transform duration-300 ease-in-out;
   }
+}
+
+.mapboxgl-ctrl-group {
+  background-color: var(--map-control-bg) !important;
+  border-color: var(--map-control-border) !important;
+}
+
+.mapboxgl-ctrl-group button {
+  background-color: var(--map-control-bg) !important;
+  color: var(--map-control-fg) !important;
+}
+
+.mapboxgl-ctrl-group button:hover {
+  background-color: var(--map-control-hover) !important;
+}
+
+.mapboxgl-ctrl-group button.active {
+  background-color: var(--map-control-active) !important;
+}
+
+.mapboxgl-ctrl-group button svg path,
+.mapboxgl-ctrl-group button svg rect,
+.mapboxgl-ctrl-group button svg circle {
+  fill: var(--map-control-fg) !important;
+  stroke: var(--map-control-fg) !important;
+}
+
+.center-marker-btn svg path {
+  fill: var(--map-control-marker-color) !important;
+  stroke: none !important;
+}
+
+.center-marker-btn:hover svg path {
+  fill: var(--map-control-fg) !important;
+}
+
+.map-center-control {
+  position: absolute !important;
+  bottom: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 1 !important;
+}
+
+.style-switcher-btn {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.style-switcher-dropdown {
+  background-color: var(--map-control-bg) !important;
+  color: var(--map-control-fg) !important;
+  border: 1px solid var(--map-control-border) !important;
+}
+
+.style-switcher-dropdown div:hover {
+  background-color: var(--map-control-hover) !important;
+}
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib {
+  display: none !important;
 }
