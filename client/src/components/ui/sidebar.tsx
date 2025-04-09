@@ -231,9 +231,6 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             >
               {children}
             </div>
-            <SidebarTrigger
-              className="absolute top-4 -left-10 z-50"
-            />
           </div>
         </div>
       </>
@@ -248,7 +245,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, state, isMobile } = useSidebar();
 
   return (
     <Button
@@ -256,17 +253,25 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn(
+        "h-11 w-7 absolute top-4 transition-transform z-50",
+        isMobile
+          ? "right-4"
+          : state === "collapsed"
+            ? "right-[calc(var(--sidebar-width-icon)+0.5rem)]"
+            : "right-[calc(var(--sidebar-width)+0.5rem)]",
+        className
+      )}
       onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
+        onClick?.(event);
+        toggleSidebar();
       }}
       {...props}
     >
       <PanelLeftIcon />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
-  )
+  );
 }
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {

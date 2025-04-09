@@ -71,13 +71,13 @@ export function LocationCard({ location }: LocationCardProps) {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <AreaChart className="h-3.5 w-3.5 shrink-0" />
-                        <span>{location.area}м²</span>
+                        <span>{location.area}m²</span>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t">
                     <div className="flex flex-col">
-                        <span className="text-2xl font-bold">{location.price}₽</span>
+                        <span className="text-2xl font-bold">{location.price}€</span>
                         <span className="text-sm text-muted-foreground">/hour</span>
                     </div>
                     <Button asChild>
