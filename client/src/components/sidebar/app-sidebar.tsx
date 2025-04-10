@@ -41,7 +41,8 @@ import {
   HardDrive,
   Scale,
   FileCheck,
-  Plus
+  Plus,
+  PanelRightIcon
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -55,8 +56,12 @@ import {
   SidebarRail,
   SidebarHeader,
   SidebarSeparator,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/hooks/useAuthContext";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const data = {
   getNavMain: (isAuthenticated: boolean) => [
@@ -166,28 +171,49 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthContext();
+  const { toggleSidebar, state } = useSidebar();
+  const isMobile = useIsMobile();
 
   return (
-    <Sidebar collapsible="icon" side="right" {...props}>
-      <SidebarHeader>
-        <Link
-          to="/"
-          className="flex items-center justify-center w-full py-4 transition-all duration-200"
-        >
-          <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
-            <span className="group-data-[collapsible=icon]:hidden">SceneHunter</span>
-            <span className="hidden group-data-[collapsible=icon]:inline">SH</span>
-          </span>
-        </Link>
-        <SidebarSeparator className="w-full" />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.getNavMain(!!user)} />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+    <>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={toggleSidebar}
+        className={cn(
+          "fixed z-50 shadow-md transition-all duration-200 bg-background hover:bg-accent",
+          state === "collapsed"
+            ? "right-[calc(var(--sidebar-width-icon)+0.75rem)]"
+            : "right-[calc(var(--sidebar-width)+0.75rem)]",
+          "top-4 flex items-center justify-center w-8 h-8",
+          isMobile && "right-4 top-4"
+        )}
+        aria-label={state === "expanded" ? "Свернуть боковую панель" : "Развернуть боковую панель"}
+      >
+        <PanelRightIcon className="h-4 w-4" />
+      </Button>
+
+      <Sidebar collapsible="icon" side="right" {...props}>
+        <SidebarHeader>
+          <Link
+            to="/"
+            className="flex items-center justify-center w-full py-4 transition-all duration-200"
+          >
+            <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
+              <span className="sidebar-text-content group-data-[collapsible=icon]:hidden">SceneHunter</span>
+              <span className="hidden group-data-[collapsible=icon]:inline">SH</span>
+            </span>
+          </Link>
+          <SidebarSeparator className="w-full" />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={data.getNavMain(!!user)} />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </>
   );
 }

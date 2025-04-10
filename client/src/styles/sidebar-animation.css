@@ -1,0 +1,85 @@
+:root {
+    --sidebar-collapse-transition: width 0.3s ease;
+    --text-visibility-transition: opacity 0s;
+    --icon-transition: opacity 0.1s ease;
+    --sidebar-animation-duration: 300ms;
+}
+
+[data-sidebar="sidebar"] {
+    transition: var(--sidebar-collapse-transition);
+}
+
+[data-sidebar="menu-button"]>span,
+[data-sidebar="menu-sub-button"]>span,
+[data-sidebar="group-label"],
+.sidebar-text-content {
+    transition: var(--text-visibility-transition);
+}
+
+[data-sidebar="menu-button"]>svg,
+[data-sidebar="menu-sub-button"]>svg {
+    transition: var(--icon-transition);
+}
+
+[data-state="collapsed"] [data-sidebar="menu-button"]>span:not(:first-child),
+[data-state="collapsed"] [data-sidebar="menu-sub-button"]>span,
+[data-state="collapsed"] [data-sidebar="group-label"],
+[data-state="collapsed"] .sidebar-text-content {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-state="expanded"] [data-sidebar="menu-button"]>span:not(:first-child),
+[data-state="expanded"] [data-sidebar="menu-sub-button"]>span,
+[data-state="expanded"] [data-sidebar="group-label"],
+[data-state="expanded"] .sidebar-text-content {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0s var(--sidebar-animation-duration);
+}
+
+[data-sidebar="sidebar"].animating [data-sidebar="menu-button"]>span:not(:first-child),
+[data-sidebar="sidebar"].animating [data-sidebar="menu-sub-button"]>span,
+[data-sidebar="sidebar"].animating [data-sidebar="group-label"],
+[data-sidebar="sidebar"].animating .sidebar-text-content {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-sidebar="sidebar"].animating [data-sidebar="menu-button"]>svg,
+[data-sidebar="sidebar"].animating [data-sidebar="menu-sub-button"]>svg {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-state="collapsed"] [data-sidebar="menu-button"]>svg,
+[data-state="collapsed"] [data-sidebar="menu-sub-button"]>svg,
+[data-state="expanded"] [data-sidebar="menu-button"]>svg,
+[data-state="expanded"] [data-sidebar="menu-sub-button"]>svg {
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-sidebar="menu-button"] .grid,
+.team-name-container {
+    transition: var(--text-visibility-transition);
+}
+
+[data-state="collapsed"] [data-sidebar="menu-button"] .grid,
+[data-state="collapsed"] .team-name-container {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-state="expanded"] [data-sidebar="menu-button"] .grid,
+[data-state="expanded"] .team-name-container {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0s var(--sidebar-animation-duration);
+}
+
+[data-sidebar="sidebar"].animating [data-sidebar="menu-button"] .grid,
+[data-sidebar="sidebar"].animating .team-name-container {
+    opacity: 0;
+    visibility: hidden;
+}
