@@ -15,10 +15,10 @@ export const useTheme = create<ThemeStore>()(
             setTheme: (theme) => {
                 const root = window.document.documentElement;
 
-                root.classList.add("no-transitions");
-
+                // Удаляем классы тем
                 root.classList.remove("light", "dark");
 
+                // Определяем какую тему применить
                 if (theme === "system") {
                     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
                         .matches
@@ -28,14 +28,6 @@ export const useTheme = create<ThemeStore>()(
                 } else {
                     root.classList.add(theme);
                 }
-
-                void root.offsetHeight;
-
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        root.classList.remove("no-transitions");
-                    });
-                });
 
                 set({ theme });
             },
