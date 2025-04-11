@@ -9,17 +9,17 @@
     "icons": [
         {
             "src": "/SceneHunter_LOGO_V2_Logo_only.png",
-            "sizes": "16x16",
+            "sizes": "512x512",
             "type": "image/png"
         },
         {
             "src": "/SceneHunter_LOGO_V2_Logo_only.png",
-            "sizes": "32x32",
+            "sizes": "512x512",
             "type": "image/png"
         },
         {
             "src": "/SceneHunter_LOGO_V2_Logo_only.png",
-            "sizes": "192x192",
+            "sizes": "512x512",
             "type": "image/png"
         },
         {
