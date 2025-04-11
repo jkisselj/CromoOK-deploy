@@ -7,7 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 document.documentElement.classList.add("no-transitions");
-
+//
 const theme = localStorage.getItem("theme-store")
   ? JSON.parse(localStorage.getItem("theme-store")!).state.theme
   : "system";
