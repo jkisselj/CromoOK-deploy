@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import logo from "@/photos/SceneHunter_LOGO_V3_W_TEXT.png";
+//
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
