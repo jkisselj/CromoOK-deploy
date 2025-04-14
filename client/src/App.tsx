@@ -10,6 +10,7 @@ import LocationDetailsPage from "./pages/locations/details";
 import AuthLayout from "./layout/auth-layout";
 import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
+//
 
 export default function App() {
   return (
