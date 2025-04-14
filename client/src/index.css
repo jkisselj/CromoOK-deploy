@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./styles/location-animations.css";
+@import "./styles/sidebar-animation.css";
 
 @plugin "tailwindcss-animate";
 

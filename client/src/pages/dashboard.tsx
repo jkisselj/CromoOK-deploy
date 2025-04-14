@@ -165,8 +165,8 @@ export default function DashboardPage() {
       <section className="w-full py-16 md:py-24 lg:py-32 bg-muted/40">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12" data-aos="fade-up">
-            <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm">Benefits</div>
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Everything You Need For Your Project</h2>
+            <div className="inline-block rounded-lg text-primary-foreground bg-primary/10 px-3 py-1 text-sm">Benefits</div>
+            <h2 className="text-3xl font-bold text-primary-foreground tracking-tighter md:text-4xl">Everything You Need For Your Project</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
               Our platform provides all the tools to find and book the perfect shooting location
             </p>
