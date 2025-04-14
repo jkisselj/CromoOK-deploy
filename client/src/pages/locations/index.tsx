@@ -7,7 +7,6 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
-// import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 
 export default function LocationsPage() {
@@ -15,7 +14,6 @@ export default function LocationsPage() {
     const { user } = useAuthContext();
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Simple search implementation (client-side filtering)
     const filteredLocations = searchQuery
         ? locations?.filter(loc =>
             loc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
