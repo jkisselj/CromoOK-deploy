@@ -201,7 +201,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
               <span className="sidebar-text-content flex items-center justify-center group-data-[collapsible=icon]:hidden">
                 <img
-                  src="/LogoLongBlack.png"
+                  src="/LogoLongBlack.svg"
                   alt="SceneHunter Logo"
                   className="h-auto w-auto dark:hidden block"
                   style={{
@@ -211,7 +211,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   }}
                 />
                 <img
-                  src="/LogoLongWhite.png"
+                  src="/LogoLongWhite.svg"
                   alt="SceneHunter Logo"
                   className="h-auto w-auto dark:block hidden"
                   style={{
@@ -223,9 +223,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </span>
               <span className="hidden group-data-[collapsible=icon]:flex justify-center">
                 <img
-                  src="/LogoBlack.png"
+                  src="/LogoBlack.svg"
                   alt="SH Logo"
-                  className="h-5 w-auto dark:hidden block"
+                  className="h-auto w-auto dark:hidden block"
                   style={{
                     imageRendering: "-webkit-optimize-contrast",
                     transform: "translateZ(0)",
@@ -235,7 +235,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <img
                   src="/LogoWhite.svg"
                   alt="SH Logo"
-                  className="h-5 w-auto dark:block hidden"
+                  className="h-auto w-auto dark:block hidden"
                   style={{
                     imageRendering: "-webkit-optimize-contrast",
                     transform: "translateZ(0)",

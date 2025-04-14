@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const { user } = useAuthContext();
   
 
-  const logo = "/LogoLongWhite.png";
+  const logo = "/LogoLongWhite.svg";
 
   useEffect(() => {
     AOS.init({
