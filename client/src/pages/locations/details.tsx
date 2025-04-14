@@ -103,7 +103,7 @@ export default function LocationDetailsPage() {
                                 </p>
                             </div>
                             <div className="text-right">
-                                <p className="text-2xl font-semibold">{location.price}₽</p>
+                                <p className="text-2xl font-semibold">{location.price}€</p>
                                 <p className="text-muted-foreground">per hour</p>
                             </div>
                         </div>
