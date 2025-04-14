@@ -25,7 +25,7 @@ requestAnimationFrame(() => {
   requestAnimationFrame(() => {
     document.documentElement.classList.remove("no-transitions");
   });
-});
+});//
 
 const queryClient = new QueryClient();
 
