@@ -32,7 +32,6 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the redirectTo path from location state, or use '/' as default
   const from = location.state?.from || "/";
 
   const form = useForm<z.infer<typeof loginSchema>>({

@@ -19,7 +19,7 @@ Features:
 
 The studio has hosted shoots for major fashion brands and magazines. Our space combines modern aesthetics with practical functionality.`,
         address: "123 Creative District, City Center",
-        price: 150, // in EUR
+        price: 150,
         area: 120,
         images: [
             "https://images.unsplash.com/photo-1581859814481-bfd944e3122f?q=80&w=2940&auto=format&fit=crop",
@@ -139,7 +139,6 @@ export function useCreateLocation() {
 
     return useMutation({
         mutationFn: async (location: CreateLocationDTO) => {
-            // Для демонстрации создаем фейковую локацию
             const newLocation = {
                 ...location,
                 id: Date.now().toString(),
@@ -147,7 +146,6 @@ export function useCreateLocation() {
                 updatedAt: new Date().toISOString(),
             };
 
-            // Добавляем новую локацию к существующим
             const existingLocations = queryClient.getQueryData<Location[]>(['locations']) || [];
             queryClient.setQueryData(['locations'], [...existingLocations, newLocation]);
 
@@ -163,11 +161,9 @@ export function useLocation(id: string) {
     return useQuery({
         queryKey: ['location', id],
         queryFn: async () => {
-            // Для демо возвращаем заглушку, если id совпадает
             if (id === DEMO_LOCATIONS[0].id) {
                 return DEMO_LOCATIONS[0];
             }
-            // Ищем в существующих локациях
             const { data: locations } = await supabase
                 .from('locations')
                 .select('*')

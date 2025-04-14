@@ -90,6 +90,18 @@ function SidebarProvider({
   }, [isMobile, setOpen, setOpenMobile])
 
   React.useEffect(() => {
+    if ((isMobile && openMobile) || (!isMobile && open)) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isMobile, open, openMobile]);
+
+  React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&

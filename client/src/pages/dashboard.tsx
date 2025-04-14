@@ -1,23 +1,16 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, Camera, Map, Clock, Shield} from "lucide-react";
+import { ArrowRight, CheckCircle, Camera, Map, Clock, Shield } from "lucide-react";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import logoLight from "@/photos/SceneHunter_LOGO_V3_W_TEXT.png";
-import logoDark from "@/photos/LOGO_SH_BLACK.png";
-import { useTheme } from "@/hooks/use-theme";
-//
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
-  const { theme } = useTheme();
+  
 
-  const isDarkTheme =
-    theme === 'dark' ||
-    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const currentLogo = isDarkTheme ? logoLight : logoDark;
+  const logo = "/LogoLongWhite.png";
 
   useEffect(() => {
     AOS.init({
@@ -55,13 +48,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
-      <div className="w-full flex justify-center py-2 z-10 relative">
-        <img
-          src={currentLogo}
-          alt="SceneHunter Logo"
-          className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain"
-        />
-      </div>
       {/* Hero section */}
       <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/10 z-10"></div>
@@ -75,7 +61,15 @@ export default function DashboardPage() {
         <div className="container px-4 md:px-6 relative z-20">
           <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
             <div className="flex flex-col justify-center space-y-4" data-aos="fade-right">
-
+              <div className="mb-4">
+                <img
+                  src={logo}
+                  alt="SceneHunter Logo"
+                  className="max-w-[240px] md:max-w-[300px] h-auto"
+                  data-aos="fade-down"
+                  data-aos-delay="100"
+                />
+              </div>
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none foreground drop-shadow-md">
                   Find the Perfect Location for Your Shoot

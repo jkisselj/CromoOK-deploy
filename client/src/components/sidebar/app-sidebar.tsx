@@ -177,18 +177,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <>
       <Button
-        variant="outline"
         size="icon"
         onClick={toggleSidebar}
         className={cn(
-          "fixed z-50 shadow-md transition-all duration-200 bg-background hover:bg-accent",
+          "fixed z-50 transition-all duration-200 bg-transparent hover:bg-transparent",
           state === "collapsed"
             ? "right-[calc(var(--sidebar-width-icon)+0.75rem)]"
             : "right-[calc(var(--sidebar-width)+0.75rem)]",
           "top-4 flex items-center justify-center w-8 h-8",
           isMobile && "right-4 top-4"
         )}
-        aria-label={state === "expanded" ? "Свернуть боковую панель" : "Развернуть боковую панель"}
+        aria-label={state === "expanded" ? "Close sidebar menu" : "Open sidebar menu"}
       >
         <PanelRightIcon className="h-4 w-4" />
       </Button>
@@ -200,8 +199,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             className="flex items-center justify-center w-full py-4 transition-all duration-200"
           >
             <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
-              <span className="sidebar-text-content group-data-[collapsible=icon]:hidden">SceneHunter</span>
-              <span className="hidden group-data-[collapsible=icon]:inline">SH</span>
+              <span className="sidebar-text-content flex items-center justify-center group-data-[collapsible=icon]:hidden">
+                <img
+                  src="/LogoLongBlack.png"
+                  alt="SceneHunter Logo"
+                  className="h-auto w-auto dark:hidden block"
+                  style={{
+                    imageRendering: "-webkit-optimize-contrast",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden"
+                  }}
+                />
+                <img
+                  src="/LogoLongWhite.png"
+                  alt="SceneHunter Logo"
+                  className="h-auto w-auto dark:block hidden"
+                  style={{
+                    imageRendering: "-webkit-optimize-contrast",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden"
+                  }}
+                />
+              </span>
+              <span className="hidden group-data-[collapsible=icon]:flex justify-center">
+                <img
+                  src="/LogoBlack.png"
+                  alt="SH Logo"
+                  className="h-5 w-auto dark:hidden block"
+                  style={{
+                    imageRendering: "-webkit-optimize-contrast",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden"
+                  }}
+                />
+                <img
+                  src="/LogoWhite.svg"
+                  alt="SH Logo"
+                  className="h-5 w-auto dark:block hidden"
+                  style={{
+                    imageRendering: "-webkit-optimize-contrast",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden"
+                  }}
+                />
+              </span>
             </span>
           </Link>
           <SidebarSeparator className="w-full" />

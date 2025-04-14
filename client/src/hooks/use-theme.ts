@@ -15,10 +15,8 @@ export const useTheme = create<ThemeStore>()(
             setTheme: (theme) => {
                 const root = window.document.documentElement;
 
-                // Удаляем классы тем
                 root.classList.remove("light", "dark");
 
-                // Определяем какую тему применить
                 if (theme === "system") {
                     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
                         .matches
