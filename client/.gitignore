@@ -26,3 +26,4 @@ dist-ssr
 .env
 
 apphosting.local.yaml
+node_modules
