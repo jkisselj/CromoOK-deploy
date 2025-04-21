@@ -34,7 +34,7 @@ export default function LocationDetailsPage() {
     return (
         <div className="min-h-screen pb-20">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b">
+            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b text-card-foreground">
                 <div className="container flex items-center h-16 gap-4">
                     <Button variant="ghost" size="icon" asChild>
                         <Link to="/locations">
@@ -55,7 +55,7 @@ export default function LocationDetailsPage() {
 
             {/* Gallery */}
             <div className="container mt-6">
-                <div className="grid grid-cols-4 grid-rows-2 gap-2 rounded-xl overflow-hidden aspect-[2/1]">
+                <div className="grid grid-cols-4 grid-rows-2 gap-2 rounded-xl overflow-hidden aspect-[2/1] text-card-foreground">
                     {(location.images.length ? location.images : Array(5).fill(location.images[0])).map((image, index) => (
                         <div
                             key={index}
@@ -84,7 +84,7 @@ export default function LocationDetailsPage() {
             </div>
 
             {/* Content */}
-            <div className="container mt-8">
+            <div className="container mt-8 text-card-foreground">
                 <div className="grid grid-cols-1 md:grid-cols-[1fr,400px] gap-12">
                     {/* Main Content */}
                     <div className="space-y-8">
