@@ -49,6 +49,10 @@ export function NavUser() {
     }
   };
 
+  const handleCancel = () => {
+    setShowLogoutDialog(false);
+  };
+
   if (!user) {
     return (
       <SidebarMenu>
@@ -81,7 +85,7 @@ export function NavUser() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleLogout}>Log out</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

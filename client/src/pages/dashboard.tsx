@@ -8,7 +8,7 @@ import "aos/dist/aos.css";
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
-  
+
 
   const logo = "/LogoLongWhite.svg";
 
@@ -280,7 +280,7 @@ export default function DashboardPage() {
       <footer className="w-full border-t bg-background">
         <div className="container flex flex-col gap-10 px-4 py-10 md:px-6 md:py-16">
           <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
-            <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
+            <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <h3 className="text-xl font-bold text-primary-foreground">SceneHunter</h3>
               </div>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
                 Find the perfect location for photo or video shooting in our collection of unique spaces.
               </p>
             </div>
-            <div className="space-y-4" data-aos="fade-up" data-aos-delay="200">
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold text-primary-foreground">Quick Links</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
                 </li>
               </ul>
             </div>
-            <div className="space-y-4" data-aos="fade-up" data-aos-delay="300">
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold text-primary-foreground">Legal Information</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -333,7 +333,7 @@ export default function DashboardPage() {
                 </li>
               </ul>
             </div>
-            <div className="space-y-4" data-aos="fade-up" data-aos-delay="400">
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold text-primary-foreground">Join Us</h3>
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-muted-foreground">Subscribe to our newsletter for latest updates</p>

@@ -15,9 +15,18 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export function NavMain({ items }: { items: { title: string; url: string; icon: any; isActive?: boolean; items?: { title: string; url: string; icon: any; }[]; }[] }) {
+  const { setOpen, state } = useSidebar();
+
+  const handleItemClick = () => {
+    if (state === "collapsed") {
+      setOpen(true);
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -31,7 +40,7 @@ export function NavMain({ items }: { items: { title: string; url: string; icon: 
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton tooltip={item.title} onClick={handleItemClick}>
                   {item.icon && <item.icon className="size-4" />}
                   <span>{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -42,7 +51,7 @@ export function NavMain({ items }: { items: { title: string; url: string; icon: 
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <Link to={subItem.url}>
+                        <Link to={subItem.url} onClick={handleItemClick}>
                           {subItem.icon && <subItem.icon className="size-4" />}
                           <span>{subItem.title}</span>
                         </Link>

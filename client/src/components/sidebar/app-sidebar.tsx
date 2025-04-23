@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavUser } from "@/components/sidebar/nav-user";
@@ -173,6 +174,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthContext();
   const { toggleSidebar, state } = useSidebar();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+
+    const sidebar = document.querySelector('[data-sidebar="sidebar"]');
+    if (sidebar) {
+      let animationTimeout: NodeJS.Timeout;
+
+      const handleTransition = () => {
+        sidebar.classList.add('animating');
+        clearTimeout(animationTimeout);
+
+        animationTimeout = setTimeout(() => {
+          sidebar.classList.remove('animating');
+        }, 350);
+      };
+
+      sidebar.addEventListener('transitionstart', handleTransition);
+
+      return () => {
+        sidebar.removeEventListener('transitionstart', handleTransition);
+        clearTimeout(animationTimeout);
+      };
+    }
+  }, []);
 
   return (
     <>
