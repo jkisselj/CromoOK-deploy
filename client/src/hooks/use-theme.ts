@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useEffect } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -35,3 +36,29 @@ export const useTheme = create<ThemeStore>()(
         }
     )
 );
+
+export function ThemeWatcher() {
+    const { theme, setTheme } = useTheme();
+    
+    useEffect(() => {
+        setTheme(theme);
+        
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        
+        const updateTheme = () => {
+            if (theme === "system") {
+                const root = window.document.documentElement;
+                root.classList.remove("light", "dark");
+                root.classList.add(mediaQuery.matches ? "dark" : "light");
+            }
+        };
+        
+        mediaQuery.addEventListener("change", updateTheme);
+        
+        return () => {
+            mediaQuery.removeEventListener("change", updateTheme);
+        };
+    }, [theme, setTheme]);
+    
+    return null;
+}

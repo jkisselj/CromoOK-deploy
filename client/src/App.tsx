@@ -10,38 +10,42 @@ import LocationDetailsPage from "./pages/locations/details";
 import AuthLayout from "./layout/auth-layout";
 import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
+import { ThemeWatcher } from "./hooks/use-theme";
 //
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="auth" element={<PublicRoute><AuthLayout /></PublicRoute>}>
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-      </Route>
-
-      <Route path="/" element={<DashboardLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="locations">
-          <Route index element={<LocationsPage />} />
-          <Route path=":id" element={<LocationDetailsPage />} />
+    <>
+      <ThemeWatcher />
+      <Routes>
+        <Route path="auth" element={<PublicRoute><AuthLayout /></PublicRoute>}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
         </Route>
-      </Route>
 
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="locations">
-          <Route path="new" element={<NewLocationPage />} />
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="locations">
+            <Route index element={<LocationsPage />} />
+            <Route path=":id" element={<LocationDetailsPage />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="locations">
+            <Route path="new" element={<NewLocationPage />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 }

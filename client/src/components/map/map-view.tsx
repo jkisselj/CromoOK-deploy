@@ -213,7 +213,6 @@ export function MapView({
                 }
             }
 
-            // Swapping the order of controls
             if (marker.current) {
                 map.current.addControl(new CenterMarkerControl(marker.current), controlPosition);
             }
