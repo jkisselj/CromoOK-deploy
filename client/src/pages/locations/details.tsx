@@ -147,7 +147,7 @@ export default function LocationDetailsPage() {
                                     </div>
                                     <div>
                                         <p className="font-medium">Space</p>
-                                        <p className="text-sm text-muted-foreground">{location.area}м² area</p>
+                                        <p className="text-sm text-muted-foreground">{location.area}m² area</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -222,7 +222,7 @@ export default function LocationDetailsPage() {
                                     <div className="space-y-6">
                                         <div>
                                             <div className="flex items-baseline gap-1 mb-1">
-                                                <span className="text-2xl font-bold">{location.price}₽</span>
+                                                <span className="text-2xl font-bold">{location.price}€</span>
                                                 <span className="text-muted-foreground">/hour</span>
                                             </div>
                                             <div className="flex items-center gap-1 text-sm text-muted-foreground">

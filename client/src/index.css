@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "./styles/location-animations.css";
-@import "./styles/sidebar-animation.css";
 
 @plugin "tailwindcss-animate";
 
@@ -49,9 +47,7 @@
   --map-control-active: var(--muted);
   --map-control-marker-color: var(--primary);
 
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 10s;
+ 
 }
 
 .dark {
@@ -146,82 +142,5 @@
   }
 }
 
-@layer utilities {
-  .sidebar-overlay {
-    @apply fixed inset-0 bg-[var(--overlay-background)] backdrop-blur-[2px] z-30;
-  }
 
-  .sidebar-container {
-    @apply fixed top-0 bottom-0 z-50 transition-transform duration-300 ease-in-out;
-  }
 
-  .sidebar-content {
-    @apply h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border;
-  }
-
-  .sidebar-toggle {
-    @apply absolute top-4 -right-12 transition-transform duration-300 ease-in-out;
-  }
-}
-
-.mapboxgl-ctrl-group {
-  background-color: var(--map-control-bg) !important;
-  border-color: var(--map-control-border) !important;
-}
-
-.mapboxgl-ctrl-group button {
-  background-color: var(--map-control-bg) !important;
-  color: var(--map-control-fg) !important;
-}
-
-.mapboxgl-ctrl-group button:hover {
-  background-color: var(--map-control-hover) !important;
-}
-
-.mapboxgl-ctrl-group button.active {
-  background-color: var(--map-control-active) !important;
-}
-
-.mapboxgl-ctrl-group button svg path,
-.mapboxgl-ctrl-group button svg rect,
-.mapboxgl-ctrl-group button svg circle {
-  fill: var(--map-control-fg) !important;
-  stroke: var(--map-control-fg) !important;
-}
-
-.center-marker-btn svg path {
-  fill: var(--map-control-marker-color) !important;
-  stroke: none !important;
-}
-
-.center-marker-btn:hover svg path {
-  fill: var(--map-control-fg) !important;
-}
-
-.map-center-control {
-  position: absolute !important;
-  bottom: 10px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 1 !important;
-}
-
-.style-switcher-btn {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-}
-
-.style-switcher-dropdown {
-  background-color: var(--map-control-bg) !important;
-  color: var(--map-control-fg) !important;
-  border: 1px solid var(--map-control-border) !important;
-}
-
-.style-switcher-dropdown div:hover {
-  background-color: var(--map-control-hover) !important;
-}
-
-.mapboxgl-ctrl-logo,
-.mapboxgl-ctrl-attrib {
-  display: none !important;
-}
