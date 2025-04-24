@@ -205,7 +205,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         size="icon"
         onClick={toggleSidebar}
         className={cn(
-          "fixed z-50 transition-all duration-200 bg-transparent hover:bg-transparent",
+          "fixed z-50 transition-all duration-400 bg-transparent hover:bg-transparent",
           state === "collapsed"
             ? "right-[calc(var(--sidebar-width-icon)+0.75rem)]"
             : "right-[calc(var(--sidebar-width)+0.75rem)]",
@@ -221,7 +221,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader>
           <Link
             to="/"
-            className="flex items-center justify-center w-full py-4 transition-all duration-200"
+            className="flex items-center justify-center w-full py-auto transition-all duration-300"
           >
             <span className="text-xl font-semibold text-sidebar-foreground transition-all text-center">
               <span className="sidebar-text-content flex items-center justify-center group-data-[collapsible=icon]:hidden">
