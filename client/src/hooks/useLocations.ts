@@ -122,36 +122,132 @@ Features:
     }
 ];
 
+// Ключ для хранения состояния созданных локаций
+const CREATED_LOCATIONS_KEY = 'user-created-locations';
+
 export function useLocations(filters?: LocationFilter) {
-    useAuthContext();
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
 
     return useQuery({
         queryKey: ['locations', filters],
         queryFn: async () => {
-            return DEMO_LOCATIONS;
+            // Получаем данные о созданных пользователем локациях из localStorage
+            let userCreatedLocations: Location[] = [];
+            try {
+                const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
+                if (storedLocations) {
+                    userCreatedLocations = JSON.parse(storedLocations);
+                    console.log('Loaded user created locations from localStorage:', userCreatedLocations);
+                }
+            } catch (err) {
+                console.error('Error reading from localStorage:', err);
+            }
+            
+            // Объединяем демо-локации с созданными пользователем
+            let allLocations = [...DEMO_LOCATIONS];
+            
+            // Добавляем созданные пользователем локации
+            if (userCreatedLocations.length > 0) {
+                allLocations = [...allLocations, ...userCreatedLocations];
+            }
+            
+            // Если есть пользователь, пытаемся получить локации из Supabase
+            if (user) {
+                try {
+                    const { data, error } = await supabase
+                        .from('locations')
+                        .select('*');
+                        
+                    if (error) {
+                        console.error('Error fetching locations from Supabase:', error);
+                    } else if (data && data.length > 0) {
+                        console.log('Got locations from Supabase:', data);
+                        return [...allLocations, ...data] as Location[];
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch from Supabase:', err);
+                }
+            }
+            
+            return allLocations;
         },
+        staleTime: 10000, // Данные считаются свежими в течение 10 секунд
     });
 }
 
 export function useCreateLocation() {
     const queryClient = useQueryClient();
-    useAuthContext();
+    const { user } = useAuthContext();
 
     return useMutation({
         mutationFn: async (location: CreateLocationDTO) => {
-            const newLocation = {
+            const timestamp = new Date().toISOString();
+            const newLocation: Location = {
                 ...location,
-                id: Date.now().toString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+                id: `loc-${Date.now().toString()}`,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+                images: location.images || [],
+                amenities: location.amenities || [],
+                rules: location.rules || [],
+                rating: undefined,
+                reviews: undefined,
+                features: {
+                    maxCapacity: location.features?.maxCapacity || 1,
+                    parkingSpots: location.features?.parkingSpots || 0, 
+                    equipmentIncluded: location.features?.equipmentIncluded || false,
+                    accessibility: location.features?.accessibility || false
+                },
+                coordinates: location.coordinates || {
+                    latitude: 55.7558,
+                    longitude: 37.6173
+                },
+                bookings: {
+                    totalBookings: 0,
+                    averageRating: 0
+                }
             };
 
-            const existingLocations = queryClient.getQueryData<Location[]>(['locations']) || [];
-            queryClient.setQueryData(['locations'], [...existingLocations, newLocation]);
+            // Если есть пользователь и Supabase настроен, сохраняем локацию в Supabase
+            if (user) {
+                try {
+                    const { error } = await supabase
+                        .from('locations')
+                        .insert([newLocation]);
+                    
+                    if (error) {
+                        console.error('Error saving location to Supabase:', error);
+                    }
+                } catch (err) {
+                    console.error('Failed to save to Supabase:', err);
+                }
+            }
+
+            // Сохраняем локацию в localStorage для постоянного хранения
+            try {
+                const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
+                let userCreatedLocations: Location[] = [];
+                
+                if (storedLocations) {
+                    userCreatedLocations = JSON.parse(storedLocations);
+                }
+                
+                userCreatedLocations.push(newLocation);
+                localStorage.setItem(CREATED_LOCATIONS_KEY, JSON.stringify(userCreatedLocations));
+                console.log('Saved new location to localStorage');
+                
+                // Обновляем кеш в React Query
+                const existingLocations = queryClient.getQueryData<Location[]>(['locations']) || [];
+                queryClient.setQueryData(['locations'], [...existingLocations, newLocation]);
+            } catch (err) {
+                console.error('Error saving to localStorage:', err);
+            }
 
             return newLocation;
         },
         onSuccess: () => {
+            // После успешного создания инвалидируем кеш запроса, чтобы заставить его перезагрузиться
             queryClient.invalidateQueries({ queryKey: ['locations'] });
         },
     });
@@ -161,20 +257,48 @@ export function useLocation(id: string) {
     return useQuery({
         queryKey: ['location', id],
         queryFn: async () => {
-            if (id === DEMO_LOCATIONS[0].id) {
-                return DEMO_LOCATIONS[0];
+            // 1. Сначала проверяем демо-локации
+            const demoLocation = DEMO_LOCATIONS.find(loc => loc.id === id);
+            if (demoLocation) {
+                return demoLocation;
             }
-            const { data: locations } = await supabase
-                .from('locations')
-                .select('*')
-                .eq('id', id)
-                .single();
+            
+            // 2. Проверяем локации из localStorage
+            try {
+                const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
+                if (storedLocations) {
+                    const userCreatedLocations: Location[] = JSON.parse(storedLocations);
+                    const userLocation = userCreatedLocations.find(loc => loc.id === id);
+                    if (userLocation) {
+                        console.log('Found location in localStorage:', userLocation);
+                        return userLocation;
+                    }
+                }
+            } catch (err) {
+                console.error('Error reading from localStorage:', err);
+            }
+            
+            // 3. Если локация не найдена локально, пытаемся получить из Supabase
+            try {
+                const { data: location, error } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
 
-            if (!locations) {
-                throw new Error('Location not found');
+                if (error) {
+                    console.error('Error fetching location from Supabase:', error);
+                    throw new Error('Location not found');
+                }
+
+                if (location) {
+                    return location as Location;
+                }
+            } catch (err) {
+                console.error('Failed to fetch location from Supabase:', err);
             }
 
-            return locations as Location;
+            throw new Error('Location not found');
         },
     });
 }
