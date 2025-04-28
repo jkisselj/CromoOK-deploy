@@ -7,6 +7,35 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+const geocoderStyles = `
+  .mapboxgl-ctrl-geocoder {
+    width: 100%;
+    max-width: 100%;
+    font-size: 15px;
+    line-height: 20px;
+    border-radius: 4px;
+  }
+  
+  @media (max-width: 640px) {
+    .mapboxgl-ctrl-geocoder {
+      min-width: 100%;
+    }
+    .mapboxgl-ctrl-geocoder--icon {
+      top: 8px;
+    }
+    .mapboxgl-ctrl-geocoder--input {
+      height: 36px;
+      padding: 6px 35px;
+    }
+    .mapboxgl-ctrl-geocoder--icon-search {
+      left: 7px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+`;
 
 interface LocationPickerProps {
     onLocationSelect?: (location: {
@@ -30,6 +59,18 @@ export function LocationPicker({
     });
     const [address, setAddress] = useState<string>(defaultAddress || '');
     const geocoderContainer = useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
+
+    useEffect(() => {
+        // Добавляем стили для геокодера
+        const styleEl = document.createElement('style');
+        styleEl.innerHTML = geocoderStyles;
+        document.head.appendChild(styleEl);
+
+        return () => {
+            styleEl.remove();
+        };
+    }, []);
 
     useEffect(() => {
         if (!geocoderContainer.current) return;
@@ -38,7 +79,9 @@ export function LocationPicker({
             accessToken: mapboxgl.accessToken || '',
             marker: false,
             placeholder: 'Search for an address...',
-            language: 'ru-RU',
+            language: 'en-US',
+            minLength: isMobile ? 3 : 2,
+            limit: isMobile ? 3 : 5,
         });
 
         geocoder.addTo(geocoderContainer.current);
@@ -60,7 +103,7 @@ export function LocationPicker({
         return () => {
             geocoder.onRemove();
         };
-    }, [defaultAddress]);
+    }, [defaultAddress, isMobile, onLocationSelect]);
 
     const handleMapClick = (lngLat: { lng: number; lat: number }) => {
         setCoordinates({ latitude: lngLat.lat, longitude: lngLat.lng });
@@ -92,24 +135,24 @@ export function LocationPicker({
                 <div
                     ref={geocoderContainer}
                     id="location-search"
-                    className="geocoder"
+                    className="geocoder w-full"
                 />
                 {address && (
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1.5">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1.5 flex-wrap">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
-                        <span>{address}</span>
+                        <span className="break-words">{address}</span>
                     </div>
                 )}
             </div>
-
             <Card className="border rounded-md overflow-hidden">
                 <CardContent className="p-0">
                     <MapView
                         latitude={coordinates.latitude}
                         longitude={coordinates.longitude}
                         onMapClick={handleMapClick}
-                        zoom={13}
-                        className="rounded-none border-0 h-[350px] shadow-none"
+                        zoom={isMobile ? 11 : 13}
+                        className="rounded-none border-0 h-[250px] sm:h-[350px] shadow-none"
+                        controlPosition={isMobile ? 'top-left' : 'top-right'}
                     />
                 </CardContent>
             </Card>
