@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import supabase from '@/lib/supabaseClient';
 import type { Location, LocationFilter, CreateLocationDTO } from '@/types/location';
 import { useAuthContext } from '@/context/AuthContext';
+import { deleteImage } from '@/lib/imageService';
 
 const DEMO_LOCATIONS: Location[] = [
     {
@@ -122,7 +123,6 @@ Features:
     }
 ];
 
-// Ключ для хранения состояния созданных локаций
 const CREATED_LOCATIONS_KEY = 'user-created-locations';
 
 export function useLocations(filters?: LocationFilter) {
@@ -132,7 +132,6 @@ export function useLocations(filters?: LocationFilter) {
     return useQuery({
         queryKey: ['locations', filters],
         queryFn: async () => {
-            // Получаем данные о созданных пользователем локациях из localStorage
             let userCreatedLocations: Location[] = [];
             try {
                 const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
@@ -143,22 +142,19 @@ export function useLocations(filters?: LocationFilter) {
             } catch (err) {
                 console.error('Error reading from localStorage:', err);
             }
-            
-            // Объединяем демо-локации с созданными пользователем
+
             let allLocations = [...DEMO_LOCATIONS];
-            
-            // Добавляем созданные пользователем локации
+
             if (userCreatedLocations.length > 0) {
                 allLocations = [...allLocations, ...userCreatedLocations];
             }
-            
-            // Если есть пользователь, пытаемся получить локации из Supabase
+
             if (user) {
                 try {
                     const { data, error } = await supabase
                         .from('locations')
                         .select('*');
-                        
+
                     if (error) {
                         console.error('Error fetching locations from Supabase:', error);
                     } else if (data && data.length > 0) {
@@ -169,10 +165,10 @@ export function useLocations(filters?: LocationFilter) {
                     console.error('Failed to fetch from Supabase:', err);
                 }
             }
-            
+
             return allLocations;
         },
-        staleTime: 10000, // Данные считаются свежими в течение 10 секунд
+        staleTime: 10000,
     });
 }
 
@@ -195,7 +191,7 @@ export function useCreateLocation() {
                 reviews: undefined,
                 features: {
                     maxCapacity: location.features?.maxCapacity || 1,
-                    parkingSpots: location.features?.parkingSpots || 0, 
+                    parkingSpots: location.features?.parkingSpots || 0,
                     equipmentIncluded: location.features?.equipmentIncluded || false,
                     accessibility: location.features?.accessibility || false
                 },
@@ -209,13 +205,12 @@ export function useCreateLocation() {
                 }
             };
 
-            // Если есть пользователь и Supabase настроен, сохраняем локацию в Supabase
             if (user) {
                 try {
                     const { error } = await supabase
                         .from('locations')
                         .insert([newLocation]);
-                    
+
                     if (error) {
                         console.error('Error saving location to Supabase:', error);
                     }
@@ -224,20 +219,18 @@ export function useCreateLocation() {
                 }
             }
 
-            // Сохраняем локацию в localStorage для постоянного хранения
             try {
                 const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
                 let userCreatedLocations: Location[] = [];
-                
+
                 if (storedLocations) {
                     userCreatedLocations = JSON.parse(storedLocations);
                 }
-                
+
                 userCreatedLocations.push(newLocation);
                 localStorage.setItem(CREATED_LOCATIONS_KEY, JSON.stringify(userCreatedLocations));
                 console.log('Saved new location to localStorage');
-                
-                // Обновляем кеш в React Query
+
                 const existingLocations = queryClient.getQueryData<Location[]>(['locations']) || [];
                 queryClient.setQueryData(['locations'], [...existingLocations, newLocation]);
             } catch (err) {
@@ -247,7 +240,6 @@ export function useCreateLocation() {
             return newLocation;
         },
         onSuccess: () => {
-            // После успешного создания инвалидируем кеш запроса, чтобы заставить его перезагрузиться
             queryClient.invalidateQueries({ queryKey: ['locations'] });
         },
     });
@@ -257,13 +249,11 @@ export function useLocation(id: string) {
     return useQuery({
         queryKey: ['location', id],
         queryFn: async () => {
-            // 1. Сначала проверяем демо-локации
             const demoLocation = DEMO_LOCATIONS.find(loc => loc.id === id);
             if (demoLocation) {
                 return demoLocation;
             }
-            
-            // 2. Проверяем локации из localStorage
+
             try {
                 const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
                 if (storedLocations) {
@@ -277,8 +267,7 @@ export function useLocation(id: string) {
             } catch (err) {
                 console.error('Error reading from localStorage:', err);
             }
-            
-            // 3. Если локация не найдена локально, пытаемся получить из Supabase
+
             try {
                 const { data: location, error } = await supabase
                     .from('locations')
@@ -299,6 +288,89 @@ export function useLocation(id: string) {
             }
 
             throw new Error('Location not found');
+        },
+    });
+}
+
+export function useDeleteLocation() {
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
+
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const isDemoLocation = DEMO_LOCATIONS.some(loc => loc.id === id);
+            if (isDemoLocation) {
+                throw new Error('Demo locations cannot be deleted');
+            }
+
+            try {
+                const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
+                if (storedLocations) {
+                    let userCreatedLocations: Location[] = JSON.parse(storedLocations);
+                    const localLocationIndex = userCreatedLocations.findIndex(loc => loc.id === id);
+
+                    if (localLocationIndex >= 0) {
+                        userCreatedLocations.splice(localLocationIndex, 1);
+                        localStorage.setItem(CREATED_LOCATIONS_KEY, JSON.stringify(userCreatedLocations));
+                        console.log('Location removed from localStorage');
+                        return { success: true, id };
+                    }
+                }
+            } catch (err) {
+                console.error('Error working with localStorage:', err);
+            }
+
+            if (!user) {
+                throw new Error('Authentication required to delete a location');
+            }
+
+            try {
+                const { data: location, error: fetchError } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error retrieving location for deletion:', fetchError);
+                    throw new Error(`Could not find location: ${fetchError.message}`);
+                }
+
+                if (location.ownerId !== user.id) {
+                    throw new Error('You can only delete your own locations');
+                }
+
+                if (location.images && location.images.length > 0) {
+                    await Promise.all(
+                        location.images.map(async (imageUrl: string) => {
+                            try {
+                                await deleteImage(imageUrl);
+                            } catch (err) {
+                                console.warn(`Could not delete image ${imageUrl}:`, err);
+                            }
+                        })
+                    );
+                }
+
+                const { error: deleteError } = await supabase
+                    .from('locations')
+                    .delete()
+                    .eq('id', id);
+
+                if (deleteError) {
+                    console.error('Error deleting location from Supabase:', deleteError);
+                    throw new Error(`Failed to delete location: ${deleteError.message}`);
+                }
+
+                return { success: true, id };
+            } catch (err) {
+                console.error('Failed to delete location:', err);
+                throw err;
+            }
+        },
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({ queryKey: ['locations'] });
+            queryClient.invalidateQueries({ queryKey: ['location', result.id] });
         },
     });
 }

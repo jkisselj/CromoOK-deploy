@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
     ArrowLeft,
     MapPin,
@@ -10,6 +10,7 @@ import {
     Shield,
     AlertCircle,
     CalendarRange,
+    Edit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/useLocations";
@@ -17,11 +18,17 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { MapView } from '@/components/map/map-view';
+import { DeleteLocationDialog } from '@/components/locations/delete-location-dialog';
+import { useAuthContext } from '@/context/AuthContext';
 import { cn } from "@/lib/utils";
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
     const { data: location, isLoading } = useLocation(id!);
+    const { user } = useAuthContext();
+    const navigate = useNavigate();
+
+    const isOwner = user && location?.ownerId === user.id;
 
     if (isLoading) {
         return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -43,6 +50,17 @@ export default function LocationDetailsPage() {
                     </Button>
                     <h1 className="text-xl font-semibold truncate">{location.title}</h1>
                     <div className="ml-auto flex items-center gap-2">
+                        {isOwner && (
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="text-primary"
+                                onClick={() => navigate(`/locations/edit/${location.id}`)}
+                            >
+                                <Edit className="h-4 w-4" />
+                                <span className="sr-only">Редактировать локацию</span>
+                            </Button>
+                        )}
                         <Button variant="ghost" size="icon" aria-label="Share location">
                             <Share2 className="h-4 w-4" />
                         </Button>
@@ -109,6 +127,32 @@ export default function LocationDetailsPage() {
                         </div>
 
                         <Separator />
+
+                        {/* Owner actions - delete button */}
+                        {isOwner && (
+                            <>
+                                <div>
+                                    <h2 className="text-xl font-semibold mb-4">Manage Location</h2>
+                                    <div className="flex flex-wrap gap-3">
+                                        <Button
+                                            variant="outline"
+                                            className="flex items-center gap-2"
+                                            onClick={() => navigate(`/locations/edit/${location.id}`)}
+                                        >
+                                            <Edit className="h-4 w-4" />
+                                            Edit Location
+                                        </Button>
+
+                                        <DeleteLocationDialog
+                                            locationId={location.id}
+                                            locationTitle={location.title}
+                                            isOwner={isOwner}
+                                        />
+                                    </div>
+                                </div>
+                                <Separator />
+                            </>
+                        )}
 
                         {/* Map */}
                         {location.coordinates && (
