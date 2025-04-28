@@ -93,7 +93,6 @@ export default function NewLocationPage() {
                 throw new Error("User not authenticated");
             }
 
-            // Include images that have been uploaded
             const locationData = {
                 ...values,
                 ownerId: user.id,
@@ -146,8 +145,6 @@ export default function NewLocationPage() {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        // Здесь в реальном приложении файлы загружаются на сервер/в хранилище
-        // В демо-версии будем использовать локальные URL
         const newImages = Array.from(files).map(file => URL.createObjectURL(file));
         setUploadedImages([...uploadedImages, ...newImages]);
         form.setValue("images", [...uploadedImages, ...newImages]);
@@ -249,7 +246,7 @@ export default function NewLocationPage() {
                                     name="price"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Price per hour (₽)</FormLabel>
+                                            <FormLabel>Price per hour (€)</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -269,7 +266,7 @@ export default function NewLocationPage() {
                                     name="area"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Area (м²)</FormLabel>
+                                            <FormLabel>Area (m²)</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
