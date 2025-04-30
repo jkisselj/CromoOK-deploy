@@ -41,7 +41,7 @@ export default function LocationDetailsPage() {
     return (
         <div className="min-h-screen pb-20">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b text-card-foreground">
+            <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b text-card-foreground">
                 <div className="container flex items-center h-16 gap-4">
                     <Button variant="ghost" size="icon" asChild>
                         <Link to="/locations">
