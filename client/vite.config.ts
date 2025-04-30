@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN),
       'process.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN),
+    },
+    server: {
+      allowedHosts: true,
     }
   };
 });

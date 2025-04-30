@@ -36,7 +36,7 @@ export default function DashboardPage() {
   }, []);
 
   const locationImages = [
-    "https://vff.ee/wp-content/uploads/2019/04/2014_Näeme-Virumaal_Jaanus-Siim_Selisoo_060176-selisoo-foto-jaanus-siim-1024x511.jpg",
+    "https://vff.ee/wp-content/uploads/2024/01/Rannapungerja-tuletorn_okt2023-EXT-42.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/2012_Virumaa-on-imeline_Vladimir-Gorohhov_kuldne-sugis-oru-pargis-24-1024x768.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/2011_Kontrastiderikas-Virumaa_Karel-Kravik_kontrastid-kaevandusmuuseum-1024x683.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/32410962703_2035979324_o-1024x687.jpg",
@@ -45,6 +45,18 @@ export default function DashboardPage() {
     "https://www.traveller.ee/blog/wp-content/uploads/2016/04/Taust.jpg",
     "https://visitestonia.com/content-images/500775/top-nature-tour-destinations-in-estonia-en-001-visit-estonia.jpg"
   ];
+
+  // Image location mappings (add linking to specific locations)
+  const imageLocationMappings = {
+    0: "1", // First image (Rannapungerja lighthouse) links to location with ID 1
+  };
+
+  // Function to handle image click
+  const handleImageClick = (index: number) => {
+    if (imageLocationMappings[index as keyof typeof imageLocationMappings]) {
+      window.location.href = `/locations/${imageLocationMappings[index as keyof typeof imageLocationMappings]}`;
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
@@ -121,6 +133,7 @@ export default function DashboardPage() {
                 className="overflow-hidden rounded-xl aspect-[4/3]"
                 data-aos="zoom-in"
                 data-aos-delay={100 * index}
+                onClick={() => handleImageClick(index)}
               >
                 <img
                   src={image}
@@ -272,6 +285,55 @@ export default function DashboardPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="w-full py-12 md:py-16 bg-muted/20">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8" data-aos="fade-up">
+            <h2 className="text-2xl font-bold tracking-tighter md:text-3xl text-primary-foreground">Our Partners</h2>
+
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 items-center justify-center py-8">
+            {/* Partner logos without grayscale effect */}
+            <div className="flex items-center justify-center p-4" data-aos="fade-up" data-aos-delay="100">
+              <img
+                src="https://www.tehnopol.ee/wp-content/uploads/2021/01/Tehnopol_logo_RGB.png"
+                alt="Partner 1"
+                className="h-12 md:h-16 w-auto object-contain scale-150"
+              />
+            </div>
+            <div className="flex items-center justify-center p-4" data-aos="fade-up" data-aos-delay="200">
+              <img
+                src="https://www.tehnopol.ee/wp-content/uploads/2021/01/TSI_logo_ENG_RGB.png"
+                alt="Partner 2"
+                className="h-12 md:h-16 w-auto object-contain scale-150"
+              />
+            </div>
+            <div className="flex items-center justify-center p-4" data-aos="fade-up" data-aos-delay="300">
+              <img
+                src="/partners/VFF_LOGO.png"
+                alt="Partner 3"
+                className="h-12 md:h-16 w-auto object-contain"
+              />
+            </div>
+            <div className="flex items-center justify-center p-4" data-aos="fade-up" data-aos-delay="300">
+              <img
+                src="/partners/IH_Logo.png"
+                alt="Partner 3"
+                className="h-12 md:h-16 w-auto object-contain scale-150"
+              />
+            </div>
+            <div className="flex items-center justify-center p-4" data-aos="fade-up" data-aos-delay="300">
+              <img
+                src="/partners/EUIF_Logo.png"
+                alt="Partner 3"
+                className="h-12 md:h-16 w-auto object-contain scale-250"
+              />
+            </div>
           </div>
         </div>
       </section>

@@ -7,61 +7,72 @@ import { deleteImage } from '@/lib/imageService';
 const DEMO_LOCATIONS: Location[] = [
     {
         id: "1",
-        title: "Luxury Photography Studio in City Center",
-        description: `A stunning, professionally equipped photography studio in the heart of the city. Perfect for fashion shoots, portraits, and commercial photography.
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
 
 Features:
-• Large windows with natural lighting
-• Professional lighting equipment included
-• Makeup and changing room
-• High ceilings (4m)
-• Sound system
-• Free parking
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
 
-The studio has hosted shoots for major fashion brands and magazines. Our space combines modern aesthetics with practical functionality.`,
-        address: "123 Creative District, City Center",
-        price: 150,
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
         area: 120,
         images: [
-            "https://images.unsplash.com/photo-1581859814481-bfd944e3122f?q=80&w=2940&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=2940&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366672149-e5e4b4d34eb3?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=2940"
+           "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-46.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-42.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png"
         ],
         amenities: [
-            "Natural Lighting",
-            "Professional Lighting Kit",
-            "Makeup Room",
-            "Wi-Fi",
-            "Sound System",
-            "Air Conditioning",
-            "Changing Room",
-            "Free Parking",
-            "Security System",
-            "Loading Dock"
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
         ],
         rules: [
-            "Minimum booking: 2 hours",
-            "50% deposit required",
-            "24-hour cancellation policy",
-            "No smoking",
-            "Clean after use",
-            "Equipment insurance required"
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
         ],
         ownerId: "demo-user",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: "published",
         coordinates: {
-            latitude: 51.5074,
-            longitude: -0.1278
+            latitude: 58.97948457196772, 
+            longitude: 27.17564623627185
         },
         features: {
-            maxCapacity: 15,
+            maxCapacity: 8,
             parkingSpots: 3,
-            equipmentIncluded: true,
-            accessibility: true,
+            equipmentIncluded: false,
+            accessibility: false,
         }
     },
     {
@@ -126,7 +137,6 @@ Features:
 const CREATED_LOCATIONS_KEY = 'user-created-locations';
 
 export function useLocations(filters?: LocationFilter) {
-    const queryClient = useQueryClient();
     const { user } = useAuthContext();
 
     return useQuery({
