@@ -30,7 +30,7 @@ Available for private bookings with flexible hours to catch the perfect light co
         price: 90,
         area: 120,
         images: [
-           "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
             "/locations/Rannapungerja-tuletorn_okt2023-EXT-46.png",
             "/locations/Rannapungerja-tuletorn_okt2023-EXT-42.png",
             "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png",
@@ -65,7 +65,7 @@ Available for private bookings with flexible hours to catch the perfect light co
         updatedAt: new Date().toISOString(),
         status: "published",
         coordinates: {
-            latitude: 58.97948457196772, 
+            latitude: 58.97948457196772,
             longitude: 27.17564623627185
         },
         features: {
@@ -77,30 +77,31 @@ Available for private bookings with flexible hours to catch the perfect light co
     },
     {
         id: "2",
-        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
-        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
+        title: "Kohtla-Nõmme Mining Museum - Industrial Heritage Filming Location",
+        description: `Step into Estonia's industrial past at the historic Kohtla-Nõmme Mining Museum - an extraordinary filming and photography location showcasing authentic mining heritage. This former coal mine complex offers a wealth of unique settings for creative projects requiring industrial atmosphere, historical backdrops, or dramatic underground spaces.
 
 Features:
-• Working lighthouse with accessible viewing platform offering 360° panoramic views
-• Authentic maritime atmosphere with original historical elements preserved
-• Beautiful sandy beach adjacent to the lighthouse 
-• Perfect location for sunrise/sunset photography with stunning natural light
-• Surrounded by pristine nature and pine forests
-• Seasonal variations provide diverse photographic opportunities year-round
-• Secluded location ensures privacy during your shoot
+• Expansive industrial complex with preserved mining structures dating back to 1937
+• Underground mining tunnels and caverns accessible at 8 meters below ground
+• Authentic industrial machinery, equipment, and tools in their original setting
+• Dramatic contrasts between underground darkness and natural daylight
+• Striking industrial architecture with distinctive Soviet-era design elements
+• Various textures including rough stone walls, metal structures, and wooden supports
+• Unique mining railroad with vintage carriages and locomotives
+• Both interior and exterior shooting locations with diverse visual appeal
 
-The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+The museum complex features multiple buildings with authentic industrial interiors, a preserved mining control room with vintage equipment, workshop areas, and the impressive underground tunnel network that extends for hundreds of meters beneath the surface. The atmospheric underground spaces provide exceptional acoustic properties and dramatic lighting opportunities.
 
-This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+Above ground, the industrial landscape includes the imposing main building with its distinctive tower, various outbuildings, vintage mining equipment displays, and railway tracks with historic locomotives and coal wagons.
 
-The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+This location is ideal for historical documentaries, period films, science fiction productions, music videos, fashion photography with industrial themes, and any project requiring authentic industrial settings with high visual impact. The stark contrasts, unusual spaces, and historic atmosphere offer endless creative possibilities that cannot be recreated in a studio setting.
 
-Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
-        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
-        price: 90,
-        area: 120,
+Available for exclusive bookings with experienced local staff who can assist with logistical support and provide historical context for your creative project.`,
+        address: "Jaama tn 100, Kohtla-Nõmme, 30503 Ida-Viru maakond, Estonia",
+        price: 120,
+        area: 1500,
         images: [
-           "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
             "/locations/Kaevandusmuuseum_okt2023-EXT-2.jpg",
             "/locations/Kaevandusmuuseum_okt2023-EXT-3.jpg",
             "/locations/Kaevandusmuuseum_okt2023-EXT-4.jpg",
@@ -155,47 +156,46 @@ Available for private bookings with flexible hours to catch the perfect light co
             "/locations/Kaevandusmuuseum_okt2023-INT-53.jpg",
             "/locations/Kaevandusmuuseum_okt2023-INT-54.jpg",
             "/locations/Kaevandusmuuseum_okt2023-INT-55.jpg",
-            "/locations/Kaevandusmuuseum_okt2023-INT-57.jpg",
-
-
-
-
+            "/locations/Kaevandusmuuseum_okt2023-INT-57.jpg"
         ],
         amenities: [
-            "Panoramic Lake Views",
-            "Access to Viewing Platform",
-            "Sandy Beach Access",
-            "Heated Interior in Winter",
-            "Parking Available",
-            "Professional Lighting Setup",
-            "Changing Room/Restroom",
-            "Evening Photography Options",
-            "Historical Location",
-            "Natural Landscapes",
-            "Original Maritime Features"
+            "Underground Mine Access",
+            "Industrial Architecture",
+            "Historic Mining Equipment",
+            "Railway Tracks & Locomotives",
+            "Multiple Building Access",
+            "Large Exterior Spaces",
+            "Control Room Settings",
+            "Industrial Machinery",
+            "Professional Lighting Available",
+            "Exhibition Halls",
+            "Vintage Equipment Displays",
+            "Museum Staff Support"
         ],
         rules: [
             "Advance Booking Required",
-            "Minimum Booking: 2 Hours",
+            "Minimum Booking: 4 Hours",
             "100% Prepayment Required",
-            "48-Hour Cancellation Policy",
-            "Maximum 8 People on Site",
-            "No Interference with Lighthouse Operation",
-            "Drone Usage Requires Special Permission",
-            "Respect Natural Environment",
-            "No Open Fires on Beach"
+            "72-Hour Cancellation Policy",
+            "Maximum 15 People for Underground Shoots",
+            "Safety Briefing Mandatory",
+            "Hard Hats Required Underground",
+            "Museum Staff Escort Required",
+            "No Modification of Historic Elements",
+            "Insurance Certificate Required",
+            "No Open Flames or Pyrotechnics"
         ],
         ownerId: "demo-user",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: "published",
         coordinates: {
-            latitude: 58.97948457196772, 
-            longitude: 27.17564623627185
+            latitude: 59.3534,
+            longitude: 27.1799
         },
         features: {
-            maxCapacity: 8,
-            parkingSpots: 3,
+            maxCapacity: 15,
+            parkingSpots: 10,
             equipmentIncluded: false,
             accessibility: false,
         }
@@ -225,11 +225,133 @@ Available for private bookings with flexible hours to catch the perfect light co
         price: 90,
         area: 120,
         images: [
-           "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
-            "/locations/Rannapungerja-tuletorn_okt2023-EXT-46.png",
-            "/locations/Rannapungerja-tuletorn_okt2023-EXT-42.png",
-            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png",
-            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png"
+            "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-2.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-3.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-4.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-5.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-6.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-7.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-8.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-9.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-10.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-11.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-12.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-13.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-14-2.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-14.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-15.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-16.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-17.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-18.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-20.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-21.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-22.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-23.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-24.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-25.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-26.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-27.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-28.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-29.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-30.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-31.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-32.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-33.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-34.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-37.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-38.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-39.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-45.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-52.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-53.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-56.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-57.jpg",
+            "/locations/Kreenholm-Narva-nov2023_EXT-60.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-1.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-2.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-3.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-4.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-5.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-6.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-7.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-8.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-10.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-11.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-12.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-13.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-14.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-15.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-16.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-17.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-18.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-19.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-20.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-21.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-22.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-23.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-24.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-25.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-26.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-27.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-28.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-29.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-32.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-33.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-35.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-36.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-37.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-38.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-39.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-41.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-48.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-49.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-50.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-51.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-56.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-57.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-58.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-61.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-62.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-63.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-64.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-65.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-66.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-67.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-69.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-70.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-71.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-72.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-73.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-74.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-83.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-84.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-85.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-86.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-87.jpg",
+            "/locations/Kreenholm-Narva-nov2023_INT-88.jpg",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         ],
         amenities: [
             "Panoramic Lake Views",
@@ -260,7 +382,7 @@ Available for private bookings with flexible hours to catch the perfect light co
         updatedAt: new Date().toISOString(),
         status: "published",
         coordinates: {
-            latitude: 58.97948457196772, 
+            latitude: 58.97948457196772,
             longitude: 27.17564623627185
         },
         features: {
@@ -270,8 +392,8 @@ Available for private bookings with flexible hours to catch the perfect light co
             accessibility: false,
         }
     },
-    
-    
+
+
 ];
 
 const CREATED_LOCATIONS_KEY = 'user-created-locations';
