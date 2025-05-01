@@ -683,6 +683,171 @@ Available for private bookings with flexible hours to catch the perfect light co
             accessibility: false,
         }
     },
+    {
+        id: "7",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
+
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
+
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        minimumBookingHours: 2,
+        images: [
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-2.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-1.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-4.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-5.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-6.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-7.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-8.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-9.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-10.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-11.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-12.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-13.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-14.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-15.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-16.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-20.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-21.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-23.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-24.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-25.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-27.jpg",
+            "/locations/Sinimae-vaatetorn_okt2023-EXT-29.jpg",
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772,
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
+    {
+        id: "8",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
+
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
+
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        minimumBookingHours: 2,
+        images: [
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-1.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-2.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-3.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-4.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-5.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-6.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-9.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-10.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-11.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-13.jpg",
+            "/locations/Kivioli-Tuhamagi_okt2023-EXT-14.jpg",
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772,
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
 ];
 
 const CREATED_LOCATIONS_KEY = 'user-created-locations';

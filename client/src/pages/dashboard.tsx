@@ -42,8 +42,8 @@ export default function DashboardPage() {
     "/locations/Valaste-juga_okt2023-EXT-16.jpg",
     "/locations/Narva-Aleksandri-kirik_okt2023-EXT-1.jpg",
     "/locations/Sompa-Klubi_okt2023-EXT-4.jpg",
-    "https://www.traveller.ee/blog/wp-content/uploads/2016/04/Taust.jpg",
-    "https://visitestonia.com/content-images/500775/top-nature-tour-destinations-in-estonia-en-001-visit-estonia.jpg"
+    "/locations/Sinimae-vaatetorn_okt2023-EXT-2.jpg",
+    "/locations/Kivioli-Tuhamagi_okt2023-EXT-1.jpg"
   ];
 
   // Image location mappings (add linking to specific locations)
@@ -54,6 +54,8 @@ export default function DashboardPage() {
     3: "4", // Fourth image (Valaste waterfall) links to location with ID 4
     4: "5", // Fifth image (Narva-Aleksandri-kirik) links to location with ID 5
     5: "6", // Sixth image (Sompa-Klubi) links to location with ID 6
+    6: "7", // Seventh image (Taust) links to location with ID 7
+    7: "8", // Eighth image (Kivioli-Tuhamagi) links to location with ID 8
   };
 
   // Function to handle image click
