@@ -77,61 +77,201 @@ Available for private bookings with flexible hours to catch the perfect light co
     },
     {
         id: "2",
-        title: "Industrial Loft Studio with Skyline View",
-        description: `An industrial-style photo studio with breathtaking city views. This unique space features exposed brick walls, large industrial windows, and modern amenities.
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
 
 Features:
-• Panoramic city views
-• Industrial aesthetic
-• Multiple shooting areas
-• Full kitchen for food photography
-• Private elevator access
-• 24/7 availability`,
-        address: "456 Warehouse District, Downtown",
-        price: 200,
-        area: 180,
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
+
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
         images: [
-            "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366672149-e5e4b4d34eb3?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=2940",
-            "https://images.unsplash.com/photo-1497366754035-5f07c98bf623?q=80&w=2940"
+           "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-2.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-3.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-4.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-6.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-9.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-EXT-10.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-1.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-2.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-3.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-5.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-6.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-7.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-8.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-9.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-10.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-11.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-12.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-13.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-14.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-15.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-16.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-19.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-20.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-21.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-22.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-23.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-24.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-25.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-26.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-28.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-29.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-30.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-32.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-33.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-34.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-36.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-37.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-38.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-39.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-40.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-41.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-42.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-43.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-44.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-45.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-46.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-48.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-49.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-50.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-51.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-52.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-53.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-54.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-55.jpg",
+            "/locations/Kaevandusmuuseum_okt2023-INT-57.jpg",
+
+
+
+
         ],
         amenities: [
-            "City View",
-            "Full Kitchen",
-            "Private Elevator",
-            "Loading Dock",
-            "24/7 Access",
-            "Climate Control",
-            "Equipment Storage",
-            "Backup Generator",
-            "Security System",
-            "Green Screen"
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
         ],
         rules: [
-            "Minimum booking: 4 hours",
-            "Full payment required in advance",
-            "48-hour cancellation policy",
-            "No pets allowed",
-            "Catering must be approved",
-            "Insurance required"
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
         ],
         ownerId: "demo-user",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: "published",
         coordinates: {
-            latitude: 51.5074,
-            longitude: -0.1278
+            latitude: 58.97948457196772, 
+            longitude: 27.17564623627185
         },
         features: {
-            maxCapacity: 25,
-            parkingSpots: 5,
-            equipmentIncluded: true,
-            accessibility: true,
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
         }
-    }
+    },
+    {
+        id: "3",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
+
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
+
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        images: [
+           "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-46.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-42.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png",
+            "/locations/Rannapungerja-tuletorn_okt2023-EXT-49.png"
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772, 
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
+    
+    
 ];
 
 const CREATED_LOCATIONS_KEY = 'user-created-locations';

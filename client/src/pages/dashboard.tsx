@@ -36,8 +36,8 @@ export default function DashboardPage() {
   }, []);
 
   const locationImages = [
-    "https://vff.ee/wp-content/uploads/2024/01/Rannapungerja-tuletorn_okt2023-EXT-42.jpg",
-    "https://vff.ee/wp-content/uploads/2019/04/2012_Virumaa-on-imeline_Vladimir-Gorohhov_kuldne-sugis-oru-pargis-24-1024x768.jpg",
+    "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
+    "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/2011_Kontrastiderikas-Virumaa_Karel-Kravik_kontrastid-kaevandusmuuseum-1024x683.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/32410962703_2035979324_o-1024x687.jpg",
     "https://vff.ee/wp-content/uploads/2019/04/2011_Virumaa-loodus_Elina-Nikolas_csc-7242-1024x683.jpg",
@@ -49,6 +49,7 @@ export default function DashboardPage() {
   // Image location mappings (add linking to specific locations)
   const imageLocationMappings = {
     0: "1", // First image (Rannapungerja lighthouse) links to location with ID 1
+    1: "2", // Second image (Kaevandusmuuseum) links to location with ID 2
   };
 
   // Function to handle image click
