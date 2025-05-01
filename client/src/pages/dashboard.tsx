@@ -2,13 +2,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Camera, Map, Clock, Shield } from "lucide-react";
 import { useAuthContext } from "@/hooks/useAuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import supabase from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
-
+  const [locations, setLocations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const logo = "/LogoLongWhite.svg";
 
@@ -35,33 +37,53 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const locationImages = [
-    "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
-    "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
-    "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
-    "/locations/Valaste-juga_okt2023-EXT-16.jpg",
-    "/locations/Narva-Aleksandri-kirik_okt2023-EXT-1.jpg",
-    "/locations/Sompa-Klubi_okt2023-EXT-4.jpg",
-    "/locations/Sinimae-vaatetorn_okt2023-EXT-2.jpg",
-    "/locations/Kivioli-Tuhamagi_okt2023-EXT-1.jpg"
-  ];
+  // Load locations from Supabase when page loads
+  useEffect(() => {
+    async function fetchLocations() {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, title, images')
+          .order('id', { ascending: true })
+          .limit(8);
 
-  // Image location mappings (add linking to specific locations)
-  const imageLocationMappings = {
-    0: "1", // First image (Rannapungerja lighthouse) links to location with ID 1
-    1: "2", // Second image (Kaevandusmuuseum) links to location with ID 2
-    2: "3", // Third image (Kreenholm) links to location with ID 3
-    3: "4", // Fourth image (Valaste waterfall) links to location with ID 4
-    4: "5", // Fifth image (Narva-Aleksandri-kirik) links to location with ID 5
-    5: "6", // Sixth image (Sompa-Klubi) links to location with ID 6
-    6: "7", // Seventh image (Taust) links to location with ID 7
-    7: "8", // Eighth image (Kivioli-Tuhamagi) links to location with ID 8
-  };
+        if (error) {
+          console.error('Error loading locations:', error);
+          return;
+        }
 
-  // Function to handle image click
+        if (data && data.length > 0) {
+          setLocations(data);
+        }
+      } catch (error) {
+        console.error('Error loading locations:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLocations();
+  }, []);
+
+  // Prepare image array from loaded locations
+  const locationImages = locations.length > 0 
+    ? locations.map(location => location.images && location.images.length > 0 ? location.images[0] : null)
+    : [
+        "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
+        "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
+        "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
+        "/locations/Valaste-juga_okt2023-EXT-16.jpg",
+        "/locations/Narva-Aleksandri-kirik_okt2023-EXT-1.jpg",
+        "/locations/Sompa-Klubi_okt2023-EXT-4.jpg",
+        "/locations/Sinimae-vaatetorn_okt2023-EXT-2.jpg",
+        "/locations/Kivioli-Tuhamagi_okt2023-EXT-1.jpg"
+      ];
+
+  // Function to handle click on an image
   const handleImageClick = (index: number) => {
-    if (imageLocationMappings[index as keyof typeof imageLocationMappings]) {
-      window.location.href = `/locations/${imageLocationMappings[index as keyof typeof imageLocationMappings]}`;
+    if (locations.length > 0 && index < locations.length) {
+      window.location.href = `/locations/${locations[index].id}`;
     }
   };
 
