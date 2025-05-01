@@ -18,6 +18,8 @@ import {
     Check,
     X,
     ChevronLeft,
+    MinusCircle,
+    PlusCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/useLocations";
@@ -40,7 +42,15 @@ export default function LocationDetailsPage() {
     const [showGallery, setShowGallery] = useState(false);
     const [showFullscreenImage, setShowFullscreenImage] = useState(false);
 
+    const [bookingHours, setBookingHours] = useState(2);
+
     const [autoplayPaused, setAutoplayPaused] = useState(false);
+
+    useEffect(() => {
+        if (location?.minimumBookingHours) {
+            setBookingHours(location.minimumBookingHours);
+        }
+    }, [location]);
 
     useEffect(() => {
         if (autoplayPaused) return;
@@ -253,7 +263,7 @@ export default function LocationDetailsPage() {
                                     </div>
                                     <div className="flex items-center gap-1.5 text-muted-foreground">
                                         <Clock className="h-4 w-4" />
-                                        <span>Min 2h</span>
+                                        <span>Min {location.minimumBookingHours || 2}h</span>
                                     </div>
                                 </div>
 
@@ -281,6 +291,38 @@ export default function LocationDetailsPage() {
                                         </Button>
                                     </div>
 
+                                    <div className="flex items-center justify-between p-3 border rounded-md h-14">
+                                        <div className="flex flex-col items-start">
+                                            <span className="text-xs text-muted-foreground">Duration</span>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <Clock className="h-4 w-4" />
+                                                <span>{bookingHours} hours</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const minHours = location.minimumBookingHours || 2;
+                                                    if (bookingHours > minHours) {
+                                                        setBookingHours(bookingHours - 1);
+                                                    }
+                                                }}
+                                                disabled={bookingHours <= (location.minimumBookingHours || 2)}
+                                            >
+                                                <MinusCircle className="h-5 w-5" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setBookingHours(bookingHours + 1)}
+                                            >
+                                                <PlusCircle className="h-5 w-5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
                                     <Button variant="outline" className="w-full h-14 text-left justify-start p-3">
                                         <div className="flex flex-col items-start">
                                             <span className="text-xs text-muted-foreground">Guests</span>
@@ -297,17 +339,17 @@ export default function LocationDetailsPage() {
                                 {/* Price breakdown */}
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between">
-                                        <span>{location.price}€ × 2 hours</span>
-                                        <span>{location.price * 2}€</span>
+                                        <span>{location.price}€ × {bookingHours} hours</span>
+                                        <span>{location.price * bookingHours}€</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>Service fee</span>
-                                        <span>{Math.round(location.price * 0.1)}€</span>
+                                        <span>{Math.round(location.price * bookingHours * 0.1)}€</span>
                                     </div>
                                     <Separator className="my-2" />
                                     <div className="flex justify-between font-semibold">
                                         <span>Total</span>
-                                        <span>{location.price * 2 + Math.round(location.price * 0.1)}€</span>
+                                        <span>{location.price * bookingHours + Math.round(location.price * bookingHours * 0.1)}€</span>
                                     </div>
                                 </div>
 

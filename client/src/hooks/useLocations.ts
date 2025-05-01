@@ -29,6 +29,7 @@ Available for private bookings with flexible hours to catch the perfect light co
         address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
         price: 90,
         area: 120,
+        minimumBookingHours: 2,
         images: [
             "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
             "/locations/Rannapungerja-tuletorn_okt2023-EXT-46.png",
@@ -100,6 +101,7 @@ Available for exclusive bookings with experienced local staff who can assist wit
         address: "Jaama tn 100, Kohtla-Nõmme, 30503 Ida-Viru maakond, Estonia",
         price: 120,
         area: 1500,
+        minimumBookingHours: 4,
         images: [
             "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
             "/locations/Kaevandusmuuseum_okt2023-EXT-2.jpg",
@@ -224,6 +226,8 @@ Available for private bookings with flexible hours to catch the perfect light co
         address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
         price: 90,
         area: 120,
+        minimumBookingHours: 5,
+
         images: [
             "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
             "/locations/Kreenholm-Narva-nov2023_EXT-2.jpg",
@@ -331,27 +335,100 @@ Available for private bookings with flexible hours to catch the perfect light co
             "/locations/Kreenholm-Narva-nov2023_INT-86.jpg",
             "/locations/Kreenholm-Narva-nov2023_INT-87.jpg",
             "/locations/Kreenholm-Narva-nov2023_INT-88.jpg",
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 5 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772,
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
+    {
+        id: "4",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
 
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
 
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
 
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
 
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        minimumBookingHours: 2,
+        images: [
+            "/locations/Valaste-juga_okt2023-EXT-16.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-3.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-2.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-1.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-4.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-5.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-6.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-7.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-8.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-9.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-10.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-11.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-12.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-14.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-16.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-17.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-18.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-19.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-20.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-22.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-24.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-25.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-26.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-32.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-33.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-34.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-37.jpg",
+            "/locations/Valaste-juga_okt2023-EXT-38.jpg",
         ],
         amenities: [
             "Panoramic Lake Views",
@@ -392,8 +469,220 @@ Available for private bookings with flexible hours to catch the perfect light co
             accessibility: false,
         }
     },
+    {
+        id: "5",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
 
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
 
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        minimumBookingHours: 2,
+        images: [
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-1.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-2.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-3.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-4.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-5.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-6.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-7.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-8.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-9.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-10.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-EXT-12.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-1.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-3.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-4.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-5.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-6.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-7.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-8.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-9.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-10.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-11.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-12.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-13.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-14.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-16.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-21.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-22.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-24.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-25.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-27.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-28.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-29.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-30.jpg",
+            "/locations/Narva-Aleksandri-kirik_okt2023-INT-32.jpg",
+
+            
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772,
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
+    {
+        id: "6",
+        title: "Rannapungerja Lighthouse - Unique Photoshoot Location",
+        description: `Discover the hidden gem of Estonia's northern coast - the historic Rannapungerja Lighthouse, now available as an exclusive photoshoot location. This functioning lighthouse stands as a sentinel over the peaceful shores of Lake Peipus, offering a truly unique setting for photographers and filmmakers.
+
+Features:
+• Working lighthouse with accessible viewing platform offering 360° panoramic views
+• Authentic maritime atmosphere with original historical elements preserved
+• Beautiful sandy beach adjacent to the lighthouse 
+• Perfect location for sunrise/sunset photography with stunning natural light
+• Surrounded by pristine nature and pine forests
+• Seasonal variations provide diverse photographic opportunities year-round
+• Secluded location ensures privacy during your shoot
+
+The lighthouse interior features original spiral staircase, vintage nautical elements, and charming details that create atmospheric backdrops. From the viewing platform, capture breathtaking vistas of Lake Peipus and the surrounding unspoiled coastline.
+
+This location is ideal for wedding photography, fashion shoots, maritime-themed commercial work, landscape photography, portrait sessions, and artistic projects requiring a unique setting. The contrast between the structured architecture of the lighthouse and the natural beauty of the surrounding beach and forest offers endless creative possibilities.
+
+The sandy beach provides additional shooting space with natural dunes and coastal vegetation adding texture and interest to your compositions.
+
+Available for private bookings with flexible hours to catch the perfect light conditions for your project.`,
+        address: "Rannapungerja, 42208 Ida-Viru County, Estonia",
+        price: 90,
+        area: 120,
+        minimumBookingHours: 2,
+        images: [
+            "/locations/Sompa-Klubi_okt2023-EXT-4.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-1.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-2.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-3.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-5.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-6.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-7.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-8.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-9.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-10.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-11.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-12.jpg",
+            "/locations/Sompa-Klubi_okt2023-EXT-13.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-2.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-1.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-3.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-5.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-6.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-8.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-9.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-10.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-11.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-12.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-14.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-15.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-16.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-18.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-19.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-20.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-21.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-22.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-23.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-24.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-25.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-26.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-27.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-28.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-29.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-30.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-31.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-32.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-34.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-35.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-39.jpg",
+            "/locations/Sompa-Klubi_okt2023-INT-42.jpg",
+            
+        ],
+        amenities: [
+            "Panoramic Lake Views",
+            "Access to Viewing Platform",
+            "Sandy Beach Access",
+            "Heated Interior in Winter",
+            "Parking Available",
+            "Professional Lighting Setup",
+            "Changing Room/Restroom",
+            "Evening Photography Options",
+            "Historical Location",
+            "Natural Landscapes",
+            "Original Maritime Features"
+        ],
+        rules: [
+            "Advance Booking Required",
+            "Minimum Booking: 2 Hours",
+            "100% Prepayment Required",
+            "48-Hour Cancellation Policy",
+            "Maximum 8 People on Site",
+            "No Interference with Lighthouse Operation",
+            "Drone Usage Requires Special Permission",
+            "Respect Natural Environment",
+            "No Open Fires on Beach"
+        ],
+        ownerId: "demo-user",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "published",
+        coordinates: {
+            latitude: 58.97948457196772,
+            longitude: 27.17564623627185
+        },
+        features: {
+            maxCapacity: 8,
+            parkingSpots: 3,
+            equipmentIncluded: false,
+            accessibility: false,
+        }
+    },
 ];
 
 const CREATED_LOCATIONS_KEY = 'user-created-locations';

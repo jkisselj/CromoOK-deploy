@@ -39,9 +39,9 @@ export default function DashboardPage() {
     "/locations/Rannapungerja-tuletorn_okt2023-EXT-45.png",
     "/locations/Kaevandusmuuseum_okt2023-EXT-1.jpg",
     "/locations/Kreenholm-Narva-nov2023_EXT-54.jpg",
-    "https://vff.ee/wp-content/uploads/2019/04/32410962703_2035979324_o-1024x687.jpg",
-    "https://vff.ee/wp-content/uploads/2019/04/2011_Virumaa-loodus_Elina-Nikolas_csc-7242-1024x683.jpg",
-    "https://vff.ee/wp-content/uploads/2019/04/2011_Kontrastiderikas-Virumaa_Aleksandr-Korb_losi-1024x625.jpg",
+    "/locations/Valaste-juga_okt2023-EXT-16.jpg",
+    "/locations/Narva-Aleksandri-kirik_okt2023-EXT-1.jpg",
+    "/locations/Sompa-Klubi_okt2023-EXT-4.jpg",
     "https://www.traveller.ee/blog/wp-content/uploads/2016/04/Taust.jpg",
     "https://visitestonia.com/content-images/500775/top-nature-tour-destinations-in-estonia-en-001-visit-estonia.jpg"
   ];
@@ -51,6 +51,9 @@ export default function DashboardPage() {
     0: "1", // First image (Rannapungerja lighthouse) links to location with ID 1
     1: "2", // Second image (Kaevandusmuuseum) links to location with ID 2
     2: "3", // Third image (Kreenholm) links to location with ID 3
+    3: "4", // Fourth image (Valaste waterfall) links to location with ID 4
+    4: "5", // Fifth image (Narva-Aleksandri-kirik) links to location with ID 5
+    5: "6", // Sixth image (Sompa-Klubi) links to location with ID 6
   };
 
   // Function to handle image click
@@ -154,6 +157,7 @@ export default function DashboardPage() {
                 className="overflow-hidden rounded-xl aspect-square"
                 data-aos="zoom-in"
                 data-aos-delay={100 * (index + 4)}
+                onClick={() => handleImageClick(index + 4)}
               >
                 <img
                   src={image}

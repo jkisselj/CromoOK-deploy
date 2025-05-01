@@ -34,6 +34,7 @@ export interface Location {
         closeTime: string;
         daysAvailable: string[];
     };
+    minimumBookingHours?: number;
 }
 
 export interface LocationFilter {
