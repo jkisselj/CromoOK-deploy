@@ -168,7 +168,7 @@ export default function LocationDetailsPage() {
                     asChild
                     className="absolute top-6 left-6 rounded-full shadow-lg bg-background/80 backdrop-blur-md z-20"
                 >
-                    <Link to="/locations">
+                    <Link to="/locations" state={{ from: 'details' }}>
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                 </Button>

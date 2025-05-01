@@ -25,9 +25,14 @@ export function LocationCard({ location }: LocationCardProps) {
     const handleImageLoad = () => {
         setIsImageLoading(false);
     };
+    
+    const handleLocationClick = () => {
+        // Сохраняем текущую позицию прокрутки при клике на локацию
+        sessionStorage.setItem('locationsScrollPosition', window.scrollY.toString());
+    };
 
     return (
-        <Link to={`/locations/${location.id}`} className="block">
+        <Link to={`/locations/${location.id}`} className="block" onClick={handleLocationClick}>
             <Card className="group overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer">
                 <div className="relative">
                     <div className="aspect-[4/3] relative overflow-hidden bg-muted">
@@ -151,7 +156,7 @@ export function LocationCard({ location }: LocationCardProps) {
                             <span className="text-2xl font-bold text-primary-foreground">{location.price}€</span>
                             <span className="text-sm text-muted-foreground">/hour</span>
                         </div>
-                        <Button 
+                        <Button
                             onClick={(e) => e.preventDefault()}
                             className="pointer-events-none"
                         >

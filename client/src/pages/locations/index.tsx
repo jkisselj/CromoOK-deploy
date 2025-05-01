@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation as useRouterLocation } from 'react-router-dom';
 import { Plus, Search, Filter, SlidersHorizontal, Loader2, MapPin, Grid, List, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LocationCard } from '@/components/locations/location-card';
@@ -7,7 +7,7 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -51,6 +51,18 @@ export default function LocationsPage() {
         direction: 'desc'
     });
     const [priceRange, setPriceRange] = useState([0, 10000]);
+    const routerLocation = useRouterLocation();
+
+    // Восстановление позиции прокрутки при возврате на страницу
+    useEffect(() => {
+        const savedScrollPosition = sessionStorage.getItem('locationsScrollPosition');
+        if (savedScrollPosition && routerLocation.state?.from === 'details') {
+            setTimeout(() => {
+                window.scrollTo(0, parseInt(savedScrollPosition, 10));
+            }, 100);
+            sessionStorage.removeItem('locationsScrollPosition');
+        }
+    }, [routerLocation]);
 
     const filteredLocations = locations?.filter(loc => {
         if (searchQuery &&
