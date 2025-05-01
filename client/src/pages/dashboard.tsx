@@ -10,7 +10,7 @@ import supabase from "@/lib/supabaseClient";
 export default function DashboardPage() {
   const { user } = useAuthContext();
   const [locations, setLocations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   const logo = "/LogoLongWhite.svg";
 

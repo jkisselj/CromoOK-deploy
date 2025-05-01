@@ -363,13 +363,11 @@ export default function LocationDetailsPage() {
                                     </span>
                                 </div>
                             </div>
-                        </Card>
-
-                        {/* Admin tools section */}
-                        {isOwner && (
-                            <Card className="mt-6">
-                                <CardContent className="p-6">
-                                    <h2 className="text-xl font-semibold mb-4">Location management</h2>
+                            
+                            {/* Admin tools section - integrated within price card */}
+                            {isOwner && (
+                                <div className="p-6 border-t bg-muted/10">
+                                    <h2 className="text-base font-semibold mb-4">Location management</h2>
                                     <div className="flex flex-col gap-3">
                                         <Button
                                             variant="outline"
@@ -386,9 +384,9 @@ export default function LocationDetailsPage() {
                                             isOwner={isOwner}
                                         />
                                     </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                                </div>
+                            )}
+                        </Card>
                     </div>
 
                     {/* Main content middle section */}
