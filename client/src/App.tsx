@@ -11,6 +11,7 @@ import AuthLayout from "./layout/auth-layout";
 import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
 import { ThemeWatcher } from "./hooks/use-theme";
+import SettingsPage from "./pages/settings";
 //
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="locations">
             <Route path="new" element={<NewLocationPage />} />
           </Route>
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

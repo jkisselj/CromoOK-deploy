@@ -42,7 +42,8 @@ import {
   Scale,
   FileCheck,
   Plus,
-  PanelRightIcon
+  PanelRightIcon,
+  Database
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -165,6 +166,9 @@ const data = {
         { title: "Storage and Files", url: "#", icon: HardDrive },
         { title: "Scalability", url: "#", icon: Scale },
         { title: "GDPR Compliance", url: "#", icon: FileCheck },
+        ...(isAuthenticated ? [
+          { title: "Settings", url: "/settings", icon: Database }
+        ] : []),
       ],
     },
   ],
