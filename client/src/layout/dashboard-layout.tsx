@@ -1,17 +1,44 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import NavTop from "@/components/sidebar/nav-top";
 
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Outlet } from "react-router";
+import { SidebarInset, SidebarProvider, useSidebar } from "@/components/ui/sidebar";
+import { Outlet, useLocation } from "react-router";
+import { useEffect, useRef } from "react";
 
-export default function DashboardLayout() {
+function DashboardLayoutInner() {
+  const location = useLocation();
+  const { setOpenMobile, setOpen, isMobile } = useSidebar();
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    if (prevPathRef.current !== location.pathname) {
+      window.scrollTo(0, 0);
+
+      if (isMobile) {
+        setOpenMobile(false);
+      } else {
+        setOpen(false);
+      }
+
+      prevPathRef.current = location.pathname;
+    }
+  }, [location.pathname, setOpenMobile, setOpen, isMobile]);
+
   return (
-    <SidebarProvider>
+    <>
       <AppSidebar />
       <SidebarInset>
         <NavTop />
         <Outlet />
       </SidebarInset>
+    </>
+  );
+}
+
+export default function DashboardLayout() {
+  return (
+    <SidebarProvider>
+      <DashboardLayoutInner />
     </SidebarProvider>
   );
 }
