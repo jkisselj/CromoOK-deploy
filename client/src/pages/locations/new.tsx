@@ -320,96 +320,17 @@ export default function NewLocationPage() {
             return;
         }
 
-        // Проверка размера файлов для мобильных устройств
-        const oversizedFiles = imageFiles.filter(file => file.size > 10 * 1024 * 1024); // 10MB limit
-        if (oversizedFiles.length > 0) {
-            toast({
-                title: "Warning",
-                description: `${oversizedFiles.length} image(s) exceed 10MB limit and will be compressed`,
-                variant: "default"
-            });
-        }
+        // Generate preview URLs for display
+        const newImages = imageFiles.map(file => URL.createObjectURL(file));
 
-        // Создаем массивы для хранения новых изображений и файлов
-        const newImageUrls: string[] = [];
-        const newImageFiles: File[] = [];
+        setUploadedImages([...uploadedImages, ...newImages]);
+        setActualImageFiles([...actualImageFiles, ...imageFiles]);
+        form.setValue("images", [...uploadedImages, ...newImages]);
 
-        // Обработка каждого файла с Promise.all для параллельной обработки
-        Promise.all(
-            imageFiles.map(file => {
-                return new Promise<{url: string, file: File}>((resolve) => {
-                    // Сохраняем оригинальный файл для небольших изображений
-                    if (file.size <= 10 * 1024 * 1024) {
-                        const url = URL.createObjectURL(file);
-                        resolve({url, file});
-                        return;
-                    }
-
-                    // Для больших файлов делаем компрессию
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            // Сохраняем пропорции, но уменьшаем размер
-                            let width = img.width;
-                            let height = img.height;
-                            const maxDimension = 1920; // Максимальное разрешение
-                            
-                            if (width > height && width > maxDimension) {
-                                height = Math.round(height * (maxDimension / width));
-                                width = maxDimension;
-                            } else if (height > maxDimension) {
-                                width = Math.round(width * (maxDimension / height));
-                                height = maxDimension;
-                            }
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            
-                            const ctx = canvas.getContext('2d');
-                            ctx?.drawImage(img, 0, 0, width, height);
-                            
-                            // Получаем сжатое изображение как URL
-                            canvas.toBlob((blob) => {
-                                if (blob) {
-                                    // Создаем новый файл из сжатого блоба
-                                    const compressedFile = new File(
-                                        [blob], 
-                                        file.name, 
-                                        { type: 'image/jpeg', lastModified: Date.now() }
-                                    );
-                                    const compressedUrl = URL.createObjectURL(blob);
-                                    resolve({url: compressedUrl, file: compressedFile});
-                                } else {
-                                    // В случае ошибки используем оригинальный файл
-                                    const url = URL.createObjectURL(file);
-                                    resolve({url, file});
-                                }
-                            }, 'image/jpeg', 0.8);
-                        };
-                        img.src = e.target?.result as string;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            })
-        ).then(results => {
-            // Извлекаем результаты
-            results.forEach(result => {
-                newImageUrls.push(result.url);
-                newImageFiles.push(result.file);
-            });
-            
-            // Обновляем состояние
-            setUploadedImages([...uploadedImages, ...newImageUrls]);
-            setActualImageFiles([...actualImageFiles, ...newImageFiles]);
-            form.setValue("images", [...uploadedImages, ...newImageUrls]);
-
-            // Show success toast
-            toast({
-                title: "Images added",
-                description: `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} successfully added`,
-            });
+        // Show success toast
+        toast({
+            title: "Images added",
+            description: `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} successfully added`,
         });
     };
 
@@ -435,10 +356,6 @@ export default function NewLocationPage() {
     };
 
     const triggerFileInput = () => {
-        // Сбрасываем value в пустую строку, чтобы обеспечить работу на iOS
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
         fileInputRef.current?.click();
     };
 
@@ -469,7 +386,6 @@ export default function NewLocationPage() {
         form.setValue("images", updatedImages);
     };
 
-    // This function is now used by the "Set as Main" button in the moveImage function
     const handleSetMainImage = (index: number) => {
         if (index === mainImageIndex) return; // Already the main image
 
@@ -599,7 +515,7 @@ export default function NewLocationPage() {
                                 <Calendar size={16} />
                                 <span className="hidden sm:inline">Scheduling</span>
                             </TabsTrigger>
-                            </TabsList>
+                        </TabsList>
 
                         <TabsContent value="basic" className="space-y-6">
                             <div className="grid gap-6 md:grid-cols-2">
@@ -632,9 +548,6 @@ export default function NewLocationPage() {
                                             <FormControl>
                                                 <Input placeholder="123 Example St." {...field} />
                                             </FormControl>
-                                            <FormDescription>
-                                                Address will be formatted in English
-                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -946,7 +859,8 @@ export default function NewLocationPage() {
                                                                 type="button"
                                                                 size="sm"
                                                                 variant="secondary"
-                                                                onClick={() => index !== 0 && handleSetMainImage(index)}
+                                                                className="h-7 bg-white/90 hover:bg-white font-medium"
+                                                                onClick={() => index !== 0 && moveImage(index, 0)}
                                                                 disabled={index === 0}
                                                             >
                                                                 Set as Main
