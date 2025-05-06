@@ -25,7 +25,7 @@ export function LocationCard({ location }: LocationCardProps) {
     const handleImageLoad = () => {
         setIsImageLoading(false);
     };
-    
+
     const handleLocationClick = () => {
         // Сохраняем текущую позицию прокрутки при клике на локацию
         sessionStorage.setItem('locationsScrollPosition', window.scrollY.toString());
@@ -53,7 +53,7 @@ export function LocationCard({ location }: LocationCardProps) {
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Badge variant="secondary" className="bg-white/90 text-black">
+                                        <Badge variant="secondary" className="bg-card text-card-foreground">
                                             <ThumbsUp className="h-3 w-3 mr-1" />
                                             Equipment Included
                                         </Badge>
@@ -65,7 +65,7 @@ export function LocationCard({ location }: LocationCardProps) {
                             </TooltipProvider>
                         )}
                         {location.status === 'published' && (
-                            <Badge className="bg-green-500/90 text-white">
+                            <Badge className="bg-green-500/90 text-card">
                                 Available
                             </Badge>
                         )}
@@ -74,7 +74,7 @@ export function LocationCard({ location }: LocationCardProps) {
                     <Button
                         variant="outline"
                         size="icon"
-                        className={`absolute top-3 right-3 bg-white/90 hover:bg-white ${isFavorite ? 'text-red-500 hover:text-red-600' : 'text-primary-foreground hover:text-foreground'}`}
+                        className={`absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/100 border-border/50 ${isFavorite ? 'text-red-500 hover:text-red-600' : ' hover:text-foreground'}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -85,7 +85,7 @@ export function LocationCard({ location }: LocationCardProps) {
                         <span className="sr-only">Add to favorites</span>
                     </Button>
 
-                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3">
+                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-background/90 via-background/70 to-transparent">
                         <h3 className="font-semibold text-lg leading-tight mb-1 text-white line-clamp-1">
                             {location.title}
                         </h3>

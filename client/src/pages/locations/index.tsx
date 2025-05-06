@@ -322,11 +322,23 @@ export default function LocationsPage() {
                                     <Button
                                         variant={viewMode === 'list' ? 'default' : 'ghost'}
                                         size="icon"
-                                        className="rounded-l-none h-9 w-9"
+                                        className="h-9 w-9"
                                         onClick={() => setViewMode('list')}
                                     >
                                         <List className="h-4 w-4" />
                                         <span className="sr-only">List view</span>
+                                    </Button>
+                                    <Separator orientation="vertical" />
+                                    <Button
+                                        variant={viewMode === 'map' ? 'default' : 'ghost'}
+                                        size="icon"
+                                        className="rounded-l-none h-9 w-9"
+                                        asChild
+                                    >
+                                        <Link to="/locations/map">
+                                            <MapPin className="h-4 w-4" />
+                                            <span className="sr-only">Map view</span>
+                                        </Link>
                                     </Button>
                                 </div>
                             </div>

@@ -443,7 +443,7 @@ export default function LocationDetailsPage() {
                         </div>
 
                         {/* Tabs for content */}
-                        <Tabs defaultValue="details" className="w-full mb-10">
+                        <Tabs defaultValue="details" className="w-full mb-10 text-muted-foreground">
                             <TabsList className="mb-6">
                                 <TabsTrigger value="details">Details</TabsTrigger>
                                 <TabsTrigger value="amenities">Amenities</TabsTrigger>
@@ -514,7 +514,7 @@ export default function LocationDetailsPage() {
 
                         {/* Image gallery - улучшенная */}
                         <div className="mt-10">
-                            <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
+                            <h2 className="text-2xl text-muted-foreground font-semibold mb-6">Gallery</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {displayImages.slice(0, 6).map((image, idx) => (
                                     <div
@@ -542,8 +542,8 @@ export default function LocationDetailsPage() {
                                         className="flex items-center justify-center gap-2 aspect-[4/3]"
                                         onClick={() => setShowGallery(true)}
                                     >
-                                        <Camera className="h-5 w-5 mr-1" />
-                                        View all {displayImages.length} photos
+                                        <Camera className="h-5 w-5 mr-1 text-muted-foreground" />
+                                        <span className="text-muted-foreground"> View all {displayImages.length} photos</span>
                                     </Button>
                                 )}
                             </div>

@@ -7,6 +7,7 @@ import DashboardLayout from "./layout/dashboard-layout";
 import LocationsPage from "./pages/locations";
 import NewLocationPage from "./pages/locations/new";
 import LocationDetailsPage from "./pages/locations/details";
+import LocationsMapPage from "./pages/locations/map";
 import AuthLayout from "./layout/auth-layout";
 import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="locations">
             <Route index element={<LocationsPage />} />
             <Route path=":id" element={<LocationDetailsPage />} />
+            <Route path="map" element={<LocationsMapPage />} />
           </Route>
         </Route>
 

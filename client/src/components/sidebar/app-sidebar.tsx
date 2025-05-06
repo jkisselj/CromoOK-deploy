@@ -73,6 +73,7 @@ const data = {
       icon: MapPin,
       items: [
         { title: "All Locations", url: "/locations", icon: Building2 },
+        { title: "Locations Map", url: "/locations/map", icon: MapPinned },
         ...(isAuthenticated ? [
           { title: "Add Location", url: "/locations/new", icon: Plus }
         ] : []),
@@ -129,8 +130,8 @@ const data = {
       url: "#",
       icon: Map,
       items: [
-        { title: "Map Integration", url: "#", icon: MapPinned },
-        { title: "Location Display", url: "#", icon: Map },
+        { title: "Locations Map", url: "/locations/map", icon: MapPinned },
+        { title: "Map Integration", url: "#", icon: Map },
         { title: "Route Building", url: "#", icon: Navigation },
       ],
     },
