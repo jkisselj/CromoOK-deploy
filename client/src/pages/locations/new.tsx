@@ -330,13 +330,18 @@ export default function NewLocationPage() {
             });
         }
 
-        // Обработка изображений с компрессией при необходимости
+        // Создаем массивы для хранения новых изображений и файлов
+        const newImageUrls: string[] = [];
+        const newImageFiles: File[] = [];
+
+        // Обработка каждого файла с Promise.all для параллельной обработки
         Promise.all(
             imageFiles.map(file => {
-                return new Promise<string>((resolve) => {
-                    // Для маленьких файлов просто создаем URL
+                return new Promise<{url: string, file: File}>((resolve) => {
+                    // Сохраняем оригинальный файл для небольших изображений
                     if (file.size <= 10 * 1024 * 1024) {
-                        resolve(URL.createObjectURL(file));
+                        const url = URL.createObjectURL(file);
+                        resolve({url, file});
                         return;
                     }
 
@@ -366,21 +371,39 @@ export default function NewLocationPage() {
                             ctx?.drawImage(img, 0, 0, width, height);
                             
                             // Получаем сжатое изображение как URL
-                            const compressedUrl = canvas.toDataURL('image/jpeg', 0.8);
-                            resolve(compressedUrl);
+                            canvas.toBlob((blob) => {
+                                if (blob) {
+                                    // Создаем новый файл из сжатого блоба
+                                    const compressedFile = new File(
+                                        [blob], 
+                                        file.name, 
+                                        { type: 'image/jpeg', lastModified: Date.now() }
+                                    );
+                                    const compressedUrl = URL.createObjectURL(blob);
+                                    resolve({url: compressedUrl, file: compressedFile});
+                                } else {
+                                    // В случае ошибки используем оригинальный файл
+                                    const url = URL.createObjectURL(file);
+                                    resolve({url, file});
+                                }
+                            }, 'image/jpeg', 0.8);
                         };
                         img.src = e.target?.result as string;
                     };
                     reader.readAsDataURL(file);
                 });
             })
-        ).then(newImages => {
-            setUploadedImages([...uploadedImages, ...newImages]);
+        ).then(results => {
+            // Извлекаем результаты
+            results.forEach(result => {
+                newImageUrls.push(result.url);
+                newImageFiles.push(result.file);
+            });
             
-            // Создаем новые File объекты для сжатых изображений
-            // (не обновляем actualImageFiles, так как они будут преобразованы при загрузке)
-            
-            form.setValue("images", [...uploadedImages, ...newImages]);
+            // Обновляем состояние
+            setUploadedImages([...uploadedImages, ...newImageUrls]);
+            setActualImageFiles([...actualImageFiles, ...newImageFiles]);
+            form.setValue("images", [...uploadedImages, ...newImageUrls]);
 
             // Show success toast
             toast({
@@ -576,7 +599,7 @@ export default function NewLocationPage() {
                                 <Calendar size={16} />
                                 <span className="hidden sm:inline">Scheduling</span>
                             </TabsTrigger>
-                        </TabsList>
+                            </TabsList>
 
                         <TabsContent value="basic" className="space-y-6">
                             <div className="grid gap-6 md:grid-cols-2">
