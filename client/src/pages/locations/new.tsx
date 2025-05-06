@@ -320,17 +320,73 @@ export default function NewLocationPage() {
             return;
         }
 
-        // Generate preview URLs for display
-        const newImages = imageFiles.map(file => URL.createObjectURL(file));
+        // Проверка размера файлов для мобильных устройств
+        const oversizedFiles = imageFiles.filter(file => file.size > 10 * 1024 * 1024); // 10MB limit
+        if (oversizedFiles.length > 0) {
+            toast({
+                title: "Warning",
+                description: `${oversizedFiles.length} image(s) exceed 10MB limit and will be compressed`,
+                variant: "default"
+            });
+        }
 
-        setUploadedImages([...uploadedImages, ...newImages]);
-        setActualImageFiles([...actualImageFiles, ...imageFiles]);
-        form.setValue("images", [...uploadedImages, ...newImages]);
+        // Обработка изображений с компрессией при необходимости
+        Promise.all(
+            imageFiles.map(file => {
+                return new Promise<string>((resolve) => {
+                    // Для маленьких файлов просто создаем URL
+                    if (file.size <= 10 * 1024 * 1024) {
+                        resolve(URL.createObjectURL(file));
+                        return;
+                    }
 
-        // Show success toast
-        toast({
-            title: "Images added",
-            description: `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} successfully added`,
+                    // Для больших файлов делаем компрессию
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            // Сохраняем пропорции, но уменьшаем размер
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDimension = 1920; // Максимальное разрешение
+                            
+                            if (width > height && width > maxDimension) {
+                                height = Math.round(height * (maxDimension / width));
+                                width = maxDimension;
+                            } else if (height > maxDimension) {
+                                width = Math.round(width * (maxDimension / height));
+                                height = maxDimension;
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx?.drawImage(img, 0, 0, width, height);
+                            
+                            // Получаем сжатое изображение как URL
+                            const compressedUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            resolve(compressedUrl);
+                        };
+                        img.src = e.target?.result as string;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            })
+        ).then(newImages => {
+            setUploadedImages([...uploadedImages, ...newImages]);
+            
+            // Создаем новые File объекты для сжатых изображений
+            // (не обновляем actualImageFiles, так как они будут преобразованы при загрузке)
+            
+            form.setValue("images", [...uploadedImages, ...newImages]);
+
+            // Show success toast
+            toast({
+                title: "Images added",
+                description: `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} successfully added`,
+            });
         });
     };
 
@@ -356,6 +412,10 @@ export default function NewLocationPage() {
     };
 
     const triggerFileInput = () => {
+        // Сбрасываем value в пустую строку, чтобы обеспечить работу на iOS
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
         fileInputRef.current?.click();
     };
 
@@ -386,6 +446,7 @@ export default function NewLocationPage() {
         form.setValue("images", updatedImages);
     };
 
+    // This function is now used by the "Set as Main" button in the moveImage function
     const handleSetMainImage = (index: number) => {
         if (index === mainImageIndex) return; // Already the main image
 
@@ -862,8 +923,7 @@ export default function NewLocationPage() {
                                                                 type="button"
                                                                 size="sm"
                                                                 variant="secondary"
-                                                                className="h-7 bg-white/90 hover:bg-white font-medium"
-                                                                onClick={() => index !== 0 && moveImage(index, 0)}
+                                                                onClick={() => index !== 0 && handleSetMainImage(index)}
                                                                 disabled={index === 0}
                                                             >
                                                                 Set as Main
