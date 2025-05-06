@@ -342,7 +342,7 @@ export function LocationsMap({
         const popupStyles = `
         .mapboxgl-popup-content {
             background-color: var(--card);
-            color: var(text-muted-foreground);
+            color: var(--card-foreground);
             border-radius: var(--radius);
             padding: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -354,17 +354,17 @@ export function LocationsMap({
         .location-popup-title {
             font-weight: 600;
             margin-bottom: 5px;
-            color: var(text-muted-foreground);
+            color: var(--card-foreground);
         }
         .location-popup-address {
             font-size: 12px;
             margin-bottom: 8px;
-            color: vartext-muted-foreground);
+            color: var(--muted-foreground);
         }
         .location-popup-tag {
             font-size: 10px;
             background: var(--secondary);
-            color: var(text-muted-foreground);
+            color: var(--secondary-foreground);
             padding: 1px 6px;
             border-radius: 9999px;
             display: inline-block;
