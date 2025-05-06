@@ -6,18 +6,23 @@ export function isLocalImageUrl(url: string): boolean {
 
 export async function initializeStorage() {
     try {
-        const { data, error } = await supabase.storage.createBucket('location-images', {
-            public: true,
-            fileSizeLimit: 10485760,
-        });
-
-        if (error && error.message !== 'Bucket already exists') {
-            console.error('Failed to initialize storage bucket:', error);
+        // Instead of creating the bucket (which might fail due to RLS),
+        // we'll just check if it exists
+        const { data: buckets, error } = await supabase
+            .storage
+            .listBuckets();
+        
+        const bucketExists = buckets?.some(bucket => bucket.name === 'location-images');
+        
+        if (!bucketExists) {
+            console.log('Storage bucket "location-images" does not exist. It should be created by an admin or through migrations.');
+        } else {
+            console.log('Storage bucket "location-images" exists.');
         }
-
-        return { success: !error, data };
+        
+        return { success: true, bucketExists };
     } catch (err) {
-        console.error('Error initializing storage:', err);
+        console.error('Error checking storage bucket:', err);
         return { success: false };
     }
 }

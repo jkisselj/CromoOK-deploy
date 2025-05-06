@@ -7,7 +7,7 @@ import { setDemoLocations, migrateDemoLocationsToSupabase } from '@/utils/migrat
 
 // Export the demo locations for migration purposes
 export const DEMO_LOCATIONS: Location[] = [
-    
+    // Add demo locations here if needed
 ];
 
 // Initialize the migration util with demo locations
@@ -129,90 +129,104 @@ export function useCreateLocation() {
     return useMutation({
         mutationFn: async (location: CreateLocationDTO) => {
             const timestamp = new Date().toISOString();
-
-            // Process images if they exist
-            let finalImages = location.images || [];
-            if (location.images && location.images.length > 0) {
-                const tempId = `temp-${Date.now().toString()}`;
-                // Use the image service to upload images to Supabase
-                finalImages = await uploadImagesFromUrls(location.images, tempId);
+            
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
             }
 
-            const newLocation: Location = {
-                ...location,
-                id: `loc-${Date.now().toString()}`,
-                createdAt: timestamp,
-                updatedAt: timestamp,
+            // Generate a temporary folder name for images that's not used as the location ID
+            const imagesFolderName = `loc-${Date.now().toString()}`;
+            
+            // Process images if they exist
+            let finalImages: string[] = [];
+            if (location.images && location.images.length > 0) {
+                try {
+                    // Use the existing image upload function with the folder name
+                    finalImages = await uploadImagesFromUrls(location.images, imagesFolderName);
+                    
+                    if (finalImages.length === 0 && location.images.length > 0) {
+                        console.warn('Images were not uploaded correctly, there might be issues with the storage service');
+                    }
+                } catch (error) {
+                    console.error('Error uploading images:', error);
+                    // If image upload fails, we can still create the location
+                    // without images or with existing URLs if they're not local
+                    finalImages = location.images.filter(url => url.startsWith('http') && !url.startsWith('blob:'));
+                }
+            }
+
+            // Prepare data for Supabase (convert camelCase to snake_case)
+            // Note: We're letting Supabase generate the UUID for us
+            const supabaseLocation = {
+                // No id field - Supabase will generate a UUID automatically
+                title: location.title,
+                description: location.description,
+                address: location.address,
+                price: location.price || 0,
+                area: location.area || 0,
                 images: finalImages,
                 amenities: location.amenities || [],
                 rules: location.rules || [],
-                rating: undefined,
-                reviews: undefined,
-                features: {
-                    maxCapacity: location.features?.maxCapacity || 1,
-                    parkingSpots: location.features?.parkingSpots || 0,
-                    equipmentIncluded: location.features?.equipmentIncluded || false,
-                    accessibility: location.features?.accessibility || false
+                owner_id: user.id,
+                created_at: timestamp,
+                updated_at: timestamp,
+                status: location.status || 'draft',
+                features: location.features || {
+                    maxCapacity: 1,
+                    parkingSpots: 0,
+                    equipmentIncluded: false,
+                    accessibility: false
                 },
                 coordinates: location.coordinates || {
                     latitude: 55.7558,
                     longitude: 37.6173
                 },
+                minimum_booking_hours: location.minimumBookingHours || 2,
                 bookings: {
                     totalBookings: 0,
                     averageRating: 0
                 }
             };
 
-            if (user) {
-                try {
-                    // Prepare data for Supabase (handle naming conventions)
-                    const supabaseLocation = {
-                        ...newLocation,
-                        owner_id: user.id,
-                        minimum_booking_hours: location.minimumBookingHours || 2
-                    };
+            try {
+                const { data, error } = await supabase
+                    .from('locations')
+                    .insert([supabaseLocation])
+                    .select()
+                    .single();
 
-                    const { error } = await supabase
-                        .from('locations')
-                        .insert([supabaseLocation]);
-
-                    if (error) {
-                        console.error('Error saving location to Supabase:', error);
-                        // Fall back to localStorage if Supabase fails
-                        saveToLocalStorage(newLocation);
-                    } else {
-                        console.log('Location saved to Supabase successfully');
-                        return newLocation;
+                if (error) {
+                    console.error('Error saving location to Supabase:', error);
+                    
+                    // Clean up uploaded images if location creation fails
+                    if (finalImages.length > 0) {
+                        for (const imageUrl of finalImages) {
+                            try {
+                                if (imageUrl.includes('supabase')) {
+                                    await deleteImage(imageUrl);
+                                }
+                            } catch (err) {
+                                console.warn(`Could not delete image ${imageUrl}:`, err);
+                            }
+                        }
                     }
-                } catch (err) {
-                    console.error('Failed to save to Supabase:', err);
-                    // Fall back to localStorage
-                    saveToLocalStorage(newLocation);
+                    
+                    throw new Error(`Error saving location: ${error.message}`);
                 }
-            } else {
-                // No user, save to localStorage
-                saveToLocalStorage(newLocation);
-            }
 
-            return newLocation;
-
-            // Helper function to save to localStorage
-            function saveToLocalStorage(location: Location) {
-                try {
-                    const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
-                    let userCreatedLocations: Location[] = [];
-
-                    if (storedLocations) {
-                        userCreatedLocations = JSON.parse(storedLocations);
-                    }
-
-                    userCreatedLocations.push(location);
-                    localStorage.setItem(CREATED_LOCATIONS_KEY, JSON.stringify(userCreatedLocations));
-                    console.log('Saved new location to localStorage');
-                } catch (err) {
-                    console.error('Error saving to localStorage:', err);
-                }
+                console.log('Location saved to Supabase successfully:', data);
+                
+                // Return data from DB to have complete data
+                return data ? {
+                    ...data,
+                    ownerId: data.owner_id,
+                    createdAt: data.created_at,
+                    updatedAt: data.updated_at,
+                    minimumBookingHours: data.minimum_booking_hours
+                } as Location : {} as Location;
+            } catch (err) {
+                console.error('Failed to save to Supabase:', err);
+                throw err;
             }
         },
         onSuccess: () => {

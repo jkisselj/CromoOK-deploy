@@ -16,9 +16,9 @@ import { Input } from "@/components/ui/input";
 import { useCreateLocation } from "@/hooks/useLocations";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, X, Upload } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload, Loader2, Star, ArrowLeft as ArrowLeftIcon, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LocationPicker } from "@/components/map/location-picker";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,6 +28,10 @@ import {
     TabsTrigger
 } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import { initializeStorage } from "@/lib/imageService";
+import { useImageUploader } from "@/hooks/useImageUploader";
+import { Progress } from "@/components/ui/progress";
 
 const schema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -54,15 +58,25 @@ const schema = z.object({
 export default function NewLocationPage() {
     const navigate = useNavigate();
     const { user } = useAuthContext();
-    const { mutateAsync: createLocation } = useCreateLocation();
+    const { mutateAsync: createLocation, isPending: isCreatingLocation } = useCreateLocation();
     const [activeTab, setActiveTab] = useState("basic");
     const [newAmenity, setNewAmenity] = useState("");
     const [newRule, setNewRule] = useState("");
     const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [actualImageFiles, setActualImageFiles] = useState<File[]>([]);
+    const [mainImageIndex, setMainImageIndex] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
+    const { isUploading, progress } = useImageUploader();
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!user) {
             navigate("/auth/login", { state: { from: "/locations/new" } });
+        } else {
+            // Initialize storage on component mount
+            initializeStorage().catch(error => {
+                console.error("Storage initialization error:", error);
+            });
         }
     }, [user, navigate]);
 
@@ -90,19 +104,61 @@ export default function NewLocationPage() {
     const onSubmit = async (values: z.infer<typeof schema>) => {
         try {
             if (!user?.id) {
-                throw new Error("User not authenticated");
+                throw new Error("User is not authenticated");
             }
 
+            setIsSubmitting(true);
+
+            // Check for required fields
+            if (!values.title || !values.description || !values.address) {
+                toast({
+                    title: "Error",
+                    description: "Please fill in all required fields",
+                    variant: "destructive"
+                });
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Create temporary folder name for image storage
+            // This is just for organizing images, not for the location ID
+            const tempImageFolder = `loc-${Date.now().toString()}`;
+
+            // Create data object for submission
             const locationData = {
                 ...values,
+                // No need to specify ID - Supabase will generate a UUID
                 ownerId: user.id,
+                // Use local URLs from state for initial upload
                 images: uploadedImages,
+                tempImageFolder, // Pass this for organizing images in storage
+                coordinates: values.coordinates || {
+                    latitude: 0,
+                    longitude: 0
+                },
+                status: values.status || 'draft'
             };
 
-            await createLocation(locationData);
+            // Call the location creation function
+            const result = await createLocation(locationData);
+
+            toast({
+                title: "Success!",
+                description: "Location created successfully",
+            });
+
+            // Navigate to the locations page
             navigate("/locations");
-        } catch (error) {
-            console.error("Failed to create location:", error);
+
+        } catch (error: any) {
+            console.error("Error creating location:", error);
+            toast({
+                title: "Error",
+                description: error.message || "Failed to create location",
+                variant: "destructive"
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -145,15 +201,122 @@ export default function NewLocationPage() {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+        const newFiles = Array.from(files);
+
+        // Generate preview URLs for display
+        const newImages = newFiles.map(file => URL.createObjectURL(file));
+
         setUploadedImages([...uploadedImages, ...newImages]);
+        setActualImageFiles([...actualImageFiles, ...newFiles]);
         form.setValue("images", [...uploadedImages, ...newImages]);
     };
 
-    const handleRemoveImage = (imageUrl: string) => {
-        const updatedImages = uploadedImages.filter(img => img !== imageUrl);
+    const handleRemoveImage = (imageUrl: string, index: number) => {
+        // Remove image and file from state
+        const updatedImages = uploadedImages.filter((_, i) => i !== index);
         setUploadedImages(updatedImages);
+
+        // If this is a local URL, revoke it
+        if (imageUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(imageUrl);
+        }
+
+        // Also remove corresponding file
+        const updatedFiles = [...actualImageFiles];
+        updatedFiles.splice(index, 1);
+        setActualImageFiles(updatedFiles);
+
+        // Update main image index if needed
+        if (index === mainImageIndex) {
+            // If we removed the main image, make the first image the main one
+            setMainImageIndex(0);
+        } else if (index < mainImageIndex) {
+            // If we removed an image before the main one, shift the index
+            setMainImageIndex(mainImageIndex - 1);
+        }
+
         form.setValue("images", updatedImages);
+    };
+
+    const handleSetMainImage = (index: number) => {
+        if (index === mainImageIndex) return; // Already the main image
+
+        // Update the main image index
+        setMainImageIndex(index);
+
+        // Re-order the images array to put the main image first
+        const updatedImages = [...uploadedImages];
+        const mainImage = updatedImages.splice(index, 1)[0];
+        updatedImages.unshift(mainImage);
+
+        // Re-order the files array to match
+        const updatedFiles = [...actualImageFiles];
+        if (updatedFiles.length > index) {
+            const mainFile = updatedFiles.splice(index, 1)[0];
+            updatedFiles.unshift(mainFile);
+        }
+
+        setUploadedImages(updatedImages);
+        setActualImageFiles(updatedFiles);
+        setMainImageIndex(0); // After reordering, the main image is always at index 0
+
+        form.setValue("images", updatedImages);
+    };
+
+    const moveImage = (fromIndex: number, toIndex: number) => {
+        if (
+            fromIndex < 0 ||
+            fromIndex >= uploadedImages.length ||
+            toIndex < 0 ||
+            toIndex >= uploadedImages.length
+        ) {
+            return; // Invalid indices
+        }
+
+        // Move image in the images array
+        const updatedImages = [...uploadedImages];
+        const [movedImage] = updatedImages.splice(fromIndex, 1);
+        updatedImages.splice(toIndex, 0, movedImage);
+
+        // Move file in the files array to match
+        const updatedFiles = [...actualImageFiles];
+        if (updatedFiles.length > fromIndex && updatedFiles.length > toIndex) {
+            const [movedFile] = updatedFiles.splice(fromIndex, 1);
+            updatedFiles.splice(toIndex, 0, movedFile);
+        }
+
+        // Update main image index if needed
+        if (fromIndex === mainImageIndex) {
+            setMainImageIndex(toIndex);
+        } else if (
+            (fromIndex < mainImageIndex && toIndex >= mainImageIndex) ||
+            (fromIndex > mainImageIndex && toIndex <= mainImageIndex)
+        ) {
+            // If we moved an image across the main image, shift the index
+            setMainImageIndex(
+                fromIndex < mainImageIndex ? mainImageIndex - 1 : mainImageIndex + 1
+            );
+        }
+
+        setUploadedImages(updatedImages);
+        setActualImageFiles(updatedFiles);
+        form.setValue("images", updatedImages);
+    };
+
+    // Render upload progress
+    const renderUploadProgress = () => {
+        if (isUploading) {
+            return (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                        <h3 className="text-xl font-semibold mb-4">Uploading images</h3>
+                        <Progress value={progress} className="h-2 mb-4" />
+                        <p className="text-center">{progress}% completed</p>
+                    </div>
+                </div>
+            );
+        }
+        return null;
     };
 
     if (!user) {
@@ -170,6 +333,8 @@ export default function NewLocationPage() {
                 </Button>
                 <h1 className="text-3xl font-bold">Add New Location</h1>
             </div>
+
+            {renderUploadProgress()}
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -205,7 +370,7 @@ export default function NewLocationPage() {
                                         <FormItem>
                                             <FormLabel>Address</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="123 Street Name" {...field} />
+                                                <Input placeholder="123 Example St." {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -246,7 +411,7 @@ export default function NewLocationPage() {
                                     name="price"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Price per hour (€)</FormLabel>
+                                            <FormLabel>Price per hour (₽)</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -287,7 +452,7 @@ export default function NewLocationPage() {
                             <div>
                                 <FormLabel>Upload Images</FormLabel>
                                 <FormDescription className="mb-4">
-                                    Upload high-quality images of your location. The first image will be used as the main image.
+                                    Upload high-quality images of your location. You can rearrange images, and set any image as the main one.
                                 </FormDescription>
 
                                 <div className="flex items-center gap-4 mb-6">
@@ -306,26 +471,65 @@ export default function NewLocationPage() {
 
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {uploadedImages.map((imageUrl, index) => (
-                                        <div key={index} className="relative group">
+                                        <div key={index} className="relative group border rounded-md overflow-hidden">
                                             <img
                                                 src={imageUrl}
                                                 alt={`Location image ${index + 1}`}
-                                                className="w-full h-40 object-cover rounded-md"
+                                                className="w-full h-40 object-cover"
                                             />
-                                            <Button
-                                                type="button"
-                                                size="icon"
-                                                variant="destructive"
-                                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => handleRemoveImage(imageUrl)}
-                                            >
-                                                <X size={16} />
-                                            </Button>
-                                            {index === 0 && (
-                                                <Badge className="absolute bottom-2 left-2">
-                                                    Main Image
-                                                </Badge>
-                                            )}
+                                            <div className="absolute top-2 right-2 flex gap-1">
+                                                <Button
+                                                    type="button"
+                                                    size="icon"
+                                                    variant={index === mainImageIndex ? "default" : "outline"}
+                                                    className="h-8 w-8 bg-white bg-opacity-80 hover:bg-opacity-100 text-amber-500"
+                                                    onClick={() => handleSetMainImage(index)}
+                                                    title="Set as main image"
+                                                >
+                                                    <Star size={16} className={index === mainImageIndex ? "fill-amber-500" : ""} />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    size="icon"
+                                                    variant="destructive"
+                                                    className="h-8 w-8 bg-white bg-opacity-80 hover:bg-opacity-100"
+                                                    onClick={() => handleRemoveImage(imageUrl, index)}
+                                                    title="Remove image"
+                                                >
+                                                    <X size={16} />
+                                                </Button>
+                                            </div>
+                                            <div className="absolute bottom-2 left-2 flex gap-1">
+                                                {index === mainImageIndex && (
+                                                    <Badge className="bg-amber-500 text-white">
+                                                        Main
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            <div className="absolute bottom-2 right-2 flex gap-1">
+                                                <Button
+                                                    type="button"
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-8 w-8 bg-white bg-opacity-80 hover:bg-opacity-100"
+                                                    onClick={() => moveImage(index, Math.max(0, index - 1))}
+                                                    disabled={index === 0}
+                                                    title="Move left"
+                                                >
+                                                    <ArrowLeftIcon size={16} />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-8 w-8 bg-white bg-opacity-80 hover:bg-opacity-100"
+                                                    onClick={() => moveImage(index, Math.min(uploadedImages.length - 1, index + 1))}
+                                                    disabled={index === uploadedImages.length - 1}
+                                                    title="Move right"
+                                                >
+                                                    <ArrowRight size={16} />
+                                                </Button>
+                                            </div>
                                         </div>
                                     ))}
 
@@ -569,7 +773,15 @@ export default function NewLocationPage() {
                             <Button type="button" variant="outline" asChild>
                                 <Link to="/locations">Cancel</Link>
                             </Button>
-                            <Button type="submit">Create Location</Button>
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting || isCreatingLocation || isUploading}
+                            >
+                                {(isSubmitting || isCreatingLocation) && (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                )}
+                                Create Location
+                            </Button>
                         </div>
                     </div>
                 </form>
