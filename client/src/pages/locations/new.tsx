@@ -165,7 +165,7 @@ export default function NewLocationPage() {
                 closeTime: "18:00",
                 daysAvailable: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
             },
-            status: 'draft' as const,
+            status: 'published' as const, // Изменено с 'draft' на 'published'
         },
     });
 
@@ -211,7 +211,7 @@ export default function NewLocationPage() {
                     latitude: 0,
                     longitude: 0
                 },
-                status: values.status || 'draft',
+                status: 'published' as const, // Всегда публикуем локацию автоматически
                 // Override availability with the properly formatted data
                 availability
             };
@@ -386,30 +386,6 @@ export default function NewLocationPage() {
         form.setValue("images", updatedImages);
     };
 
-    const handleSetMainImage = (index: number) => {
-        if (index === mainImageIndex) return; // Already the main image
-
-        // Update the main image index
-        setMainImageIndex(index);
-
-        // Re-order the images array to put the main image first
-        const updatedImages = [...uploadedImages];
-        const mainImage = updatedImages.splice(index, 1)[0];
-        updatedImages.unshift(mainImage);
-
-        // Re-order the files array to match
-        const updatedFiles = [...actualImageFiles];
-        if (updatedFiles.length > index) {
-            const mainFile = updatedFiles.splice(index, 1)[0];
-            updatedFiles.unshift(mainFile);
-        }
-
-        setUploadedImages(updatedImages);
-        setActualImageFiles(updatedFiles);
-        setMainImageIndex(0); // After reordering, the main image is always at index 0
-
-        form.setValue("images", updatedImages);
-    };
 
     const moveImage = (fromIndex: number, toIndex: number) => {
         if (
@@ -1272,27 +1248,7 @@ export default function NewLocationPage() {
                     </Tabs>
 
                     <div className="flex items-center justify-between pt-6 border-t">
-                        <FormField
-                            control={form.control}
-                            name="status"
-                            render={({ field }) => (
-                                <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox
-                                                checked={field.value === 'published'}
-                                                onCheckedChange={(checked: boolean | "indeterminate") => {
-                                                    field.onChange(checked ? 'published' : 'draft');
-                                                }}
-                                            />
-                                            <FormLabel className="text-sm font-normal">
-                                                Publish location immediately
-                                            </FormLabel>
-                                        </div>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                        <div></div> {/* Пустой div для сохранения выравнивания */}
 
                         <div className="flex gap-4">
                             <Button type="button" variant="outline" asChild>
