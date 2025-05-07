@@ -14,18 +14,40 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useDeleteLocation } from '@/hooks/useLocations';
+import { useToast } from '@/components/ui/use-toast';
 
 interface DeleteLocationDialogProps {
     locationId: string;
     locationTitle: string;
     isOwner: boolean;
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
-export function DeleteLocationDialog({ locationId, locationTitle, isOwner }: DeleteLocationDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export function DeleteLocationDialog({
+    locationId,
+    locationTitle,
+    isOwner,
+    isOpen: externalIsOpen,
+    onClose
+}: DeleteLocationDialogProps) {
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const deleteLocation = useDeleteLocation();
     const navigate = useNavigate();
+    const { toast } = useToast();
+
+    // Use external state if provided, otherwise internal
+    const isControlled = externalIsOpen !== undefined;
+    const isOpen = isControlled ? externalIsOpen : internalIsOpen;
+
+    const setIsOpen = (open: boolean) => {
+        if (!isControlled) {
+            setInternalIsOpen(open);
+        } else if (!open && onClose) {
+            onClose();
+        }
+    };
 
     if (!isOwner) {
         return null;
@@ -35,10 +57,21 @@ export function DeleteLocationDialog({ locationId, locationTitle, isOwner }: Del
         setIsDeleting(true);
         try {
             await deleteLocation.mutateAsync(locationId);
-            alert(`Location "${locationTitle}" has been successfully deleted`);
-            navigate('/locations');
+            toast({
+                title: 'Location Deleted',
+                description: `Location "${locationTitle}" has been successfully deleted`,
+            });
+
+            // If we're on the location page, redirect to the locations list
+            if (window.location.pathname.includes(`/locations/${locationId}`)) {
+                navigate('/locations');
+            }
         } catch (error) {
-            alert(error instanceof Error ? error.message : 'Failed to delete location');
+            toast({
+                title: 'Error',
+                description: error instanceof Error ? error.message : 'Failed to delete location',
+                variant: 'destructive',
+            });
         } finally {
             setIsDeleting(false);
             setIsOpen(false);
@@ -47,12 +80,14 @@ export function DeleteLocationDialog({ locationId, locationTitle, isOwner }: Del
 
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="flex items-center gap-2">
-                    <Trash className="h-4 w-4" />
-                    Delete Location
-                </Button>
-            </AlertDialogTrigger>
+            {!isControlled && (
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="flex items-center gap-2">
+                        <Trash className="h-4 w-4" />
+                        Delete Location
+                    </Button>
+                </AlertDialogTrigger>
+            )}
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
@@ -60,7 +95,7 @@ export function DeleteLocationDialog({ locationId, locationTitle, isOwner }: Del
                         Delete Location
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to delete the location "{locationTitle}"? This action cannot be undone,
+                        Are you sure you want to delete location "{locationTitle}"? This action cannot be undone,
                         and all location data, including images, will be permanently deleted.
                     </AlertDialogDescription>
                 </AlertDialogHeader>

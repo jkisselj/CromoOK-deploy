@@ -2,6 +2,9 @@ import {
   ChevronsUpDown,
   LogOut,
   LogIn,
+  User,
+  MapPin,
+  Settings
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -58,7 +61,6 @@ export function NavUser() {
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex items-center gap-2 w-full group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center">
-            <ThemeToggle />
             <Link to="/auth/login" className="w-full">
               <SidebarMenuButton
                 size="lg"
@@ -107,12 +109,16 @@ export function NavUser() {
                       alt={user.email}
                     />
                     <AvatarFallback className="rounded-lg">
-                      {user.email?.[0]?.toUpperCase()}
+                      {user.user_metadata?.username?.[0]?.toUpperCase() ||
+                        user.user_metadata?.full_name?.[0]?.toUpperCase() ||
+                        user.email?.[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">
-                      {user.user_metadata?.name || user.email}
+                      {user.user_metadata?.full_name ||
+                        user.user_metadata?.username ||
+                        user.email}
                     </span>
                     <span className="truncate text-xs">{user.email}</span>
                   </div>
@@ -130,21 +136,49 @@ export function NavUser() {
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
                         src={user.user_metadata?.avatar_url}
-                        alt={user.user_metadata?.name || user.email}
+                        alt={user.user_metadata?.full_name || user.user_metadata?.username || user.email}
                       />
                       <AvatarFallback className="rounded-lg">
-                        {user.email?.[0]?.toUpperCase()}
+                        {user.user_metadata?.username?.[0]?.toUpperCase() ||
+                          user.user_metadata?.full_name?.[0]?.toUpperCase() ||
+                          user.email?.[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
-                        {user.user_metadata?.name || user.email}
+                        {user.user_metadata?.username||
+                          user.user_metadata?.full_name ||
+                          user.email}
                       </span>
                       <span className="truncate text-xs">{user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer flex items-center">
+                    <User className="mr-2 size-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/profile?tab=locations" className="cursor-pointer flex items-center">
+                    <MapPin className="mr-2 size-4" />
+                    <span>My Locations</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="cursor-pointer flex items-center">
+                    <Settings className="mr-2 size-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   onClick={() => setShowLogoutDialog(true)}
                   className="cursor-pointer"

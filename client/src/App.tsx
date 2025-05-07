@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/auth/protected-route";
 import PublicRoute from "./components/auth/public-route";
 import { ThemeWatcher } from "./hooks/use-theme";
 import SettingsPage from "./pages/settings";
-//
+import ProfilePage from "./pages/profile";
 
 export default function App() {
   return (
@@ -46,6 +46,7 @@ export default function App() {
             <Route path="new" element={<NewLocationPage />} />
           </Route>
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
