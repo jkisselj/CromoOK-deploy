@@ -12,6 +12,7 @@ export interface Location {
     createdAt: string;
     updatedAt: string;
     status: 'draft' | 'published' | 'archived';
+    shareToken?: string; // Token for sharing private locations
     coordinates?: {
         latitude: number;
         longitude: number;

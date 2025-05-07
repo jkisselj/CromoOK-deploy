@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal, Star, EyeOff, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal } from 'lucide-react';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useLocations, useUpdateLocationStatus } from '@/hooks/useLocations';
 import { DeleteLocationDialog } from '@/components/locations/delete-location-dialog';
@@ -19,7 +19,7 @@ import {
 
 export function UserLocations() {
     const { user } = useAuthContext();
-    // Передаем true в качестве второго параметра, чтобы загрузить все локации пользователя, включая черновики
+    // Pass true as the second parameter to load all user locations, including drafts
     const { data: allLocations, isLoading, refetch } = useLocations(undefined, true);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -28,9 +28,8 @@ export function UserLocations() {
     // Filter locations by current user
     const userLocations = allLocations?.filter(loc => loc.ownerId === user?.id) || [];
 
-    // Добавляем useEffect для автоматического обновления данных при монтировании компонента
+    // Auto-refetch data when the component mounts
     useEffect(() => {
-        // Обновляем данные при загрузке компонента
         refetch();
     }, [refetch]);
 
@@ -49,12 +48,11 @@ export function UserLocations() {
             { id, status: 'published' },
             {
                 onSuccess: () => {
-                    // Явно запрашиваем обновление данных после изменения статуса
                     refetch();
                 },
                 onError: (error) => {
-                    console.error('Ошибка при публикации локации:', error);
-                    alert('Не удалось опубликовать локацию. Попробуйте еще раз.');
+                    console.error('Error publishing location:', error);
+                    alert('Failed to publish location. Please try again.');
                 }
             }
         );
@@ -65,12 +63,11 @@ export function UserLocations() {
             { id, status: 'draft' },
             {
                 onSuccess: () => {
-                    // Явно запрашиваем обновление данных после изменения статуса
                     refetch();
                 },
                 onError: (error) => {
-                    console.error('Ошибка при отмене публикации локации:', error);
-                    alert('Не удалось отменить публикацию локации. Попробуйте еще раз.');
+                    console.error('Error unpublishing location:', error);
+                    alert('Failed to unpublish location. Please try again.');
                 }
             }
         );

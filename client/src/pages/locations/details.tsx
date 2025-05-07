@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
     ArrowLeft,
     MapPin,
@@ -20,7 +20,8 @@ import {
     ChevronLeft,
     MinusCircle,
     PlusCircle,
-    EyeOff
+    EyeOff,
+    Link2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation, useUpdateLocationStatus } from "@/hooks/useLocations";
@@ -29,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { MapView } from '@/components/map/map-view';
 import { DeleteLocationDialog } from '@/components/locations/delete-location-dialog';
+import { ShareLocationDialog } from '@/components/locations/share-location-dialog';
 import { useAuthContext } from '@/context/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
@@ -36,12 +38,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
-    const { data: location, isLoading } = useLocation(id!);
+    const [searchParams] = useSearchParams();
+    const shareToken = searchParams.get('token'); // Get token from URL params
+    const { data: location, isLoading } = useLocation(id!, shareToken || undefined);
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [showGallery, setShowGallery] = useState(false);
     const [showFullscreenImage, setShowFullscreenImage] = useState(false);
+    const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
     const [bookingHours, setBookingHours] = useState(2);
 
@@ -400,6 +405,15 @@ export default function LocationDetailsPage() {
                                             </Button>
                                         )}
 
+                                        <Button
+                                            variant="outline"
+                                            className="flex items-center justify-center gap-2 w-full"
+                                            onClick={() => setIsShareDialogOpen(true)}
+                                        >
+                                            <Link2 className="h-4 w-4" />
+                                            Share link
+                                        </Button>
+
                                         <DeleteLocationDialog
                                             locationId={location.id}
                                             locationTitle={location.title}
@@ -534,7 +548,7 @@ export default function LocationDetailsPage() {
                             </TabsContent>
                         </Tabs>
 
-                        {/* Image gallery - улучшенная */}
+                        {/* Image gallery */}
                         <div className="mt-10">
                             <h2 className="text-2xl text-muted-foreground font-semibold mb-6">Gallery</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -585,7 +599,7 @@ export default function LocationDetailsPage() {
                 <Button size="lg">Book now</Button>
             </div>
 
-            {/* Полноэкранное изображение */}
+            {/* Fullscreen image */}
             {showFullscreenImage && (
                 <div className="fixed inset-0 bg-black z-50 flex flex-col">
                     <div className="p-4 flex items-center justify-between text-white/90 bg-black/50">
@@ -621,7 +635,7 @@ export default function LocationDetailsPage() {
                 </div>
             )}
 
-            {/* Улучшенная галерея для просмотра всех фотографий */}
+            {/* Gallery for viewing all images */}
             {showGallery && (
                 <div className="fixed inset-0 bg-background z-50 flex flex-col">
                     <div className="p-4 flex items-center justify-between border-b">
@@ -659,6 +673,17 @@ export default function LocationDetailsPage() {
                         </div>
                     </ScrollArea>
                 </div>
+            )}
+
+            {/* Share link dialog */}
+            {location.shareToken && (
+                <ShareLocationDialog
+                    isOpen={isShareDialogOpen}
+                    onClose={() => setIsShareDialogOpen(false)}
+                    locationId={location.id}
+                    locationTitle={location.title}
+                    shareToken={location.shareToken}
+                />
             )}
         </div>
     );

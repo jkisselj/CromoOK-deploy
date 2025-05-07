@@ -247,25 +247,39 @@ export function useCreateLocation() {
     });
 }
 
-export function useLocation(id: string) {
+export function useLocation(id: string, shareToken?: string) {
     const { user } = useAuthContext();
 
     return useQuery({
-        queryKey: ['location', id],
+        queryKey: ['location', id, shareToken],
         queryFn: async () => {
             // First try to get the location from Supabase
             try {
-                const { data: location, error } = await supabase
+                let query = supabase
                     .from('locations')
                     .select('*')
-                    .eq('id', id)
-                    .single();
+                    .eq('id', id);
+
+                // Если предоставлен токен доступа, добавляем его в запрос
+                if (shareToken) {
+                    // Устанавливаем токен доступа как параметр для политики безопасности
+                    await supabase.rpc('set_config', {
+                        key: 'app.location_share_token',
+                        value: shareToken
+                    });
+                }
+
+                const { data: location, error } = await query.single();
 
                 if (!error && location) {
-                    // Проверка доступа: пользователь может видеть только опубликованные локации
-                    // или свои собственные локации (независимо от статуса)
+                    // Проверка доступа: пользователь может видеть локацию если:
+                    // 1. Она опубликована
+                    // 2. Он является владельцем
+                    // 3. Предоставлен правильный токен доступа
                     const isOwner = user && location.owner_id === user.id;
-                    if (!isOwner && location.status !== 'published') {
+                    const hasValidShareToken = shareToken && location.share_token === shareToken;
+
+                    if (!isOwner && location.status !== 'published' && !hasValidShareToken) {
                         throw new Error('This location is not available');
                     }
 
@@ -275,7 +289,8 @@ export function useLocation(id: string) {
                         ownerId: location.owner_id,
                         createdAt: location.created_at,
                         updatedAt: location.updated_at,
-                        minimumBookingHours: location.minimum_booking_hours
+                        minimumBookingHours: location.minimum_booking_hours,
+                        shareToken: location.share_token
                     } as Location;
                 }
             } catch (err) {
