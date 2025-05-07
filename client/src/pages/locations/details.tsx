@@ -19,10 +19,11 @@ import {
     X,
     ChevronLeft,
     MinusCircle,
-    PlusCircle
+    PlusCircle,
+    EyeOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "@/hooks/useLocations";
+import { useLocation, useUpdateLocationStatus } from "@/hooks/useLocations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,7 @@ export default function LocationDetailsPage() {
     const [bookingHours, setBookingHours] = useState(2);
 
     const [autoplayPaused, setAutoplayPaused] = useState(false);
+    const updateLocationStatus = useUpdateLocationStatus();
 
     useEffect(() => {
         if (location?.minimumBookingHours) {
@@ -363,7 +365,7 @@ export default function LocationDetailsPage() {
                                     </span>
                                 </div>
                             </div>
-                            
+
                             {/* Admin tools section - integrated within price card */}
                             {isOwner && (
                                 <div className="p-6 border-t bg-muted/10">
@@ -377,6 +379,26 @@ export default function LocationDetailsPage() {
                                             <Edit className="h-4 w-4" />
                                             Edit Location
                                         </Button>
+
+                                        {location.status === 'published' && (
+                                            <Button
+                                                variant="outline"
+                                                className="flex items-center justify-center gap-2 w-full"
+                                                onClick={() => {
+                                                    updateLocationStatus.mutate(
+                                                        { id: location.id, status: 'draft' },
+                                                        {
+                                                            onSuccess: () => {
+                                                                navigate('/locations');
+                                                            }
+                                                        }
+                                                    );
+                                                }}
+                                            >
+                                                <EyeOff className="h-4 w-4" />
+                                                Unpublish Location
+                                            </Button>
+                                        )}
 
                                         <DeleteLocationDialog
                                             locationId={location.id}

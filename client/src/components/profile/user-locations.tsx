@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal, Star, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuthContext } from '@/hooks/useAuthContext';
-import { useLocations } from '@/hooks/useLocations';
+import { useLocations, useUpdateLocationStatus } from '@/hooks/useLocations';
 import { DeleteLocationDialog } from '@/components/locations/delete-location-dialog';
 import {
     DropdownMenu,
@@ -19,12 +19,20 @@ import {
 
 export function UserLocations() {
     const { user } = useAuthContext();
-    const { data: allLocations, isLoading } = useLocations();
+    // Передаем true в качестве второго параметра, чтобы загрузить все локации пользователя, включая черновики
+    const { data: allLocations, isLoading, refetch } = useLocations(undefined, true);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const updateLocationStatus = useUpdateLocationStatus();
 
     // Filter locations by current user
     const userLocations = allLocations?.filter(loc => loc.ownerId === user?.id) || [];
+
+    // Добавляем useEffect для автоматического обновления данных при монтировании компонента
+    useEffect(() => {
+        // Обновляем данные при загрузке компонента
+        refetch();
+    }, [refetch]);
 
     const handleDeleteClick = (locationId: string) => {
         setSelectedLocationId(locationId);
@@ -34,6 +42,38 @@ export function UserLocations() {
     const onDeleteDialogClose = () => {
         setIsDeleteDialogOpen(false);
         setSelectedLocationId(null);
+    };
+
+    const handlePublishLocation = (id: string) => {
+        updateLocationStatus.mutate(
+            { id, status: 'published' },
+            {
+                onSuccess: () => {
+                    // Явно запрашиваем обновление данных после изменения статуса
+                    refetch();
+                },
+                onError: (error) => {
+                    console.error('Ошибка при публикации локации:', error);
+                    alert('Не удалось опубликовать локацию. Попробуйте еще раз.');
+                }
+            }
+        );
+    };
+
+    const handleUnpublishLocation = (id: string) => {
+        updateLocationStatus.mutate(
+            { id, status: 'draft' },
+            {
+                onSuccess: () => {
+                    // Явно запрашиваем обновление данных после изменения статуса
+                    refetch();
+                },
+                onError: (error) => {
+                    console.error('Ошибка при отмене публикации локации:', error);
+                    alert('Не удалось отменить публикацию локации. Попробуйте еще раз.');
+                }
+            }
+        );
     };
 
     const selectedLocation = userLocations.find(loc => loc.id === selectedLocationId);
@@ -152,12 +192,12 @@ export function UserLocations() {
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                     <DropdownMenuSeparator />
                                                     {location.status !== 'published' && (
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handlePublishLocation(location.id)}>
                                                             Publish
                                                         </DropdownMenuItem>
                                                     )}
                                                     {location.status === 'published' && (
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleUnpublishLocation(location.id)}>
                                                             Unpublish
                                                         </DropdownMenuItem>
                                                     )}

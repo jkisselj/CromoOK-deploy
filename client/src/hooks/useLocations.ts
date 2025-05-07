@@ -24,10 +24,11 @@ export async function migrateAllDemoLocationsToSupabase(forceUpdate = false) {
     return migrateDemoLocationsToSupabase(forceUpdate);
 }
 
-export function useLocations(filters?: LocationFilter) {
+export function useLocations(filters?: LocationFilter, includeUserDrafts: boolean = false) {
+    const { user } = useAuthContext();
 
     return useQuery({
-        queryKey: ['locations', filters],
+        queryKey: ['locations', filters, includeUserDrafts],
         queryFn: async () => {
             // First try to get locations from Supabase
             try {
@@ -49,8 +50,12 @@ export function useLocations(filters?: LocationFilter) {
                     }
                 }
 
+                // Если includeUserDrafts = false, показываем только опубликованные
+                if (!includeUserDrafts) {
+                    query = query.eq('status', 'published');
+                }
+
                 const { data, error } = await query
-                    .eq('status', 'published')
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -67,6 +72,13 @@ export function useLocations(filters?: LocationFilter) {
                         updatedAt: loc.updated_at,
                         minimumBookingHours: loc.minimum_booking_hours
                     }));
+
+                    // Если includeUserDrafts = true, фильтруем, чтобы показать только локации текущего пользователя
+                    if (includeUserDrafts && user) {
+                        return mappedData.filter(loc =>
+                            loc.status === 'published' || loc.ownerId === user.id
+                        ) as Location[];
+                    }
 
                     // If we have Supabase data, we don't need to load demo or local data
                     return mappedData as Location[];
@@ -129,21 +141,21 @@ export function useCreateLocation() {
     return useMutation({
         mutationFn: async (location: CreateLocationDTO) => {
             const timestamp = new Date().toISOString();
-            
+
             if (!user) {
                 throw new Error('User is not authenticated. Please log in.');
             }
 
             // Generate a temporary folder name for images that's not used as the location ID
             const imagesFolderName = `loc-${Date.now().toString()}`;
-            
+
             // Process images if they exist
             let finalImages: string[] = [];
             if (location.images && location.images.length > 0) {
                 try {
                     // Use the existing image upload function with the folder name
                     finalImages = await uploadImagesFromUrls(location.images, imagesFolderName);
-                    
+
                     if (finalImages.length === 0 && location.images.length > 0) {
                         console.warn('Images were not uploaded correctly, there might be issues with the storage service');
                     }
@@ -197,7 +209,7 @@ export function useCreateLocation() {
 
                 if (error) {
                     console.error('Error saving location to Supabase:', error);
-                    
+
                     // Clean up uploaded images if location creation fails
                     if (finalImages.length > 0) {
                         for (const imageUrl of finalImages) {
@@ -210,12 +222,12 @@ export function useCreateLocation() {
                             }
                         }
                     }
-                    
+
                     throw new Error(`Error saving location: ${error.message}`);
                 }
 
                 console.log('Location saved to Supabase successfully:', data);
-                
+
                 // Return data from DB to have complete data
                 return data ? {
                     ...data,
@@ -236,6 +248,8 @@ export function useCreateLocation() {
 }
 
 export function useLocation(id: string) {
+    const { user } = useAuthContext();
+
     return useQuery({
         queryKey: ['location', id],
         queryFn: async () => {
@@ -248,6 +262,13 @@ export function useLocation(id: string) {
                     .single();
 
                 if (!error && location) {
+                    // Проверка доступа: пользователь может видеть только опубликованные локации
+                    // или свои собственные локации (независимо от статуса)
+                    const isOwner = user && location.owner_id === user.id;
+                    if (!isOwner && location.status !== 'published') {
+                        throw new Error('This location is not available');
+                    }
+
                     // Map snake_case to camelCase for frontend
                     return {
                         ...location,
@@ -372,6 +393,73 @@ export function useDeleteLocation() {
         onSuccess: (result) => {
             queryClient.invalidateQueries({ queryKey: ['locations'] });
             queryClient.invalidateQueries({ queryKey: ['location', result.id] });
+        },
+    });
+}
+
+export function useUpdateLocationStatus() {
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
+
+    return useMutation({
+        mutationFn: async ({ id, status }: { id: string; status: 'draft' | 'published' | 'archived' }) => {
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
+            }
+
+            try {
+                // Get the location first to check ownership
+                const { data: location, error: fetchError } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error fetching location from Supabase:', fetchError);
+                    throw new Error(`Failed to fetch location: ${fetchError.message}`);
+                }
+
+                if (!location) {
+                    throw new Error('Location not found');
+                }
+
+                // Check ownership
+                if (location.owner_id !== user.id) {
+                    throw new Error('You can only update your own locations');
+                }
+
+                // Update the location status
+                const { data, error } = await supabase
+                    .from('locations')
+                    .update({ status, updated_at: new Date().toISOString() })
+                    .eq('id', id)
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('Error updating location status in Supabase:', error);
+                    throw new Error(`Failed to update location status: ${error.message}`);
+                }
+
+                console.log('Location status updated successfully:', data);
+
+                // Return data from DB to have complete data
+                return data ? {
+                    ...data,
+                    ownerId: data.owner_id,
+                    createdAt: data.created_at,
+                    updatedAt: data.updated_at,
+                    minimumBookingHours: data.minimum_booking_hours
+                } as Location : {} as Location;
+            } catch (err) {
+                console.error('Failed to update location status:', err);
+                throw err;
+            }
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['locations'] });
+            queryClient.invalidateQueries({ queryKey: ['location', variables.id] });
         },
     });
 }
