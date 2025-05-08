@@ -605,7 +605,10 @@ export function useLocationShareAccess(locationId: string, shareToken?: string) 
     return useQuery({
         queryKey: ['location-share-access', locationId, shareToken],
         queryFn: async () => {
+            console.log('Checking share access with token:', shareToken, 'for location:', locationId);
+
             if (!shareToken) {
+                console.log('No share token provided');
                 return null;
             }
 
@@ -623,13 +626,16 @@ export function useLocationShareAccess(locationId: string, shareToken?: string) 
                 }
 
                 if (!shareData) {
+                    console.log('No share data found for token');
                     return null;
                 }
 
                 if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
+                    console.log('Share token has expired:', shareData.expires_at);
                     return null;
                 }
 
+                console.log('Share access found:', shareData.access_level, 'All share data:', shareData);
                 return shareData.access_level as ShareAccessLevel;
             } catch (err) {
                 console.error('Failed to fetch location share access:', err);
@@ -725,7 +731,7 @@ export function useUpdateLocation() {
                 if (user && existingLocation.owner_id === user.id) {
                     hasEditAccess = true;
                 }
-                
+
                 if (!hasEditAccess && shareToken) {
                     const { data: shareData, error: shareError } = await supabase
                         .from('location_shares')
@@ -734,10 +740,10 @@ export function useUpdateLocation() {
                         .eq('share_token', shareToken)
                         .single();
 
-                    if (!shareError && shareData && 
+                    if (!shareError && shareData &&
                         (shareData.access_level === 'admin' || shareData.access_level === 'full_info')) {
                         hasEditAccess = true;
-                        
+
                         if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
                             throw new Error('The share link has expired');
                         }
@@ -749,25 +755,25 @@ export function useUpdateLocation() {
                 }
 
                 let finalImages = existingLocation.images || [];
-                
+
                 if (location.images && location.images.length > 0) {
-                    const newImages = location.images.filter(img => 
-                        img.startsWith('blob:') || 
+                    const newImages = location.images.filter(img =>
+                        img.startsWith('blob:') ||
                         (img.startsWith('http') && !existingLocation.images.includes(img))
                     );
-                    
+
                     if (newImages.length > 0) {
                         try {
                             const imagesFolderName = existingLocation.tempImageFolder || `loc-${Date.now().toString()}`;
                             const uploadedImages = await uploadImagesFromUrls(newImages, imagesFolderName);
-                            
+
                             finalImages = [...finalImages.filter((img: string) => !img.startsWith('blob:'))];
-                            
+
                             const imageMap = new Map();
                             uploadedImages.forEach((url, index) => {
                                 imageMap.set(newImages[index], url);
                             });
-                            
+
                             location.images.forEach(img => {
                                 if (existingLocation.images.includes(img)) {
                                     if (!finalImages.includes(img)) {
