@@ -255,7 +255,7 @@ export function useLocation(id: string, shareToken?: string) {
         queryFn: async () => {
             // Проверяем токен доступа если он предоставлен
             let effectiveAccessLevel: ShareAccessLevel | null = null;
-            
+
             if (shareToken) {
                 try {
                     // Получаем информацию о токене доступа
@@ -265,7 +265,7 @@ export function useLocation(id: string, shareToken?: string) {
                         .eq('location_id', id)
                         .eq('share_token', shareToken)
                         .single();
-                    
+
                     if (!shareError && shareData) {
                         // Если токен действительный, сохраняем уровень доступа
                         effectiveAccessLevel = shareData.access_level as ShareAccessLevel;

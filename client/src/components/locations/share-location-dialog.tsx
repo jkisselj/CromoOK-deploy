@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link2, Copy, Check, Eye, Lock, ShieldCheck } from 'lucide-react';
-import { 
+import {
     Dialog,
     DialogContent,
     DialogHeader,
@@ -34,7 +34,7 @@ export function ShareLocationDialog({
     const [accessLevel, setAccessLevel] = useState<ShareAccessLevel>('full_info');
     const [shareName, setShareName] = useState('');
     const [shareUrl, setShareUrl] = useState('');
-    
+
     const createLocationShare = useCreateLocationShare();
 
     // Обрабатываем создание ссылки в зависимости от выбранного уровня доступа
@@ -45,7 +45,7 @@ export function ShareLocationDialog({
                 accessLevel,
                 name: shareName
             });
-            
+
             // Создаем URL с токеном для совместного доступа
             // Важно: убедитесь, что токен передается как параметр 'token'
             const url = `${window.location.origin}/locations/${locationId}?token=${share.shareToken}`;
@@ -85,26 +85,26 @@ export function ShareLocationDialog({
                         Create a link for access to the location "{locationTitle}" with a selected access level.
                     </DialogDescription>
                 </DialogHeader>
-                
+
                 {!shareUrl ? (
                     // Form for creating a link with access level selection
                     <>
                         <div className="space-y-4 my-2">
                             <div>
                                 <Label htmlFor="share-name">Link name (optional)</Label>
-                                <Input 
+                                <Input
                                     id="share-name"
-                                    value={shareName} 
+                                    value={shareName}
                                     onChange={(e) => setShareName(e.target.value)}
                                     placeholder="Example: for client A"
                                     className="mt-1"
                                 />
                             </div>
-                            
+
                             <div>
                                 <Label>Access level</Label>
-                                <RadioGroup 
-                                    value={accessLevel} 
+                                <RadioGroup
+                                    value={accessLevel}
                                     onValueChange={(value) => setAccessLevel(value as ShareAccessLevel)}
                                     className="mt-2 space-y-3"
                                 >
@@ -125,7 +125,7 @@ export function ShareLocationDialog({
                                                 </div>
                                             </CardContent>
                                         </Card>
-                                        
+
                                         <Card className={`border-2 transition-colors cursor-pointer ${accessLevel === 'full_info' ? 'border-primary' : 'border-muted'}`}>
                                             <CardContent className="p-4">
                                                 <div className="flex items-start gap-3">
@@ -142,7 +142,7 @@ export function ShareLocationDialog({
                                                 </div>
                                             </CardContent>
                                         </Card>
-                                        
+
                                         <Card className={`border-2 transition-colors cursor-pointer ${accessLevel === 'admin' ? 'border-primary' : 'border-muted'}`}>
                                             <CardContent className="p-4">
                                                 <div className="flex items-start gap-3">
@@ -163,9 +163,9 @@ export function ShareLocationDialog({
                                 </RadioGroup>
                             </div>
                         </div>
-                        
+
                         <DialogFooter className="mt-4">
-                            <Button 
+                            <Button
                                 onClick={handleCreateShare}
                                 disabled={createLocationShare.isPending}
                                 className="w-full sm:w-auto"
@@ -196,16 +196,16 @@ export function ShareLocationDialog({
                                     <><ShieldCheck className="h-4 w-4" /> Access level: admin</>
                                 )}
                             </div>
-                            
+
                             <div className="flex items-center space-x-2">
                                 <Input
                                     value={shareUrl}
                                     readOnly
                                     className="flex-1"
                                 />
-                                <Button 
-                                    type="button" 
-                                    size="icon" 
+                                <Button
+                                    type="button"
+                                    size="icon"
                                     onClick={copyToClipboard}
                                     variant="outline"
                                 >
@@ -216,22 +216,22 @@ export function ShareLocationDialog({
                                     )}
                                 </Button>
                             </div>
-                            
+
                             <div className="text-sm text-muted-foreground mt-2">
                                 This link will work until you delete it or the location.
                             </div>
                         </div>
-                        
+
                         <DialogFooter className="sm:justify-start mt-4">
-                            <Button 
-                                type="button" 
+                            <Button
+                                type="button"
                                 onClick={copyToClipboard}
                                 className="w-full sm:w-auto"
                             >
                                 {copied ? 'Copied!' : 'Copy link'}
                             </Button>
-                            <Button 
-                                type="button" 
+                            <Button
+                                type="button"
                                 onClick={() => setShareUrl('')}
                                 variant="outline"
                                 className="w-full sm:w-auto"

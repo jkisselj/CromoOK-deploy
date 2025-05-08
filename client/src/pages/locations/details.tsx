@@ -44,7 +44,7 @@ export default function LocationDetailsPage() {
     const [searchParams] = useSearchParams();
     const shareToken = searchParams.get('token'); // Получаем токен из URL параметров
     const accessLevelParam = searchParams.get('access') as ShareAccessLevel | null; // Получаем уровень доступа из URL
-    
+
     const { data: location, isLoading } = useLocation(id!, shareToken || undefined);
     const { data: accessLevel } = useLocationShareAccess(id!, shareToken || undefined);
     const { user } = useAuthContext();
@@ -58,7 +58,7 @@ export default function LocationDetailsPage() {
 
     const [autoplayPaused, setAutoplayPaused] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
-    
+
     // Определяем фактический уровень доступа
     // Приоритет:
     // 1. Если пользователь - владелец, всегда полный доступ
@@ -66,10 +66,10 @@ export default function LocationDetailsPage() {
     // 3. Если есть уровень доступа из URL, используем его
     // 4. По умолчанию - полный доступ для опубликованных локаций, иначе null (нет доступа)
     const isOwner = Boolean(user && location?.ownerId === user.id);
-    const effectiveAccessLevel = isOwner 
-        ? 'admin' as ShareAccessLevel 
+    const effectiveAccessLevel = isOwner
+        ? 'admin' as ShareAccessLevel
         : accessLevel || accessLevelParam || (location?.status === 'published' ? 'full_info' : null);
-    
+
     // Флаги для определения, что показывать в зависимости от уровня доступа
     const canViewBasicInfo = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
     const canViewDetails = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
@@ -262,16 +262,25 @@ export default function LocationDetailsPage() {
                 {/* Title container with improved styling */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10 z-10">
                     <div className="max-w-4xl">
-                        <Badge className="mb-3 bg-primary/90 hover:bg-primary text-white">
-                            {location.status === "published" ? "Available" : location.status}
-                        </Badge>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">
-                            {location.title}
-                        </h1>
-                        <div className="flex items-center gap-2 text-white/90">
-                            <MapPin className="h-4 w-4" />
-                            <span className="font-medium">{location.address}</span>
-                        </div>
+                        {canViewBasicInfo ? (
+                            <>
+                                <Badge className="mb-3 bg-primary/90 hover:bg-primary text-white">
+                                    {location.status === "published" ? "Available" : location.status}
+                                </Badge>
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">
+                                    {location.title}
+                                </h1>
+                                <div className="flex items-center gap-2 text-white/90">
+                                    <MapPin className="h-4 w-4" />
+                                    <span className="font-medium">{location.address}</span>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="bg-black/40 backdrop-blur-sm p-4 rounded-lg inline-flex items-center">
+                                <Lock className="h-5 w-5 text-amber-400 mr-2" />
+                                <span className="text-white font-medium">Limited access view - Photos only</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -673,7 +682,11 @@ export default function LocationDetailsPage() {
             {showFullscreenImage && (
                 <div className="fixed inset-0 bg-black z-50 flex flex-col">
                     <div className="p-4 flex items-center justify-between text-white/90 bg-black/50">
-                        <h3 className="font-medium">Photo {activeImageIndex + 1} of {displayImages.length}</h3>
+                        <h3 className="font-medium">
+                            {canViewBasicInfo 
+                                ? `${location.title} - Photo ${activeImageIndex + 1} of ${displayImages.length}`
+                                : `Photo ${activeImageIndex + 1} of ${displayImages.length}`}
+                        </h3>
                         <Button variant="ghost" size="icon" className="text-white hover:text-white/80" onClick={() => setShowFullscreenImage(false)}>
                             <X className="h-5 w-5" />
                         </Button>
@@ -682,7 +695,9 @@ export default function LocationDetailsPage() {
                     <div className="flex-1 relative">
                         <img
                             src={displayImages[activeImageIndex]}
-                            alt={`${location.title} - photo ${activeImageIndex + 1}`}
+                            alt={canViewBasicInfo 
+                                ? `${location.title} - photo ${activeImageIndex + 1}` 
+                                : `Photo ${activeImageIndex + 1}`}
                             className="absolute inset-0 w-full h-full object-contain"
                         />
 
