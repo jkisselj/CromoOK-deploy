@@ -31,6 +31,7 @@ export default function App() {
           <Route path="locations">
             <Route index element={<LocationsPage />} />
             <Route path=":id" element={<LocationDetailsPage />} />
+            <Route path="edit/:id" element={<EditLocationPage />} />
             <Route path="map" element={<LocationsMapPage />} />
           </Route>
         </Route>
@@ -45,7 +46,6 @@ export default function App() {
         >
           <Route path="locations">
             <Route path="new" element={<NewLocationPage />} />
-            <Route path="edit/:id" element={<EditLocationPage />} />
           </Route>
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />

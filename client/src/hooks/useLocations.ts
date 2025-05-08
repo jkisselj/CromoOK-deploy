@@ -697,10 +697,10 @@ export function useUpdateLocation() {
     const { user } = useAuthContext();
 
     return useMutation({
-        mutationFn: async ({ id, location }: { id: string; location: Partial<CreateLocationDTO> }) => {
+        mutationFn: async ({ id, location, shareToken }: { id: string; location: Partial<CreateLocationDTO>; shareToken?: string }) => {
             const timestamp = new Date().toISOString();
 
-            if (!user) {
+            if (!user && !shareToken) {
                 throw new Error('User is not authenticated. Please log in.');
             }
 
@@ -720,8 +720,32 @@ export function useUpdateLocation() {
                     throw new Error('Location not found');
                 }
 
-                if (existingLocation.owner_id !== user.id) {
-                    throw new Error('You can only update your own locations');
+                let hasEditAccess = false;
+
+                if (user && existingLocation.owner_id === user.id) {
+                    hasEditAccess = true;
+                }
+                
+                if (!hasEditAccess && shareToken) {
+                    const { data: shareData, error: shareError } = await supabase
+                        .from('location_shares')
+                        .select('*')
+                        .eq('location_id', id)
+                        .eq('share_token', shareToken)
+                        .single();
+
+                    if (!shareError && shareData && 
+                        (shareData.access_level === 'edit' || shareData.access_level === 'full')) {
+                        hasEditAccess = true;
+                        
+                        if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
+                            throw new Error('The share link has expired');
+                        }
+                    }
+                }
+
+                if (!hasEditAccess) {
+                    throw new Error('You do not have permission to update this location');
                 }
 
                 let finalImages = existingLocation.images || [];

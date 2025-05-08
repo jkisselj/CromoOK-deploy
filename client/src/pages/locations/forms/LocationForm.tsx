@@ -112,16 +112,17 @@ const DAYS_OF_WEEK = [
 interface LocationFormProps {
     mode: 'create' | 'edit';
     locationId?: string;
+    shareToken?: string;
 }
 
-export default function LocationForm({ mode, locationId }: LocationFormProps) {
+export default function LocationForm({ mode, locationId, shareToken }: LocationFormProps) {
     const navigate = useNavigate();
     const { user } = useAuthContext();
 
     const { mutateAsync: createLocation, isPending: isCreatingLocation } = useCreateLocation();
     const { mutateAsync: updateLocation, isPending: isUpdatingLocation } = useUpdateLocation();
     const { data: existingLocation, isLoading: isLoadingLocation } =
-        mode === 'edit' && locationId ? useLocation(locationId) : { data: null, isLoading: false };
+        mode === 'edit' && locationId ? useLocation(locationId, shareToken) : { data: null, isLoading: false };
 
     const [activeTab, setActiveTab] = useState("basic");
     const [newAmenity, setNewAmenity] = useState("");
@@ -265,13 +266,14 @@ export default function LocationForm({ mode, locationId }: LocationFormProps) {
                 }
                 await updateLocation({
                     id: locationId,
-                    location: locationData
+                    location: locationData,
+                    ...(shareToken ? { shareToken } : {})
                 });
                 toast({
                     title: "Success!",
                     description: "Location updated successfully",
                 });
-                navigate(`/locations/${locationId}`);
+                navigate(`/locations/${locationId}${shareToken ? `?token=${shareToken}` : ''}`);
             }
 
         } catch (error: any) {
@@ -382,10 +384,8 @@ export default function LocationForm({ mode, locationId }: LocationFormProps) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
-        } else if (e.type === "dragleave") {
-            setDragActive(false);
+        if (e.type === "dragenter" || e.type === "dragleave" || e.type === "dragover") {
+            setDragActive(e.type === "dragenter" || e.type === "dragover");
         }
     };
 
