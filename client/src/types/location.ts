@@ -13,6 +13,7 @@ export interface Location {
     updatedAt: string;
     status: 'draft' | 'published' | 'archived';
     shareToken?: string; // Token for sharing private locations
+    shareAccessLevel?: ShareAccessLevel; // Default access level for shares
     coordinates?: {
         latitude: number;
         longitude: number;
@@ -36,6 +37,20 @@ export interface Location {
         daysAvailable: string[];
     };
     minimumBookingHours?: number;
+}
+
+// Типы уровней доступа для совместного использования
+export type ShareAccessLevel = 'photos_only' | 'full_info' | 'admin';
+
+export interface LocationShare {
+    id: string;
+    locationId: string;
+    shareToken: string;
+    accessLevel: ShareAccessLevel;
+    createdAt: string;
+    expiresAt?: string;
+    createdBy?: string;
+    name?: string;
 }
 
 export interface LocationFilter {

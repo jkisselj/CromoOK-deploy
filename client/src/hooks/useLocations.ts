@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import supabase from '@/lib/supabaseClient';
-import type { Location, LocationFilter, CreateLocationDTO } from '@/types/location';
+import type { Location, LocationFilter, CreateLocationDTO, ShareAccessLevel, LocationShare } from '@/types/location';
 import { useAuthContext } from '@/context/AuthContext';
 import { deleteImage, uploadImagesFromUrls } from '@/lib/imageService';
 import { setDemoLocations, migrateDemoLocationsToSupabase } from '@/utils/migrationUtils';
@@ -255,70 +255,73 @@ export function useLocation(id: string, shareToken?: string) {
         queryFn: async () => {
             // First try to get the location from Supabase
             try {
-                let query = supabase
+                // Получаем локацию из Supabase
+                const { data: location, error } = await supabase
                     .from('locations')
                     .select('*')
-                    .eq('id', id);
+                    .eq('id', id)
+                    .single();
 
-                // Если предоставлен токен доступа, добавляем его в запрос
-                if (shareToken) {
-                    // Устанавливаем токен доступа как параметр для политики безопасности
-                    await supabase.rpc('set_config', {
-                        key: 'app.location_share_token',
-                        value: shareToken
-                    });
+                if (error) {
+                    console.error('Failed to fetch location from Supabase:', error);
+                    throw error;
                 }
 
-                const { data: location, error } = await query.single();
+                if (!location) {
+                    throw new Error('Location not found');
+                }
 
-                if (!error && location) {
-                    // Проверка доступа: пользователь может видеть локацию если:
-                    // 1. Она опубликована
-                    // 2. Он является владельцем
-                    // 3. Предоставлен правильный токен доступа
-                    const isOwner = user && location.owner_id === user.id;
-                    const hasValidShareToken = shareToken && location.share_token === shareToken;
+                // Проверка доступа к локации
+                const isOwner = user && location.owner_id === user.id;
+                const isPublished = location.status === 'published';
+                const hasValidShareToken = shareToken && location.share_token === shareToken;
 
-                    if (!isOwner && location.status !== 'published' && !hasValidShareToken) {
-                        throw new Error('This location is not available');
+                // Пользователь может видеть локацию, если:
+                // 1. Она опубликована, или
+                // 2. Он является владельцем, или
+                // 3. Предоставлен правильный токен доступа
+                if (!isPublished && !isOwner && !hasValidShareToken) {
+                    throw new Error('This location is not available or you do not have access');
+                }
+
+                // Map snake_case to camelCase for frontend
+                return {
+                    ...location,
+                    ownerId: location.owner_id,
+                    createdAt: location.created_at,
+                    updatedAt: location.updated_at,
+                    minimumBookingHours: location.minimum_booking_hours,
+                    shareToken: location.share_token
+                } as Location;
+            } catch (err) {
+                console.error('Error loading location:', err);
+
+                // Проверяем демо-локации и локальное хранилище только если нет токена доступа
+                if (!shareToken) {
+                    // If not found in Supabase, check demo locations
+                    const demoLocation = DEMO_LOCATIONS.find(loc => loc.id === id);
+                    if (demoLocation) {
+                        return demoLocation;
                     }
 
-                    // Map snake_case to camelCase for frontend
-                    return {
-                        ...location,
-                        ownerId: location.owner_id,
-                        createdAt: location.created_at,
-                        updatedAt: location.updated_at,
-                        minimumBookingHours: location.minimum_booking_hours,
-                        shareToken: location.share_token
-                    } as Location;
-                }
-            } catch (err) {
-                console.error('Failed to fetch location from Supabase:', err);
-            }
-
-            // If not found in Supabase, check demo locations
-            const demoLocation = DEMO_LOCATIONS.find(loc => loc.id === id);
-            if (demoLocation) {
-                return demoLocation;
-            }
-
-            // If not found in demo data, check localStorage
-            try {
-                const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
-                if (storedLocations) {
-                    const userCreatedLocations: Location[] = JSON.parse(storedLocations);
-                    const userLocation = userCreatedLocations.find(loc => loc.id === id);
-                    if (userLocation) {
-                        console.log('Found location in localStorage:', userLocation);
-                        return userLocation;
+                    // If not found in demo data, check localStorage
+                    try {
+                        const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
+                        if (storedLocations) {
+                            const userCreatedLocations: Location[] = JSON.parse(storedLocations);
+                            const userLocation = userCreatedLocations.find(loc => loc.id === id);
+                            if (userLocation) {
+                                console.log('Found location in localStorage:', userLocation);
+                                return userLocation;
+                            }
+                        }
+                    } catch (storageErr) {
+                        console.error('Error reading from localStorage:', storageErr);
                     }
                 }
-            } catch (err) {
-                console.error('Error reading from localStorage:', err);
-            }
 
-            throw new Error('Location not found');
+                throw new Error('Location not found or you do not have access');
+            }
         },
     });
 }
@@ -475,6 +478,269 @@ export function useUpdateLocationStatus() {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['locations'] });
             queryClient.invalidateQueries({ queryKey: ['location', variables.id] });
+        },
+    });
+}
+
+/**
+ * Hook для создания или обновления ссылки для совместного доступа к локации
+ */
+export function useCreateLocationShare() {
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
+
+    return useMutation({
+        mutationFn: async ({
+            locationId,
+            accessLevel,
+            name = ''
+        }: {
+            locationId: string;
+            accessLevel: ShareAccessLevel;
+            name?: string;
+        }) => {
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
+            }
+
+            try {
+                // Получаем локацию для проверки прав доступа
+                const { data: location, error: fetchError } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', locationId)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error fetching location from Supabase:', fetchError);
+                    throw new Error(`Failed to fetch location: ${fetchError.message}`);
+                }
+
+                if (!location) {
+                    throw new Error('Location not found');
+                }
+
+                // Проверка прав владельца
+                if (location.owner_id !== user.id) {
+                    throw new Error('You can only share your own locations');
+                }
+
+                // Генерируем токен для общего доступа
+                const { data: tokenData, error: tokenError } = await supabase
+                    .rpc('generate_unique_share_token');
+
+                if (tokenError) {
+                    console.error('Error generating share token:', tokenError);
+                    throw new Error(`Failed to generate share token: ${tokenError.message}`);
+                }
+
+                const shareToken = tokenData || (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+
+                // Создаем запись о совместном доступе
+                const { data: shareData, error: shareError } = await supabase
+                    .from('location_shares')
+                    .insert([{
+                        location_id: locationId,
+                        share_token: shareToken,
+                        access_level: accessLevel,
+                        created_by: user.id,
+                        name: name || null
+                    }])
+                    .select()
+                    .single();
+
+                if (shareError) {
+                    console.error('Error creating location share:', shareError);
+                    throw new Error(`Failed to create share link: ${shareError.message}`);
+                }
+
+                // Преобразуем полученные данные в формат для frontend
+                return {
+                    id: shareData.id,
+                    locationId: shareData.location_id,
+                    shareToken: shareData.share_token,
+                    accessLevel: shareData.access_level as ShareAccessLevel,
+                    createdAt: shareData.created_at,
+                    expiresAt: shareData.expires_at,
+                    createdBy: shareData.created_by,
+                    name: shareData.name
+                } as LocationShare;
+            } catch (err) {
+                console.error('Failed to create location share:', err);
+                throw err;
+            }
+        },
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({ queryKey: ['location-shares', result.locationId] });
+        },
+    });
+}
+
+/**
+ * Hook для получения всех ссылок совместного доступа для конкретной локации
+ */
+export function useLocationShares(locationId: string) {
+    const { user } = useAuthContext();
+
+    return useQuery({
+        queryKey: ['location-shares', locationId],
+        queryFn: async () => {
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
+            }
+
+            try {
+                // Получаем локацию для проверки прав доступа
+                const { data: location, error: fetchError } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', locationId)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error fetching location from Supabase:', fetchError);
+                    throw new Error(`Failed to fetch location: ${fetchError.message}`);
+                }
+
+                if (!location) {
+                    throw new Error('Location not found');
+                }
+
+                // Проверка прав владельца
+                if (location.owner_id !== user.id) {
+                    throw new Error('You can only view shares for your own locations');
+                }
+
+                // Получаем все ссылки для совместного доступа
+                const { data: sharesData, error: sharesError } = await supabase
+                    .from('location_shares')
+                    .select('*')
+                    .eq('location_id', locationId)
+                    .order('created_at', { ascending: false });
+
+                if (sharesError) {
+                    console.error('Error fetching location shares:', sharesError);
+                    throw new Error(`Failed to fetch share links: ${sharesError.message}`);
+                }
+
+                // Преобразуем полученные данные в формат для frontend
+                return (sharesData || []).map(share => ({
+                    id: share.id,
+                    locationId: share.location_id,
+                    shareToken: share.share_token,
+                    accessLevel: share.access_level as ShareAccessLevel,
+                    createdAt: share.created_at,
+                    expiresAt: share.expires_at,
+                    createdBy: share.created_by,
+                    name: share.name
+                } as LocationShare));
+            } catch (err) {
+                console.error('Failed to fetch location shares:', err);
+                return [];
+            }
+        },
+        enabled: !!user && !!locationId,
+    });
+}
+
+/**
+ * Hook для получения уровня доступа по токену
+ */
+export function useLocationShareAccess(locationId: string, shareToken?: string) {
+    return useQuery({
+        queryKey: ['location-share-access', locationId, shareToken],
+        queryFn: async () => {
+            if (!shareToken) {
+                return null;
+            }
+
+            try {
+                // Получаем запись о совместном доступе по токену
+                const { data: shareData, error: shareError } = await supabase
+                    .from('location_shares')
+                    .select('*')
+                    .eq('location_id', locationId)
+                    .eq('share_token', shareToken)
+                    .single();
+
+                if (shareError) {
+                    console.error('Error fetching location share access:', shareError);
+                    return null;
+                }
+
+                if (!shareData) {
+                    return null;
+                }
+
+                // Проверяем срок действия
+                if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
+                    return null; // Истек срок действия
+                }
+
+                return shareData.access_level as ShareAccessLevel;
+            } catch (err) {
+                console.error('Failed to fetch location share access:', err);
+                return null;
+            }
+        },
+        enabled: !!shareToken && !!locationId,
+    });
+}
+
+/**
+ * Hook для удаления ссылки совместного доступа
+ */
+export function useDeleteLocationShare() {
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
+
+    return useMutation({
+        mutationFn: async ({ shareId, locationId }: { shareId: string; locationId: string }) => {
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
+            }
+
+            try {
+                // Получаем запись о совместном доступе
+                const { data: shareData, error: fetchError } = await supabase
+                    .from('location_shares')
+                    .select('*, locations!inner(*)')
+                    .eq('id', shareId)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error fetching location share:', fetchError);
+                    throw new Error(`Failed to fetch share link: ${fetchError.message}`);
+                }
+
+                if (!shareData) {
+                    throw new Error('Share link not found');
+                }
+
+                // Проверка прав владельца локации
+                if (shareData.locations.owner_id !== user.id) {
+                    throw new Error('You can only delete shares for your own locations');
+                }
+
+                // Удаляем запись о совместном доступе
+                const { error: deleteError } = await supabase
+                    .from('location_shares')
+                    .delete()
+                    .eq('id', shareId);
+
+                if (deleteError) {
+                    console.error('Error deleting location share:', deleteError);
+                    throw new Error(`Failed to delete share link: ${deleteError.message}`);
+                }
+
+                return { success: true, id: shareId, locationId };
+            } catch (err) {
+                console.error('Failed to delete location share:', err);
+                throw err;
+            }
+        },
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({ queryKey: ['location-shares', result.locationId] });
         },
     });
 }

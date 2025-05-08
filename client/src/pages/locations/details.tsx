@@ -21,10 +21,12 @@ import {
     MinusCircle,
     PlusCircle,
     EyeOff,
-    Link2
+    Link2,
+    Lock,
+    Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation, useUpdateLocationStatus } from "@/hooks/useLocations";
+import { useLocation, useUpdateLocationStatus, useLocationShareAccess } from "@/hooks/useLocations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -35,12 +37,16 @@ import { useAuthContext } from '@/context/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ShareAccessLevel } from "@/types/location";
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
-    const shareToken = searchParams.get('token'); // Get token from URL params
+    const shareToken = searchParams.get('token'); // Получаем токен из URL параметров
+    const accessLevelParam = searchParams.get('access') as ShareAccessLevel | null; // Получаем уровень доступа из URL
+    
     const { data: location, isLoading } = useLocation(id!, shareToken || undefined);
+    const { data: accessLevel } = useLocationShareAccess(id!, shareToken || undefined);
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -52,6 +58,23 @@ export default function LocationDetailsPage() {
 
     const [autoplayPaused, setAutoplayPaused] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
+    
+    // Определяем фактический уровень доступа
+    // Приоритет:
+    // 1. Если пользователь - владелец, всегда полный доступ
+    // 2. Если есть уровень доступа из БД, используем его
+    // 3. Если есть уровень доступа из URL, используем его
+    // 4. По умолчанию - полный доступ для опубликованных локаций, иначе null (нет доступа)
+    const isOwner = Boolean(user && location?.ownerId === user.id);
+    const effectiveAccessLevel = isOwner 
+        ? 'admin' as ShareAccessLevel 
+        : accessLevel || accessLevelParam || (location?.status === 'published' ? 'full_info' : null);
+    
+    // Флаги для определения, что показывать в зависимости от уровня доступа
+    const canViewBasicInfo = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
+    const canViewDetails = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
+    const canViewPrice = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
+    const canEdit = isOwner || effectiveAccessLevel === 'admin';
 
     useEffect(() => {
         if (location?.minimumBookingHours) {
@@ -75,8 +98,6 @@ export default function LocationDetailsPage() {
 
     const pauseAutoplay = () => setAutoplayPaused(true);
     const resumeAutoplay = () => setAutoplayPaused(false);
-
-    const isOwner = user && location?.ownerId === user.id;
 
     if (isLoading) {
         return (
@@ -261,119 +282,133 @@ export default function LocationDetailsPage() {
                     {/* Left sidebar with admin tools and price */}
                     <div className="order-2 lg:order-1">
                         {/* Price card */}
-                        <Card className="sticky top-6">
-                            <CardContent className="p-6">
-                                <div className="flex items-baseline justify-between mb-6">
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-bold">{location.price}€</span>
-                                        <span className="text-muted-foreground text-lg">/hour</span>
+                        {canViewPrice ? (
+                            <Card className="sticky top-6">
+                                <CardContent className="p-6">
+                                    <div className="flex items-baseline justify-between mb-6">
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-3xl font-bold">{location.price}€</span>
+                                            <span className="text-muted-foreground text-lg">/hour</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                                            <Clock className="h-4 w-4" />
+                                            <span>Min {location.minimumBookingHours || 2}h</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                                        <Clock className="h-4 w-4" />
-                                        <span>Min {location.minimumBookingHours || 2}h</span>
-                                    </div>
-                                </div>
 
-                                {/* Booking form */}
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <Button variant="outline" className="h-14 text-left justify-start p-3">
-                                            <div className="flex flex-col items-start">
-                                                <span className="text-xs text-muted-foreground">Date</span>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <CalendarRange className="h-4 w-4" />
-                                                    <span>Select date</span>
+                                    {/* Booking form */}
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                                <div className="flex flex-col items-start">
+                                                    <span className="text-xs text-muted-foreground">Date</span>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <CalendarRange className="h-4 w-4" />
+                                                        <span>Select date</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Button>
+                                            </Button>
 
-                                        <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                            <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                                <div className="flex flex-col items-start">
+                                                    <span className="text-xs text-muted-foreground">Time</span>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <Clock className="h-4 w-4" />
+                                                        <span>Select time</span>
+                                                    </div>
+                                                </div>
+                                            </Button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-3 border rounded-md h-14">
                                             <div className="flex flex-col items-start">
-                                                <span className="text-xs text-muted-foreground">Time</span>
+                                                <span className="text-xs text-muted-foreground">Duration</span>
                                                 <div className="flex items-center gap-2 mt-0.5">
                                                     <Clock className="h-4 w-4" />
-                                                    <span>Select time</span>
+                                                    <span>{bookingHours} hours</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => {
+                                                        const minHours = location.minimumBookingHours || 2;
+                                                        if (bookingHours > minHours) {
+                                                            setBookingHours(bookingHours - 1);
+                                                        }
+                                                    }}
+                                                    disabled={bookingHours <= (location.minimumBookingHours || 2)}
+                                                >
+                                                    <MinusCircle className="h-5 w-5" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setBookingHours(bookingHours + 1)}
+                                                >
+                                                    <PlusCircle className="h-5 w-5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <Button variant="outline" className="w-full h-14 text-left justify-start p-3">
+                                            <div className="flex flex-col items-start">
+                                                <span className="text-xs text-muted-foreground">Guests</span>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <Users className="h-4 w-4" />
+                                                    <span>Number of people</span>
                                                 </div>
                                             </div>
                                         </Button>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-3 border rounded-md h-14">
-                                        <div className="flex flex-col items-start">
-                                            <span className="text-xs text-muted-foreground">Duration</span>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <Clock className="h-4 w-4" />
-                                                <span>{bookingHours} hours</span>
-                                            </div>
+                                    <Separator className="my-6" />
+
+                                    {/* Price breakdown */}
+                                    <div className="space-y-3 mb-6">
+                                        <div className="flex justify-between">
+                                            <span>{location.price}€ × {bookingHours} hours</span>
+                                            <span>{location.price * bookingHours}€</span>
                                         </div>
-                                        <div className="flex items-center">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => {
-                                                    const minHours = location.minimumBookingHours || 2;
-                                                    if (bookingHours > minHours) {
-                                                        setBookingHours(bookingHours - 1);
-                                                    }
-                                                }}
-                                                disabled={bookingHours <= (location.minimumBookingHours || 2)}
-                                            >
-                                                <MinusCircle className="h-5 w-5" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => setBookingHours(bookingHours + 1)}
-                                            >
-                                                <PlusCircle className="h-5 w-5" />
-                                            </Button>
+                                        <div className="flex justify-between">
+                                            <span>Service fee</span>
+                                            <span>{Math.round(location.price * bookingHours * 0.1)}€</span>
+                                        </div>
+                                        <Separator className="my-2" />
+                                        <div className="flex justify-between font-semibold">
+                                            <span>Total</span>
+                                            <span>{location.price * bookingHours + Math.round(location.price * bookingHours * 0.1)}€</span>
                                         </div>
                                     </div>
 
-                                    <Button variant="outline" className="w-full h-14 text-left justify-start p-3">
-                                        <div className="flex flex-col items-start">
-                                            <span className="text-xs text-muted-foreground">Guests</span>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <Users className="h-4 w-4" />
-                                                <span>Number of people</span>
-                                            </div>
-                                        </div>
-                                    </Button>
-                                </div>
-
-                                <Separator className="my-6" />
-
-                                {/* Price breakdown */}
-                                <div className="space-y-3 mb-6">
-                                    <div className="flex justify-between">
-                                        <span>{location.price}€ × {bookingHours} hours</span>
-                                        <span>{location.price * bookingHours}€</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Service fee</span>
-                                        <span>{Math.round(location.price * bookingHours * 0.1)}€</span>
-                                    </div>
-                                    <Separator className="my-2" />
-                                    <div className="flex justify-between font-semibold">
-                                        <span>Total</span>
-                                        <span>{location.price * bookingHours + Math.round(location.price * bookingHours * 0.1)}€</span>
+                                    <Button className="w-full" size="lg">Book now</Button>
+                                </CardContent>
+                                <div className="p-4 border-t bg-muted/20">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="text-muted-foreground">
+                                            You won't be charged yet
+                                        </span>
                                     </div>
                                 </div>
-
-                                <Button className="w-full" size="lg">Book now</Button>
-                            </CardContent>
-                            <div className="p-4 border-t bg-muted/20">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Info className="h-3.5 w-3.5 text-muted-foreground" />
-                                    <span className="text-muted-foreground">
-                                        You won't be charged yet
-                                    </span>
+                            </Card>
+                        ) : (
+                            <Card className="sticky top-6 p-6">
+                                <div className="flex items-center justify-center flex-col space-y-3 py-8">
+                                    <Lock className="h-10 w-10 text-muted-foreground/50" />
+                                    <h3 className="text-xl font-medium">Pricing Information Hidden</h3>
+                                    <p className="text-muted-foreground text-center max-w-xs">
+                                        Pricing and booking details for this location are not available with your current access level.
+                                    </p>
                                 </div>
-                            </div>
+                            </Card>
+                        )}
 
-                            {/* Admin tools section - integrated within price card */}
-                            {isOwner && (
-                                <div className="p-6 border-t bg-muted/10">
+                        {/* Admin tools section */}
+                        {canEdit && (
+                            <Card className="mt-6">
+                                <CardContent className="p-6">
                                     <h2 className="text-base font-semibold mb-4">Location management</h2>
                                     <div className="flex flex-col gap-3">
                                         <Button
@@ -420,137 +455,170 @@ export default function LocationDetailsPage() {
                                             isOwner={isOwner}
                                         />
                                     </div>
-                                </div>
-                            )}
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
 
                     {/* Main content middle section */}
                     <div className="order-1 lg:order-2 lg:col-span-2">
-                        {/* Quick info cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
-                            <Card className="border-0 shadow-none bg-muted/20">
-                                <CardContent className="p-4 md:p-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                            <Users className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Capacity</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Up to {location.features?.maxCapacity || 10} people
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-0 shadow-none bg-muted/20">
-                                <CardContent className="p-4 md:p-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                            <Ruler className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Space</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {location.area}m² area
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-0 shadow-none bg-muted/20">
-                                <CardContent className="p-4 md:p-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                            <Shield className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Verified</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Qualified location
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Tabs for content */}
-                        <Tabs defaultValue="details" className="w-full mb-10 text-muted-foreground">
-                            <TabsList className="mb-6">
-                                <TabsTrigger value="details">Details</TabsTrigger>
-                                <TabsTrigger value="amenities">Amenities</TabsTrigger>
-                                <TabsTrigger value="rules">Rules</TabsTrigger>
-                                <TabsTrigger value="map">Map</TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="details" className="space-y-6">
-                                <div>
-                                    <h2 className="text-2xl font-semibold mb-4">About this location</h2>
-                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <p className="text-muted-foreground whitespace-pre-line">
-                                            {location.description}
+                        {/* Access level banner for non-full access */}
+                        {effectiveAccessLevel === 'photos_only' && (
+                            <Card className="mb-6 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+                                <CardContent className="p-4 flex items-center gap-3">
+                                    <Eye className="h-5 w-5 text-amber-500" />
+                                    <div>
+                                        <h3 className="font-medium">Limited access mode</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            You have read-only access to view photos of this location.
                                         </p>
                                     </div>
-                                </div>
-                            </TabsContent>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                            <TabsContent value="amenities">
-                                <h2 className="text-2xl font-semibold mb-6">What this place offers</h2>
-                                {location.amenities?.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                        {location.amenities.map((amenity, i) => (
-                                            <div key={i} className="flex items-center gap-3">
-                                                <Check className="h-4 w-4 text-primary" />
-                                                <span>{amenity}</span>
+                        {/* Quick info cards - show only if basic info is available */}
+                        {canViewBasicInfo && (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+                                <Card className="border-0 shadow-none bg-muted/20">
+                                    <CardContent className="p-4 md:p-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Users className="h-5 w-5" />
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-muted-foreground">No amenities listed for this location.</p>
-                                )}
-                            </TabsContent>
+                                            <div>
+                                                <p className="font-medium">Capacity</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Up to {location.features?.maxCapacity || 10} people
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                            <TabsContent value="rules">
-                                <h2 className="text-2xl font-semibold mb-6">Location rules</h2>
-                                {location.rules?.length > 0 ? (
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                        {location.rules.map((rule, i) => (
-                                            <div key={i} className="flex items-center gap-3">
-                                                <div className="p-1.5 rounded-full bg-muted">
-                                                    <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                                <Card className="border-0 shadow-none bg-muted/20">
+                                    <CardContent className="p-4 md:p-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Ruler className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">Space</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {location.area}m² area
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="border-0 shadow-none bg-muted/20">
+                                    <CardContent className="p-4 md:p-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Shield className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">Verified</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Qualified location
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+
+                        {/* Tabs for content - show only if details are available */}
+                        {canViewDetails ? (
+                            <Tabs defaultValue="details" className="w-full mb-10 text-muted-foreground">
+                                <TabsList className="mb-6">
+                                    <TabsTrigger value="details">Details</TabsTrigger>
+                                    <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                                    <TabsTrigger value="rules">Rules</TabsTrigger>
+                                    <TabsTrigger value="map">Map</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="details" className="space-y-6">
+                                    <div>
+                                        <h2 className="text-2xl font-semibold mb-4">About this location</h2>
+                                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                                            <p className="text-muted-foreground whitespace-pre-line">
+                                                {location.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="amenities">
+                                    <h2 className="text-2xl font-semibold mb-6">What this place offers</h2>
+                                    {location.amenities?.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                            {location.amenities.map((amenity, i) => (
+                                                <div key={i} className="flex items-center gap-3">
+                                                    <Check className="h-4 w-4 text-primary" />
+                                                    <span>{amenity}</span>
                                                 </div>
-                                                <span>{rule}</span>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-muted-foreground">No amenities listed for this location.</p>
+                                    )}
+                                </TabsContent>
+
+                                <TabsContent value="rules">
+                                    <h2 className="text-2xl font-semibold mb-6">Location rules</h2>
+                                    {location.rules?.length > 0 ? (
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            {location.rules.map((rule, i) => (
+                                                <div key={i} className="flex items-center gap-3">
+                                                    <div className="p-1.5 rounded-full bg-muted">
+                                                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                                                    </div>
+                                                    <span>{rule}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-muted-foreground">No specific rules for this location.</p>
+                                    )}
+                                </TabsContent>
+
+                                <TabsContent value="map">
+                                    <h2 className="text-2xl font-semibold mb-6">Location on map</h2>
+                                    {location.coordinates ? (
+                                        <MapView
+                                            latitude={location.coordinates.latitude}
+                                            longitude={location.coordinates.longitude}
+                                            zoom={15}
+                                            interactive={true}
+                                            className="w-full h-[500px] rounded-xl overflow-hidden"
+                                        />
+                                    ) : (
+                                        <p className="text-muted-foreground">Map location not available.</p>
+                                    )}
+                                </TabsContent>
+                            </Tabs>
+                        ) : (
+                            <Card className="mb-10">
+                                <CardContent className="p-6">
+                                    <div className="flex items-center justify-center flex-col space-y-3 py-8">
+                                        <Lock className="h-10 w-10 text-muted-foreground/50" />
+                                        <h3 className="text-xl font-medium">Location Details Hidden</h3>
+                                        <p className="text-muted-foreground text-center max-w-xs">
+                                            Detailed information about this location is not available with your current access level.
+                                        </p>
                                     </div>
-                                ) : (
-                                    <p className="text-muted-foreground">No specific rules for this location.</p>
-                                )}
-                            </TabsContent>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                            <TabsContent value="map">
-                                <h2 className="text-2xl font-semibold mb-6">Location on map</h2>
-                                {location.coordinates ? (
-                                    <MapView
-                                        latitude={location.coordinates.latitude}
-                                        longitude={location.coordinates.longitude}
-                                        zoom={15}
-                                        interactive={true}
-                                        className="w-full h-[500px] rounded-xl overflow-hidden"
-                                    />
-                                ) : (
-                                    <p className="text-muted-foreground">Map location not available.</p>
-                                )}
-                            </TabsContent>
-                        </Tabs>
-
-                        {/* Image gallery */}
+                        {/* Image gallery - всегда показывается */}
                         <div className="mt-10">
-                            <h2 className="text-2xl text-muted-foreground font-semibold mb-6">Gallery</h2>
+                            <h2 className="text-2xl text-muted-foreground font-semibold mb-6">
+                                {canViewBasicInfo ? 'Gallery' : 'Photos'}
+                            </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {displayImages.slice(0, 6).map((image, idx) => (
                                     <div
@@ -563,7 +631,7 @@ export default function LocationDetailsPage() {
                                     >
                                         <img
                                             src={image}
-                                            alt={`Gallery image ${idx + 1}`}
+                                            alt={canViewBasicInfo ? `${location.title} - photo ${idx + 1}` : `Photo ${idx + 1}`}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -588,16 +656,18 @@ export default function LocationDetailsPage() {
                 </div>
             </div>
 
-            {/* Mobile bottom action bar */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border z-40 flex items-center justify-between">
-                <div>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-bold">{location.price}€</span>
-                        <span className="text-muted-foreground">/hour</span>
+            {/* Mobile bottom action bar - only show if price is viewable */}
+            {canViewPrice && (
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border z-40 flex items-center justify-between">
+                    <div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-xl font-bold">{location.price}€</span>
+                            <span className="text-muted-foreground">/hour</span>
+                        </div>
                     </div>
+                    <Button size="lg">Book now</Button>
                 </div>
-                <Button size="lg">Book now</Button>
-            </div>
+            )}
 
             {/* Fullscreen image */}
             {showFullscreenImage && (
@@ -682,7 +752,6 @@ export default function LocationDetailsPage() {
                     onClose={() => setIsShareDialogOpen(false)}
                     locationId={location.id}
                     locationTitle={location.title}
-                    shareToken={location.shareToken}
                 />
             )}
         </div>

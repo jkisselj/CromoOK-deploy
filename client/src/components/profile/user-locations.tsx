@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal } from 'lucide-react';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useLocations, useUpdateLocationStatus } from '@/hooks/useLocations';
