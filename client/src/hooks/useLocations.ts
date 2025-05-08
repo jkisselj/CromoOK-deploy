@@ -282,21 +282,23 @@ export function useLocation(id: string, shareToken?: string) {
                     effectiveAccessLevel
                 });
 
-                if (!isPublished && !isOwner && !hasValidShareToken) {
+                // Always grant access if the user is the owner or the location is published
+                // or if the user has a valid share token (any level of access)
+                if (isOwner || isPublished || hasValidShareToken) {
+                    console.log('Access granted to location:', id);
+                    return {
+                        ...location,
+                        ownerId: location.owner_id,
+                        createdAt: location.created_at,
+                        updatedAt: location.updated_at,
+                        minimumBookingHours: location.minimum_booking_hours,
+                        shareToken: shareToken, // Return the share token if it was passed
+                        shareAccessLevel: effectiveAccessLevel || undefined
+                    } as Location;
+                } else {
                     console.error('Access denied to location:', id);
                     throw new Error('This location is not available or you do not have access');
                 }
-
-                console.log('Access granted to location:', id);
-                return {
-                    ...location,
-                    ownerId: location.owner_id,
-                    createdAt: location.created_at,
-                    updatedAt: location.updated_at,
-                    minimumBookingHours: location.minimum_booking_hours,
-                    shareToken: location.share_token,
-                    shareAccessLevel: effectiveAccessLevel || undefined
-                } as Location;
             } catch (err) {
                 console.error('Error loading location:', err);
 
