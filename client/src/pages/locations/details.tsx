@@ -38,6 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShareAccessLevel } from "@/types/location";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
@@ -53,11 +54,13 @@ export default function LocationDetailsPage() {
     const [showGallery, setShowGallery] = useState(false);
     const [showFullscreenImage, setShowFullscreenImage] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+    const [showMobileActions, setShowMobileActions] = useState(false);
 
     const [bookingHours, setBookingHours] = useState(2);
 
     const [autoplayPaused, setAutoplayPaused] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
+    const isMobile = useIsMobile();
 
    
     const isOwner = Boolean(user && location?.ownerId === user.id);
@@ -205,21 +208,76 @@ export default function LocationDetailsPage() {
                     >
                         <LayoutGrid className="h-4 w-4" />
                     </Button>
-                    <Button
-                        variant="secondary"
-                        size="icon"
-                        className="rounded-full shadow-lg bg-background/80 backdrop-blur-md"
-                    >
-                        <Share2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="icon"
-                        className="rounded-full shadow-lg bg-background/80 backdrop-blur-md"
-                    >
-                        <Heart className="h-4 w-4" />
-                    </Button>
+                    {isMobile ? (
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            className="rounded-full shadow-lg bg-background/80 backdrop-blur-md"
+                            onClick={() => setShowMobileActions(prev => !prev)}
+                        >
+                            <AlertCircle className="h-4 w-4" />
+                        </Button>
+                    ) : (
+                        <>
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="rounded-full shadow-lg bg-background/80 backdrop-blur-md"
+                                onClick={() => setIsShareDialogOpen(true)}
+                            >
+                                <Share2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="rounded-full shadow-lg bg-background/80 backdrop-blur-md"
+                            >
+                                <Heart className="h-4 w-4" />
+                            </Button>
+                        </>
+                    )}
                 </div>
+                
+                {/* Mobile actions dropdown */}
+                {isMobile && showMobileActions && (
+                    <div className="absolute top-20 right-6 bg-background/95 backdrop-blur-md shadow-lg rounded-xl p-2 z-30 w-40">
+                        <div className="flex flex-col">
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="justify-start py-2"
+                                onClick={() => {
+                                    setIsShareDialogOpen(true);
+                                    setShowMobileActions(false);
+                                }}
+                            >
+                                <Share2 className="h-4 w-4 mr-2" />
+                                <span>Share</span>
+                            </Button>
+                            <Button variant="ghost" size="sm" className="justify-start py-2">
+                                <Heart className="h-4 w-4 mr-2" />
+                                <span>Save</span>
+                            </Button>
+                            {canEdit && (
+                                <>
+                                    <Separator className="my-1" />
+                                    <Button 
+                                        variant="ghost"
+                                        size="sm"
+                                        className="justify-start py-2 text-red-500 hover:text-red-600 hover:bg-red-100/10"
+                                        onClick={() => {
+                                            navigate(`/locations/edit/${location.id}`);
+                                            setShowMobileActions(false);
+                                        }}
+                                    >
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        <span>Edit</span>
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Fullscreen action */}
                 <Button
@@ -280,10 +338,10 @@ export default function LocationDetailsPage() {
             </div>
 
             {/* Main content */}
-            <div className="max-w-7xl mx-auto px-4 py-10">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="max-w-7xl mx-auto px-4 py-6 lg:py-10">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     <div className="order-2 lg:order-1">
-                        <div className="sticky top-6 space-y-6">
+                        <div className="sticky top-6 space-y-4 lg:space-y-6">
                             {canViewPrice ? (
                                 <Card>
                                     <CardContent className="p-6">
@@ -482,16 +540,16 @@ export default function LocationDetailsPage() {
 
                         {/* Quick info cards - show only if basic info is available */}
                         {canViewBasicInfo && (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-8 lg:mb-10">
                                 <Card className="border-0 shadow-none bg-muted/20">
-                                    <CardContent className="p-4 md:p-6">
+                                    <CardContent className={`p-3 sm:p-4 md:p-6 ${isMobile ? 'flex flex-row items-center' : ''}`}>
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                                <Users className="h-5 w-5" />
+                                            <div className="p-2 md:p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Users className="h-4 w-4 md:h-5 md:w-5" />
                                             </div>
                                             <div>
                                                 <p className="font-medium">Capacity</p>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs sm:text-sm text-muted-foreground">
                                                     Up to {location.features?.maxCapacity || 10} people
                                                 </p>
                                             </div>
@@ -500,14 +558,14 @@ export default function LocationDetailsPage() {
                                 </Card>
 
                                 <Card className="border-0 shadow-none bg-muted/20">
-                                    <CardContent className="p-4 md:p-6">
+                                    <CardContent className={`p-3 sm:p-4 md:p-6 ${isMobile ? 'flex flex-row items-center' : ''}`}>
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                                <Ruler className="h-5 w-5" />
+                                            <div className="p-2 md:p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Ruler className="h-4 w-4 md:h-5 md:w-5" />
                                             </div>
                                             <div>
                                                 <p className="font-medium">Space</p>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs sm:text-sm text-muted-foreground">
                                                     {location.area}m² area
                                                 </p>
                                             </div>
@@ -516,14 +574,14 @@ export default function LocationDetailsPage() {
                                 </Card>
 
                                 <Card className="border-0 shadow-none bg-muted/20">
-                                    <CardContent className="p-4 md:p-6">
+                                    <CardContent className={`p-3 sm:p-4 md:p-6 ${isMobile ? 'flex flex-row items-center' : ''}`}>
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2.5 rounded-full bg-primary/10 text-primary">
-                                                <Shield className="h-5 w-5" />
+                                            <div className="p-2 md:p-2.5 rounded-full bg-primary/10 text-primary">
+                                                <Shield className="h-4 w-4 md:h-5 md:w-5" />
                                             </div>
                                             <div>
                                                 <p className="font-medium">Verified</p>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs sm:text-sm text-muted-foreground">
                                                     Qualified location
                                                 </p>
                                             </div>
@@ -536,11 +594,11 @@ export default function LocationDetailsPage() {
                         {/* Tabs for content - show only if details are available */}
                         {canViewDetails ? (
                             <Tabs defaultValue="details" className="w-full mb-10 text-muted-foreground">
-                                <TabsList className="mb-6">
-                                    <TabsTrigger value="details">Details</TabsTrigger>
-                                    <TabsTrigger value="amenities">Amenities</TabsTrigger>
-                                    <TabsTrigger value="rules">Rules</TabsTrigger>
-                                    <TabsTrigger value="map">Map</TabsTrigger>
+                                <TabsList className={`mb-6 ${isMobile ? 'w-full grid grid-cols-4' : ''}`}>
+                                    <TabsTrigger value="details" className={isMobile ? 'text-xs' : ''}>Details</TabsTrigger>
+                                    <TabsTrigger value="amenities" className={isMobile ? 'text-xs' : ''}>Amenities</TabsTrigger>
+                                    <TabsTrigger value="rules" className={isMobile ? 'text-xs' : ''}>Rules</TabsTrigger>
+                                    <TabsTrigger value="map" className={isMobile ? 'text-xs' : ''}>Map</TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="details" className="space-y-6">
@@ -617,13 +675,13 @@ export default function LocationDetailsPage() {
                             </Card>
                         )}
 
-                        {/* Image gallery - всегда показывается */}
-                        <div className="mt-10">
-                            <h2 className="text-2xl text-muted-foreground font-semibold mb-6">
+                        {/* Image gallery - адаптированная для мобильных устройств */}
+                        <div className="mt-8 lg:mt-10">
+                            <h2 className="text-xl lg:text-2xl text-muted-foreground font-semibold mb-4 lg:mb-6">
                                 {canViewBasicInfo ? 'Gallery' : 'Photos'}
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {displayImages.slice(0, 6).map((image, idx) => (
+                            <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-2 md:grid-cols-3 gap-3'}`}>
+                                {displayImages.slice(0, isMobile ? 4 : 6).map((image, idx) => (
                                     <div
                                         key={idx}
                                         className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group"
@@ -643,14 +701,16 @@ export default function LocationDetailsPage() {
                                     </div>
                                 ))}
 
-                                {displayImages.length > 6 && (
+                                {displayImages.length > (isMobile ? 4 : 6) && (
                                     <Button
                                         variant="outline"
                                         className="flex items-center justify-center gap-2 aspect-[4/3]"
                                         onClick={() => setShowGallery(true)}
                                     >
-                                        <Camera className="h-5 w-5 mr-1 text-muted-foreground" />
-                                        <span className="text-muted-foreground"> View all {displayImages.length} photos</span>
+                                        <Camera className="h-4 w-4 mr-1 text-muted-foreground" />
+                                        <span className={`text-muted-foreground ${isMobile ? 'text-xs' : ''}`}> 
+                                            {isMobile ? `+${displayImages.length - 4} photos` : `View all ${displayImages.length} photos`}
+                                        </span>
                                     </Button>
                                 )}
                             </div>
@@ -660,7 +720,7 @@ export default function LocationDetailsPage() {
             </div>
 
             {/* Mobile bottom action bar - only show if price is viewable */}
-            {canViewPrice && (
+            {canViewPrice && isMobile && (
                 <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border z-40 flex items-center justify-between">
                     <div>
                         <div className="flex items-baseline gap-1">
@@ -668,8 +728,26 @@ export default function LocationDetailsPage() {
                             <span className="text-muted-foreground">/hour</span>
                         </div>
                     </div>
-                    <Button size="lg">Book now</Button>
+                    <Button 
+                        size="lg"
+                        onClick={() => {
+                            // Прокрутить к блоку бронирования на мобильных устройствах
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                            // Добавить отступ для основного контента, чтобы предотвратить перекрытие нижней панелью
+                            document.body.style.paddingBottom = '80px';
+                        }}
+                    >
+                        Book now
+                    </Button>
                 </div>
+            )}
+
+            {/* Добавляем отступ внизу для мобильных устройств, чтобы контент не перекрывался нижней панелью */}
+            {isMobile && canViewPrice && (
+                <div className="h-20 lg:h-0"></div>
             )}
 
             {/* Fullscreen image */}
