@@ -735,7 +735,7 @@ export function useUpdateLocation() {
                         .single();
 
                     if (!shareError && shareData && 
-                        (shareData.access_level === 'edit' || shareData.access_level === 'full')) {
+                        (shareData.access_level === 'admin' || shareData.access_level === 'full_info')) {
                         hasEditAccess = true;
                         
                         if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
