@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,8 @@ import { Plus, Edit, Trash2, Loader2, MapPin, Eye, MoreHorizontal } from 'lucide
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useLocations, useUpdateLocationStatus } from '@/hooks/useLocations';
 import { DeleteLocationDialog } from '@/components/locations/delete-location-dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from '@/components/ui/use-toast';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,21 +24,37 @@ export function UserLocations() {
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
+    const isMobile = useIsMobile();
+    const navigate = useNavigate();
+    const componentMounted = useRef(true);
+    const { toast } = useToast();
 
     const userLocations = allLocations?.filter(loc => loc.ownerId === user?.id) || [];
+
+    useEffect(() => {
+        return () => {
+            componentMounted.current = false;
+        };
+    }, []);
 
     useEffect(() => {
         refetch();
     }, [refetch]);
 
     const handleDeleteClick = (locationId: string) => {
+        if (!componentMounted.current) return;
         setSelectedLocationId(locationId);
         setIsDeleteDialogOpen(true);
     };
 
     const onDeleteDialogClose = () => {
+        if (!componentMounted.current) return;
         setIsDeleteDialogOpen(false);
-        setSelectedLocationId(null);
+        setTimeout(() => {
+            if (componentMounted.current) {
+                setSelectedLocationId(null);
+            }
+        }, 300);
     };
 
     const handlePublishLocation = (id: string) => {
@@ -44,11 +62,21 @@ export function UserLocations() {
             { id, status: 'published' },
             {
                 onSuccess: () => {
-                    refetch();
+                    if (componentMounted.current) {
+                        refetch();
+                        toast({
+                            title: "Success",
+                            description: "Location has been published",
+                        });
+                    }
                 },
                 onError: (error) => {
                     console.error('Error publishing location:', error);
-                    alert('Failed to publish location. Please try again.');
+                    toast({
+                        title: "Error",
+                        description: "Failed to publish location. Please try again.",
+                        variant: "destructive"
+                    });
                 }
             }
         );
@@ -59,14 +87,30 @@ export function UserLocations() {
             { id, status: 'draft' },
             {
                 onSuccess: () => {
-                    refetch();
+                    if (componentMounted.current) {
+                        refetch();
+                        toast({
+                            title: "Success",
+                            description: "Location has been unpublished",
+                        });
+                    }
                 },
                 onError: (error) => {
                     console.error('Error unpublishing location:', error);
-                    alert('Failed to unpublish location. Please try again.');
+                    toast({
+                        title: "Error",
+                        description: "Failed to unpublish location. Please try again.",
+                        variant: "destructive"
+                    });
                 }
             }
         );
+    };
+
+    const handleLocationAction = (action: 'view' | 'edit', locationId: string) => {
+        if (isMobile) {
+            navigate(action === 'view' ? `/locations/${locationId}` : `/locations/edit/${locationId}`);
+        }
     };
 
     const selectedLocation = userLocations.find(loc => loc.id === selectedLocationId);

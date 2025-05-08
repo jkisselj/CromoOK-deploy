@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useDeleteLocation } from '@/hooks/useLocations';
 import { useToast } from '@/components/ui/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DeleteLocationDialogProps {
     locationId: string;
@@ -36,10 +37,20 @@ export function DeleteLocationDialog({
     const deleteLocation = useDeleteLocation();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const isMobile = useIsMobile();
 
-    // Use external state if provided, otherwise internal
     const isControlled = externalIsOpen !== undefined;
     const isOpen = isControlled ? externalIsOpen : internalIsOpen;
+
+    useEffect(() => {
+        return () => {
+            if (isControlled && onClose) {
+                onClose();
+            } else {
+                setInternalIsOpen(false);
+            }
+        };
+    }, [isControlled, onClose]);
 
     const setIsOpen = (open: boolean) => {
         if (!isControlled) {
@@ -57,14 +68,20 @@ export function DeleteLocationDialog({
         setIsDeleting(true);
         try {
             await deleteLocation.mutateAsync(locationId);
+            setIsOpen(false);
             toast({
                 title: 'Location Deleted',
                 description: `Location "${locationTitle}" has been successfully deleted`,
             });
 
-            // If we're on the location page, redirect to the locations list
             if (window.location.pathname.includes(`/locations/${locationId}`)) {
-                navigate('/locations');
+                if (isMobile) {
+                    setTimeout(() => {
+                        navigate('/locations');
+                    }, 100);
+                } else {
+                    navigate('/locations');
+                }
             }
         } catch (error) {
             toast({
@@ -74,7 +91,13 @@ export function DeleteLocationDialog({
             });
         } finally {
             setIsDeleting(false);
-            setIsOpen(false);
+            if (isMobile && isOpen) {
+                setTimeout(() => {
+                    setIsOpen(false);
+                }, 100);
+            } else {
+                setIsOpen(false);
+            }
         }
     };
 
