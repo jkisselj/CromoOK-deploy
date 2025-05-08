@@ -48,13 +48,34 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
+      const { data: userData } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'login',
+            login_hint: email
+          }
+        }
+      });
+
+      if (userData) {
+        setError("This email is linked to a Google account. Please sign in using the 'Login with Google' button.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        setError(error.message);
+        if (error.message.includes("Invalid login credentials")) {
+          setError("You may have registered via Google. Try clicking the 'Login with Google' button.");
+        } else {
+          setError(error.message);
+        }
         console.error("Login error:", error);
       } else {
         console.log("User logged in:", data.user);

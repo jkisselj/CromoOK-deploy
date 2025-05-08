@@ -73,6 +73,16 @@ export default function Register() {
         return;
       }
 
+      const { data: userData } = await supabase.auth.admin.getUserById(email);
+      
+      if (userData) {
+        if (userData.user && userData.user.app_metadata?.provider === 'google') {
+          setError("This email is already linked to a Google account. Please sign in with Google or use another email.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -83,13 +93,21 @@ export default function Register() {
         },
       });
 
-      if (error) throw error;
-
-      if (data.user) {
+      if (error) {
+        if (error.message.includes("User already registered")) {
+          setError("A user with this email is already registered. Did you sign up with Google? Try logging in with the 'Login with Google' button.");
+        } else {
+          setError(error.message);
+        }
+      } else if (data.user) {
         navigate("/");
       }
     } catch (err: any) {
-      setError(err.message);
+      if (err.message.includes("already registered") || err.message.includes("already exists")) {
+        setError("A user with this email already exists. If you previously logged in with Google, use the 'Login with Google' button.");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setIsLoading(false);
     }

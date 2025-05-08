@@ -282,185 +282,185 @@ export default function LocationDetailsPage() {
             {/* Main content */}
             <div className="max-w-7xl mx-auto px-4 py-10">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left sidebar with admin tools and price */}
                     <div className="order-2 lg:order-1">
-                        {/* Price card */}
-                        {canViewPrice ? (
-                            <Card className="sticky top-6">
-                                <CardContent className="p-6">
-                                    <div className="flex items-baseline justify-between mb-6">
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-3xl font-bold">{location.price}€</span>
-                                            <span className="text-muted-foreground text-lg">/hour</span>
+                        <div className="sticky top-6 space-y-6">
+                            {canViewPrice ? (
+                                <Card>
+                                    <CardContent className="p-6">
+                                        <div className="flex items-baseline justify-between mb-6">
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-3xl font-bold">{location.price}€</span>
+                                                <span className="text-muted-foreground text-lg">/hour</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                                                <Clock className="h-4 w-4" />
+                                                <span>Min {location.minimumBookingHours || 2}h</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                                            <Clock className="h-4 w-4" />
-                                            <span>Min {location.minimumBookingHours || 2}h</span>
-                                        </div>
-                                    </div>
 
-                                    {/* Booking form */}
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Button variant="outline" className="h-14 text-left justify-start p-3">
-                                                <div className="flex flex-col items-start">
-                                                    <span className="text-xs text-muted-foreground">Date</span>
-                                                    <div className="flex items-center gap-2 mt-0.5">
-                                                        <CalendarRange className="h-4 w-4" />
-                                                        <span>Select date</span>
+                                        {/* Booking form */}
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-xs text-muted-foreground">Date</span>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <CalendarRange className="h-4 w-4" />
+                                                            <span>Select date</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </Button>
+                                                </Button>
 
-                                            <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                                <Button variant="outline" className="h-14 text-left justify-start p-3">
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-xs text-muted-foreground">Time</span>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <Clock className="h-4 w-4" />
+                                                            <span>Select time</span>
+                                                        </div>
+                                                    </div>
+                                                </Button>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-3 border rounded-md h-14">
                                                 <div className="flex flex-col items-start">
-                                                    <span className="text-xs text-muted-foreground">Time</span>
+                                                    <span className="text-xs text-muted-foreground">Duration</span>
                                                     <div className="flex items-center gap-2 mt-0.5">
                                                         <Clock className="h-4 w-4" />
-                                                        <span>Select time</span>
+                                                        <span>{bookingHours} hours</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => {
+                                                            const minHours = location.minimumBookingHours || 2;
+                                                            if (bookingHours > minHours) {
+                                                                setBookingHours(bookingHours - 1);
+                                                            }
+                                                        }}
+                                                        disabled={bookingHours <= (location.minimumBookingHours || 2)}
+                                                    >
+                                                        <MinusCircle className="h-5 w-5" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => setBookingHours(bookingHours + 1)}
+                                                    >
+                                                        <PlusCircle className="h-5 w-5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            <Button variant="outline" className="w-full h-14 text-left justify-start p-3">
+                                                <div className="flex flex-col items-start">
+                                                    <span className="text-xs text-muted-foreground">Guests</span>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <Users className="h-4 w-4" />
+                                                        <span>Number of people</span>
                                                     </div>
                                                 </div>
                                             </Button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-3 border rounded-md h-14">
-                                            <div className="flex flex-col items-start">
-                                                <span className="text-xs text-muted-foreground">Duration</span>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <Clock className="h-4 w-4" />
-                                                    <span>{bookingHours} hours</span>
-                                                </div>
+                                        <Separator className="my-6" />
+
+                                        {/* Price breakdown */}
+                                        <div className="space-y-3 mb-6">
+                                            <div className="flex justify-between">
+                                                <span>{location.price}€ × {bookingHours} hours</span>
+                                                <span>{location.price * bookingHours}€</span>
                                             </div>
-                                            <div className="flex items-center">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => {
-                                                        const minHours = location.minimumBookingHours || 2;
-                                                        if (bookingHours > minHours) {
-                                                            setBookingHours(bookingHours - 1);
-                                                        }
-                                                    }}
-                                                    disabled={bookingHours <= (location.minimumBookingHours || 2)}
-                                                >
-                                                    <MinusCircle className="h-5 w-5" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => setBookingHours(bookingHours + 1)}
-                                                >
-                                                    <PlusCircle className="h-5 w-5" />
-                                                </Button>
+                                            <div className="flex justify-between">
+                                                <span>Service fee</span>
+                                                <span>{Math.round(location.price * bookingHours * 0.1)}€</span>
+                                            </div>
+                                            <Separator className="my-2" />
+                                            <div className="flex justify-between font-semibold">
+                                                <span>Total</span>
+                                                <span>{location.price * bookingHours + Math.round(location.price * bookingHours * 0.1)}€</span>
                                             </div>
                                         </div>
 
-                                        <Button variant="outline" className="w-full h-14 text-left justify-start p-3">
-                                            <div className="flex flex-col items-start">
-                                                <span className="text-xs text-muted-foreground">Guests</span>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <Users className="h-4 w-4" />
-                                                    <span>Number of people</span>
-                                                </div>
-                                            </div>
-                                        </Button>
-                                    </div>
-
-                                    <Separator className="my-6" />
-
-                                    {/* Price breakdown */}
-                                    <div className="space-y-3 mb-6">
-                                        <div className="flex justify-between">
-                                            <span>{location.price}€ × {bookingHours} hours</span>
-                                            <span>{location.price * bookingHours}€</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Service fee</span>
-                                            <span>{Math.round(location.price * bookingHours * 0.1)}€</span>
-                                        </div>
-                                        <Separator className="my-2" />
-                                        <div className="flex justify-between font-semibold">
-                                            <span>Total</span>
-                                            <span>{location.price * bookingHours + Math.round(location.price * bookingHours * 0.1)}€</span>
+                                        <Button className="w-full" size="lg">Book now</Button>
+                                    </CardContent>
+                                    <div className="p-4 border-t bg-muted/20">
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                                            <span className="text-muted-foreground">
+                                                You won't be charged yet
+                                            </span>
                                         </div>
                                     </div>
-
-                                    <Button className="w-full" size="lg">Book now</Button>
-                                </CardContent>
-                                <div className="p-4 border-t bg-muted/20">
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Info className="h-3.5 w-3.5 text-muted-foreground" />
-                                        <span className="text-muted-foreground">
-                                            You won't be charged yet
-                                        </span>
+                                </Card>
+                            ) : (
+                                <Card className="p-6">
+                                    <div className="flex items-center justify-center flex-col space-y-3 py-8">
+                                        <Lock className="h-10 w-10 text-muted-foreground/50" />
+                                        <h3 className="text-xl font-medium">Pricing Information Hidden</h3>
+                                        <p className="text-muted-foreground text-center max-w-xs">
+                                            Pricing and booking details for this location are not available with your current access level.
+                                        </p>
                                     </div>
-                                </div>
-                            </Card>
-                        ) : (
-                            <Card className="sticky top-6 p-6">
-                                <div className="flex items-center justify-center flex-col space-y-3 py-8">
-                                    <Lock className="h-10 w-10 text-muted-foreground/50" />
-                                    <h3 className="text-xl font-medium">Pricing Information Hidden</h3>
-                                    <p className="text-muted-foreground text-center max-w-xs">
-                                        Pricing and booking details for this location are not available with your current access level.
-                                    </p>
-                                </div>
-                            </Card>
-                        )}
+                                </Card>
+                            )}
 
-                        {/* Admin tools section */}
-                        {canEdit && (
-                            <Card className="mt-6">
-                                <CardContent className="p-6">
-                                    <h2 className="text-base font-semibold mb-4">Location management</h2>
-                                    <div className="flex flex-col gap-3">
-                                        <Button
-                                            variant="outline"
-                                            className="flex items-center justify-center gap-2 w-full"
-                                            onClick={() => navigate(`/locations/edit/${location.id}`)}
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                            Edit Location
-                                        </Button>
-
-                                        {location.status === 'published' && (
+                            {/* Admin tools section - всегда отображается вторым, после блока бронирования */}
+                            {canEdit && (
+                                <Card>
+                                    <CardContent className="p-6">
+                                        <h2 className="text-base font-semibold mb-4">Location management</h2>
+                                        <div className="flex flex-col gap-3">
                                             <Button
                                                 variant="outline"
                                                 className="flex items-center justify-center gap-2 w-full"
-                                                onClick={() => {
-                                                    updateLocationStatus.mutate(
-                                                        { id: location.id, status: 'draft' },
-                                                        {
-                                                            onSuccess: () => {
-                                                                navigate('/locations');
-                                                            }
-                                                        }
-                                                    );
-                                                }}
+                                                onClick={() => navigate(`/locations/edit/${location.id}`)}
                                             >
-                                                <EyeOff className="h-4 w-4" />
-                                                Unpublish Location
+                                                <Edit className="h-4 w-4" />
+                                                Edit Location
                                             </Button>
-                                        )}
 
-                                        <Button
-                                            variant="outline"
-                                            className="flex items-center justify-center gap-2 w-full"
-                                            onClick={() => setIsShareDialogOpen(true)}
-                                        >
-                                            <Link2 className="h-4 w-4" />
-                                            Share link
-                                        </Button>
+                                            {location.status === 'published' && (
+                                                <Button
+                                                    variant="outline"
+                                                    className="flex items-center justify-center gap-2 w-full"
+                                                    onClick={() => {
+                                                        updateLocationStatus.mutate(
+                                                            { id: location.id, status: 'draft' },
+                                                            {
+                                                                onSuccess: () => {
+                                                                    navigate('/locations');
+                                                                }
+                                                            }
+                                                        );
+                                                    }}
+                                                >
+                                                    <EyeOff className="h-4 w-4" />
+                                                    Unpublish Location
+                                                </Button>
+                                            )}
 
-                                        <DeleteLocationDialog
-                                            locationId={location.id}
-                                            locationTitle={location.title}
-                                            isOwner={isOwner}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                                            <Button
+                                                variant="outline"
+                                                className="flex items-center justify-center gap-2 w-full"
+                                                onClick={() => setIsShareDialogOpen(true)}
+                                            >
+                                                <Link2 className="h-4 w-4" />
+                                                Share link
+                                            </Button>
+
+                                            <DeleteLocationDialog
+                                                locationId={location.id}
+                                                locationTitle={location.title}
+                                                isOwner={isOwner}
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
                     </div>
 
                     {/* Main content middle section */}

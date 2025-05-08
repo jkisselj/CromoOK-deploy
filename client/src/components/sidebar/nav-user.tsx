@@ -61,6 +61,7 @@ export function NavUser() {
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex items-center gap-2 w-full group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center">
+            <ThemeToggle />
             <Link to="/auth/login" className="w-full">
               <SidebarMenuButton
                 size="lg"
@@ -146,7 +147,7 @@ export function NavUser() {
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
-                        {user.user_metadata?.username||
+                        {user.user_metadata?.username ||
                           user.user_metadata?.full_name ||
                           user.email}
                       </span>
