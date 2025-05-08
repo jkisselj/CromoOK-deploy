@@ -3,7 +3,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useTheme } from '@/hooks/use-theme';
 
-// Custom styles for dark-themed map controls
 const mapControlStyles = `
   .mapboxgl-ctrl-group {
     background-color: #1f2937 !important;

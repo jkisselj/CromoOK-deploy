@@ -42,8 +42,8 @@ import { ShareAccessLevel } from "@/types/location";
 export default function LocationDetailsPage() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
-    const shareToken = searchParams.get('token'); // Получаем токен из URL параметров
-    const accessLevelParam = searchParams.get('access') as ShareAccessLevel | null; // Получаем уровень доступа из URL
+    const shareToken = searchParams.get('token');
+    const accessLevelParam = searchParams.get('access') as ShareAccessLevel | null;
 
     const { data: location, isLoading } = useLocation(id!, shareToken || undefined);
     const { data: accessLevel } = useLocationShareAccess(id!, shareToken || undefined);
@@ -59,18 +59,12 @@ export default function LocationDetailsPage() {
     const [autoplayPaused, setAutoplayPaused] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
 
-    // Определяем фактический уровень доступа
-    // Приоритет:
-    // 1. Если пользователь - владелец, всегда полный доступ
-    // 2. Если есть уровень доступа из БД, используем его
-    // 3. Если есть уровень доступа из URL, используем его
-    // 4. По умолчанию - полный доступ для опубликованных локаций, иначе null (нет доступа)
+   
     const isOwner = Boolean(user && location?.ownerId === user.id);
     const effectiveAccessLevel = isOwner
         ? 'admin' as ShareAccessLevel
         : accessLevel || accessLevelParam || (location?.status === 'published' ? 'full_info' : null);
 
-    // Флаги для определения, что показывать в зависимости от уровня доступа
     const canViewBasicInfo = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
     const canViewDetails = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';
     const canViewPrice = effectiveAccessLevel === 'full_info' || effectiveAccessLevel === 'admin';

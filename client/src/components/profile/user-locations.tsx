@@ -18,16 +18,13 @@ import {
 
 export function UserLocations() {
     const { user } = useAuthContext();
-    // Pass true as the second parameter to load all user locations, including drafts
     const { data: allLocations, isLoading, refetch } = useLocations(undefined, true);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const updateLocationStatus = useUpdateLocationStatus();
 
-    // Filter locations by current user
     const userLocations = allLocations?.filter(loc => loc.ownerId === user?.id) || [];
 
-    // Auto-refetch data when the component mounts
     useEffect(() => {
         refetch();
     }, [refetch]);

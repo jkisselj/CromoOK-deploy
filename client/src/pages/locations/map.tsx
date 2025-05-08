@@ -21,21 +21,17 @@ export default function LocationsMapPage() {
     const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
     const navigate = useNavigate();
 
-    // Default map center (can be adjusted to your region)
     const [mapCenter, setMapCenter] = useState({
-        latitude: 59.436962, // Example: Tallinn
+        latitude: 59.436962,
         longitude: 24.753574,
         zoom: 11
     });
 
     useEffect(() => {
         if (locations) {
-            // Only show published locations
             const filtered = locations.filter(loc => loc.status === 'published');
             setFilteredLocations(filtered);
 
-            // If no selected location but we have locations on the map,
-            // center the map on the first location with coordinates
             if (!selectedLocation && filtered.length > 0) {
                 const locationWithCoords = filtered.find(loc => loc.coordinates);
                 if (locationWithCoords && locationWithCoords.coordinates) {
@@ -54,11 +50,10 @@ export default function LocationsMapPage() {
             setSelectedLocation(location);
             setIsLocationSheetOpen(true);
 
-            // Smoothly center the map on the selected location
             setMapCenter({
                 latitude: location.coordinates.latitude,
                 longitude: location.coordinates.longitude,
-                zoom: 14 // Zoom in when selecting a location
+                zoom: 14
             });
         }
     };

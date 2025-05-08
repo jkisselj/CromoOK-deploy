@@ -64,7 +64,6 @@ import { initializeStorage } from "@/lib/imageService";
 import { useImageUploader } from "@/hooks/useImageUploader";
 import { Progress } from "@/components/ui/progress";
 
-// Schema updated with all fields from Location type
 const schema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
@@ -94,20 +93,17 @@ const schema = z.object({
     status: z.enum(['draft', 'published']).default('draft'),
 });
 
-// Predefined amenities for quick selection
 const COMMON_AMENITIES = [
     "WiFi", "Air Conditioning", "Heating", "Kitchen", "Free Parking",
     "Bathroom", "Makeup Area", "Background Stands", "Lighting Equipment",
     "Audio Equipment", "Props & Furniture", "Dressing Room", "Coffee Machine"
 ];
 
-// Predefined tags for categorization
 const LOCATION_TAGS = [
     "Studio", "Outdoor", "Urban", "Nature", "Industrial", "Minimalist",
     "Vintage", "Modern", "Home", "Office", "Restaurant", "Workshop", "Event Space"
 ];
 
-// Predefined days of the week
 const DAYS_OF_WEEK = [
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 ];
@@ -134,7 +130,6 @@ export default function NewLocationPage() {
         if (!user) {
             navigate("/auth/login", { state: { from: "/locations/new" } });
         } else {
-            // Initialize storage on component mount
             initializeStorage().catch(error => {
                 console.error("Storage initialization error:", error);
             });
@@ -165,7 +160,7 @@ export default function NewLocationPage() {
                 closeTime: "18:00",
                 daysAvailable: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
             },
-            status: 'published' as const, // Изменено с 'draft' на 'published'
+            status: 'published' as const,
         },
     });
 
@@ -177,7 +172,6 @@ export default function NewLocationPage() {
 
             setIsSubmitting(true);
 
-            // Check for required fields
             if (!values.title || !values.description || !values.address) {
                 toast({
                     title: "Error",
@@ -188,35 +182,27 @@ export default function NewLocationPage() {
                 return;
             }
 
-            // Create temporary folder name for image storage
-            // This is just for organizing images, not for the location ID
             const tempImageFolder = `loc-${Date.now().toString()}`;
 
-            // Ensure availability has required fields with default values if missing
             const availability = values.availability ? {
                 openTime: values.availability.openTime || "09:00",
                 closeTime: values.availability.closeTime || "18:00",
                 daysAvailable: values.availability.daysAvailable || []
             } : undefined;
 
-            // Create data object for submission
             const locationData = {
                 ...values,
-                // No need to specify ID - Supabase will generate a UUID
                 ownerId: user.id,
-                // Use local URLs from state for initial upload
                 images: uploadedImages,
-                tempImageFolder, // Pass this for organizing images in storage
+                tempImageFolder,
                 coordinates: values.coordinates || {
                     latitude: 0,
                     longitude: 0
                 },
-                status: 'published' as const, // Всегда публикуем локацию автоматически
-                // Override availability with the properly formatted data
+                status: 'published' as const,
                 availability
             };
 
-            // Call the location creation function
             await createLocation(locationData);
 
             toast({
@@ -224,7 +210,6 @@ export default function NewLocationPage() {
                 description: "Location created successfully",
             });
 
-            // Navigate to the locations page
             navigate("/locations");
 
         } catch (error: any) {
@@ -306,7 +291,6 @@ export default function NewLocationPage() {
     };
 
     const processFiles = (newFiles: File[]) => {
-        // Filter out non-image files
         const imageFiles = newFiles.filter(file => 
             file.type.startsWith('image/')
         );
@@ -320,14 +304,12 @@ export default function NewLocationPage() {
             return;
         }
 
-        // Generate preview URLs for display
         const newImages = imageFiles.map(file => URL.createObjectURL(file));
 
         setUploadedImages([...uploadedImages, ...newImages]);
         setActualImageFiles([...actualImageFiles, ...imageFiles]);
         form.setValue("images", [...uploadedImages, ...newImages]);
 
-        // Show success toast
         toast({
             title: "Images added",
             description: `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} successfully added`,
@@ -360,26 +342,20 @@ export default function NewLocationPage() {
     };
 
     const handleRemoveImage = (imageUrl: string, index: number) => {
-        // Remove image and file from state
         const updatedImages = uploadedImages.filter((_, i) => i !== index);
         setUploadedImages(updatedImages);
 
-        // If this is a local URL, revoke it
         if (imageUrl.startsWith('blob:')) {
             URL.revokeObjectURL(imageUrl);
         }
 
-        // Also remove corresponding file
         const updatedFiles = [...actualImageFiles];
         updatedFiles.splice(index, 1);
         setActualImageFiles(updatedFiles);
 
-        // Update main image index if needed
         if (index === mainImageIndex) {
-            // If we removed the main image, make the first image the main one
             setMainImageIndex(0);
         } else if (index < mainImageIndex) {
-            // If we removed an image before the main one, shift the index
             setMainImageIndex(mainImageIndex - 1);
         }
 
@@ -394,29 +370,25 @@ export default function NewLocationPage() {
             toIndex < 0 ||
             toIndex >= uploadedImages.length
         ) {
-            return; // Invalid indices
+            return;
         }
 
-        // Move image in the images array
         const updatedImages = [...uploadedImages];
         const [movedImage] = updatedImages.splice(fromIndex, 1);
         updatedImages.splice(toIndex, 0, movedImage);
 
-        // Move file in the files array to match
         const updatedFiles = [...actualImageFiles];
         if (updatedFiles.length > fromIndex && updatedFiles.length > toIndex) {
             const [movedFile] = updatedFiles.splice(fromIndex, 1);
             updatedFiles.splice(toIndex, 0, movedFile);
         }
 
-        // Update main image index if needed
         if (fromIndex === mainImageIndex) {
             setMainImageIndex(toIndex);
         } else if (
             (fromIndex < mainImageIndex && toIndex >= mainImageIndex) ||
             (fromIndex > mainImageIndex && toIndex <= mainImageIndex)
         ) {
-            // If we moved an image across the main image, shift the index
             setMainImageIndex(
                 fromIndex < mainImageIndex ? mainImageIndex - 1 : mainImageIndex + 1
             );
@@ -427,7 +399,6 @@ export default function NewLocationPage() {
         form.setValue("images", updatedImages);
     };
 
-    // Render upload progress
     const renderUploadProgress = () => {
         if (isUploading) {
             return (
@@ -759,7 +730,6 @@ export default function NewLocationPage() {
                                                     size="sm"
                                                     className="flex items-center gap-1"
                                                     onClick={() => {
-                                                        // Clean up object URLs
                                                         uploadedImages.forEach(url => {
                                                             if (url.startsWith('blob:')) URL.revokeObjectURL(url);
                                                         });
@@ -1248,7 +1218,7 @@ export default function NewLocationPage() {
                     </Tabs>
 
                     <div className="flex items-center justify-between pt-6 border-t">
-                        <div></div> {/* Пустой div для сохранения выравнивания */}
+                        <div></div>
 
                         <div className="flex gap-4">
                             <Button type="button" variant="outline" asChild>

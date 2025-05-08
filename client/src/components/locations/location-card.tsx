@@ -27,7 +27,6 @@ export function LocationCard({ location }: LocationCardProps) {
     };
 
     const handleLocationClick = () => {
-        // Сохраняем текущую позицию прокрутки при клике на локацию
         sessionStorage.setItem('locationsScrollPosition', window.scrollY.toString());
     };
 

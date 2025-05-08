@@ -27,7 +27,7 @@ export function LocationPicker({
     const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number }>({
         latitude: 59.437,
         longitude: 24.745
-    }); // Координаты Таллинна, Эстония
+    });
     const [address, setAddress] = useState<string>(defaultAddress || '');
     const geocoderContainer = useRef<HTMLDivElement>(null);
 
@@ -38,7 +38,7 @@ export function LocationPicker({
             accessToken: mapboxgl.accessToken || '',
             marker: false,
             placeholder: 'Search for an address...',
-            language: 'en', // Изменено на английский язык
+            language: 'en',
         });
 
         geocoder.addTo(geocoderContainer.current);

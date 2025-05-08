@@ -6,8 +6,6 @@ export function isLocalImageUrl(url: string): boolean {
 
 export async function initializeStorage() {
     try {
-        // Instead of creating the bucket (which might fail due to RLS),
-        // we'll just check if it exists
         const { data: buckets } = await supabase
             .storage
             .listBuckets();

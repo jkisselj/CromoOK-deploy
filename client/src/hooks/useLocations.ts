@@ -5,21 +5,13 @@ import { useAuthContext } from '@/context/AuthContext';
 import { deleteImage, uploadImagesFromUrls } from '@/lib/imageService';
 import { setDemoLocations, migrateDemoLocationsToSupabase } from '@/utils/migrationUtils';
 
-// Export the demo locations for migration purposes
 export const DEMO_LOCATIONS: Location[] = [
-    // Add demo locations here if needed
 ];
 
-// Initialize the migration util with demo locations
 setDemoLocations(DEMO_LOCATIONS);
 
 const CREATED_LOCATIONS_KEY = 'user-created-locations';
 
-/**
- * Migrates all demo locations to Supabase
- * This function can be called from a settings or admin page
- * @param forceUpdate If true, will update existing locations with the same title
- */
 export async function migrateAllDemoLocationsToSupabase(forceUpdate = false) {
     return migrateDemoLocationsToSupabase(forceUpdate);
 }
@@ -30,12 +22,10 @@ export function useLocations(filters?: LocationFilter, includeUserDrafts: boolea
     return useQuery({
         queryKey: ['locations', filters, includeUserDrafts],
         queryFn: async () => {
-            // First try to get locations from Supabase
             try {
                 let query = supabase.from('locations').select('*');
 
                 if (filters) {
-                    // Apply filters if provided
                     if (filters.minPrice !== undefined) {
                         query = query.gte('price', filters.minPrice);
                     }
@@ -50,7 +40,6 @@ export function useLocations(filters?: LocationFilter, includeUserDrafts: boolea
                     }
                 }
 
-                // Если includeUserDrafts = false, показываем только опубликованные
                 if (!includeUserDrafts) {
                     query = query.eq('status', 'published');
                 }
@@ -63,31 +52,26 @@ export function useLocations(filters?: LocationFilter, includeUserDrafts: boolea
                 } else if (data && data.length > 0) {
                     console.log('Got locations from Supabase:', data);
 
-                    // Fix property casing to match frontend expectations
                     const mappedData = data.map(loc => ({
                         ...loc,
-                        // Map snake_case to camelCase
                         ownerId: loc.owner_id,
                         createdAt: loc.created_at,
                         updatedAt: loc.updated_at,
                         minimumBookingHours: loc.minimum_booking_hours
                     }));
 
-                    // Если includeUserDrafts = true, фильтруем, чтобы показать только локации текущего пользователя
                     if (includeUserDrafts && user) {
                         return mappedData.filter(loc =>
                             loc.status === 'published' || loc.ownerId === user.id
                         ) as Location[];
                     }
 
-                    // If we have Supabase data, we don't need to load demo or local data
                     return mappedData as Location[];
                 }
             } catch (err) {
                 console.error('Failed to fetch from Supabase:', err);
             }
 
-            // If Supabase failed or returned no data, try to get local data
             let userCreatedLocations: Location[] = [];
             try {
                 const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
@@ -99,13 +83,11 @@ export function useLocations(filters?: LocationFilter, includeUserDrafts: boolea
                 console.error('Error reading from localStorage:', err);
             }
 
-            // Merge demo and local data
             let allLocations = [...DEMO_LOCATIONS];
             if (userCreatedLocations.length > 0) {
                 allLocations = [...allLocations, ...userCreatedLocations];
             }
 
-            // Apply filters if provided
             if (filters) {
                 if (filters.minPrice !== undefined) {
                     allLocations = allLocations.filter(loc => loc.price >= filters.minPrice!);
@@ -146,14 +128,11 @@ export function useCreateLocation() {
                 throw new Error('User is not authenticated. Please log in.');
             }
 
-            // Generate a temporary folder name for images that's not used as the location ID
             const imagesFolderName = `loc-${Date.now().toString()}`;
 
-            // Process images if they exist
             let finalImages: string[] = [];
             if (location.images && location.images.length > 0) {
                 try {
-                    // Use the existing image upload function with the folder name
                     finalImages = await uploadImagesFromUrls(location.images, imagesFolderName);
 
                     if (finalImages.length === 0 && location.images.length > 0) {
@@ -161,16 +140,11 @@ export function useCreateLocation() {
                     }
                 } catch (error) {
                     console.error('Error uploading images:', error);
-                    // If image upload fails, we can still create the location
-                    // without images or with existing URLs if they're not local
                     finalImages = location.images.filter(url => url.startsWith('http') && !url.startsWith('blob:'));
                 }
             }
 
-            // Prepare data for Supabase (convert camelCase to snake_case)
-            // Note: We're letting Supabase generate the UUID for us
             const supabaseLocation = {
-                // No id field - Supabase will generate a UUID automatically
                 title: location.title,
                 description: location.description,
                 address: location.address,
@@ -210,7 +184,6 @@ export function useCreateLocation() {
                 if (error) {
                     console.error('Error saving location to Supabase:', error);
 
-                    // Clean up uploaded images if location creation fails
                     if (finalImages.length > 0) {
                         for (const imageUrl of finalImages) {
                             try {
@@ -228,7 +201,6 @@ export function useCreateLocation() {
 
                 console.log('Location saved to Supabase successfully:', data);
 
-                // Return data from DB to have complete data
                 return data ? {
                     ...data,
                     ownerId: data.owner_id,
@@ -253,12 +225,10 @@ export function useLocation(id: string, shareToken?: string) {
     return useQuery({
         queryKey: ['location', id, shareToken],
         queryFn: async () => {
-            // Проверяем токен доступа если он предоставлен
             let effectiveAccessLevel: ShareAccessLevel | null = null;
 
             if (shareToken) {
                 try {
-                    // Получаем информацию о токене доступа
                     const { data: shareData, error: shareError } = await supabase
                         .from('location_shares')
                         .select('*')
@@ -267,7 +237,6 @@ export function useLocation(id: string, shareToken?: string) {
                         .single();
 
                     if (!shareError && shareData) {
-                        // Если токен действительный, сохраняем уровень доступа
                         effectiveAccessLevel = shareData.access_level as ShareAccessLevel;
                         console.log('Valid share token found with access level:', effectiveAccessLevel);
                     } else {
@@ -278,7 +247,6 @@ export function useLocation(id: string, shareToken?: string) {
                 }
             }
 
-            // Получаем локацию из Supabase
             try {
                 const { data: location, error } = await supabase
                     .from('locations')
@@ -295,20 +263,14 @@ export function useLocation(id: string, shareToken?: string) {
                     throw new Error('Location not found');
                 }
 
-                // Проверка доступа к локации
                 const isOwner = user && location.owner_id === user.id;
                 const isPublished = location.status === 'published';
-                const hasValidShareToken = !!effectiveAccessLevel; // Токен действителен, если мы получили уровень доступа
+                const hasValidShareToken = !!effectiveAccessLevel;
 
-                // Пользователь может видеть локацию, если:
-                // 1. Она опубликована, или
-                // 2. Он является владельцем, или
-                // 3. Предоставлен правильный токен доступа
                 if (!isPublished && !isOwner && !hasValidShareToken) {
                     throw new Error('This location is not available or you do not have access');
                 }
 
-                // Map snake_case to camelCase for frontend
                 return {
                     ...location,
                     ownerId: location.owner_id,
@@ -316,21 +278,17 @@ export function useLocation(id: string, shareToken?: string) {
                     updatedAt: location.updated_at,
                     minimumBookingHours: location.minimum_booking_hours,
                     shareToken: location.share_token,
-                    // Добавляем информацию об уровне доступа по ссылке, если она есть
                     shareAccessLevel: effectiveAccessLevel || undefined
                 } as Location;
             } catch (err) {
                 console.error('Error loading location:', err);
 
-                // Проверяем демо-локации и локальное хранилище только если нет токена доступа
                 if (!shareToken) {
-                    // If not found in Supabase, check demo locations
                     const demoLocation = DEMO_LOCATIONS.find(loc => loc.id === id);
                     if (demoLocation) {
                         return demoLocation;
                     }
 
-                    // If not found in demo data, check localStorage
                     try {
                         const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
                         if (storedLocations) {
@@ -363,10 +321,8 @@ export function useDeleteLocation() {
                 throw new Error('Demo locations cannot be deleted');
             }
 
-            // Try to delete from Supabase first if user is authenticated
             if (user) {
                 try {
-                    // Get the location first to check ownership and gather image info
                     const { data: location, error: fetchError } = await supabase
                         .from('locations')
                         .select('*')
@@ -374,12 +330,10 @@ export function useDeleteLocation() {
                         .single();
 
                     if (!fetchError && location) {
-                        // Check ownership
                         if (location.owner_id !== user.id) {
                             throw new Error('You can only delete your own locations');
                         }
 
-                        // Delete images from storage if they exist
                         if (location.images && location.images.length > 0) {
                             await Promise.all(
                                 location.images.map(async (imageUrl: string) => {
@@ -394,7 +348,6 @@ export function useDeleteLocation() {
                             );
                         }
 
-                        // Delete the location from Supabase
                         const { error: deleteError } = await supabase
                             .from('locations')
                             .delete()
@@ -410,11 +363,9 @@ export function useDeleteLocation() {
                     }
                 } catch (err) {
                     console.error('Failed to delete location from Supabase:', err);
-                    // Continue to try localStorage if Supabase deletion fails
                 }
             }
 
-            // Try to delete from localStorage
             try {
                 const storedLocations = localStorage.getItem(CREATED_LOCATIONS_KEY);
                 if (storedLocations) {
@@ -452,7 +403,6 @@ export function useUpdateLocationStatus() {
             }
 
             try {
-                // Get the location first to check ownership
                 const { data: location, error: fetchError } = await supabase
                     .from('locations')
                     .select('*')
@@ -468,12 +418,10 @@ export function useUpdateLocationStatus() {
                     throw new Error('Location not found');
                 }
 
-                // Check ownership
                 if (location.owner_id !== user.id) {
                     throw new Error('You can only update your own locations');
                 }
 
-                // Update the location status
                 const { data, error } = await supabase
                     .from('locations')
                     .update({ status, updated_at: new Date().toISOString() })
@@ -488,7 +436,6 @@ export function useUpdateLocationStatus() {
 
                 console.log('Location status updated successfully:', data);
 
-                // Return data from DB to have complete data
                 return data ? {
                     ...data,
                     ownerId: data.owner_id,
@@ -508,9 +455,6 @@ export function useUpdateLocationStatus() {
     });
 }
 
-/**
- * Hook для создания или обновления ссылки для совместного доступа к локации
- */
 export function useCreateLocationShare() {
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
@@ -530,7 +474,6 @@ export function useCreateLocationShare() {
             }
 
             try {
-                // Получаем локацию для проверки прав доступа
                 const { data: location, error: fetchError } = await supabase
                     .from('locations')
                     .select('*')
@@ -546,12 +489,10 @@ export function useCreateLocationShare() {
                     throw new Error('Location not found');
                 }
 
-                // Проверка прав владельца
                 if (location.owner_id !== user.id) {
                     throw new Error('You can only share your own locations');
                 }
 
-                // Генерируем токен для общего доступа
                 const { data: tokenData, error: tokenError } = await supabase
                     .rpc('generate_unique_share_token');
 
@@ -562,7 +503,6 @@ export function useCreateLocationShare() {
 
                 const shareToken = tokenData || (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
 
-                // Создаем запись о совместном доступе
                 const { data: shareData, error: shareError } = await supabase
                     .from('location_shares')
                     .insert([{
@@ -580,7 +520,6 @@ export function useCreateLocationShare() {
                     throw new Error(`Failed to create share link: ${shareError.message}`);
                 }
 
-                // Преобразуем полученные данные в формат для frontend
                 return {
                     id: shareData.id,
                     locationId: shareData.location_id,
@@ -602,9 +541,6 @@ export function useCreateLocationShare() {
     });
 }
 
-/**
- * Hook для получения всех ссылок совместного доступа для конкретной локации
- */
 export function useLocationShares(locationId: string) {
     const { user } = useAuthContext();
 
@@ -616,7 +552,6 @@ export function useLocationShares(locationId: string) {
             }
 
             try {
-                // Получаем локацию для проверки прав доступа
                 const { data: location, error: fetchError } = await supabase
                     .from('locations')
                     .select('*')
@@ -632,12 +567,10 @@ export function useLocationShares(locationId: string) {
                     throw new Error('Location not found');
                 }
 
-                // Проверка прав владельца
                 if (location.owner_id !== user.id) {
                     throw new Error('You can only view shares for your own locations');
                 }
 
-                // Получаем все ссылки для совместного доступа
                 const { data: sharesData, error: sharesError } = await supabase
                     .from('location_shares')
                     .select('*')
@@ -649,7 +582,6 @@ export function useLocationShares(locationId: string) {
                     throw new Error(`Failed to fetch share links: ${sharesError.message}`);
                 }
 
-                // Преобразуем полученные данные в формат для frontend
                 return (sharesData || []).map(share => ({
                     id: share.id,
                     locationId: share.location_id,
@@ -669,9 +601,6 @@ export function useLocationShares(locationId: string) {
     });
 }
 
-/**
- * Hook для получения уровня доступа по токену
- */
 export function useLocationShareAccess(locationId: string, shareToken?: string) {
     return useQuery({
         queryKey: ['location-share-access', locationId, shareToken],
@@ -681,7 +610,6 @@ export function useLocationShareAccess(locationId: string, shareToken?: string) 
             }
 
             try {
-                // Получаем запись о совместном доступе по токену
                 const { data: shareData, error: shareError } = await supabase
                     .from('location_shares')
                     .select('*')
@@ -698,9 +626,8 @@ export function useLocationShareAccess(locationId: string, shareToken?: string) 
                     return null;
                 }
 
-                // Проверяем срок действия
                 if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
-                    return null; // Истек срок действия
+                    return null;
                 }
 
                 return shareData.access_level as ShareAccessLevel;
@@ -713,9 +640,6 @@ export function useLocationShareAccess(locationId: string, shareToken?: string) 
     });
 }
 
-/**
- * Hook для удаления ссылки совместного доступа
- */
 export function useDeleteLocationShare() {
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
@@ -727,7 +651,6 @@ export function useDeleteLocationShare() {
             }
 
             try {
-                // Получаем запись о совместном доступе
                 const { data: shareData, error: fetchError } = await supabase
                     .from('location_shares')
                     .select('*, locations!inner(*)')
@@ -743,12 +666,10 @@ export function useDeleteLocationShare() {
                     throw new Error('Share link not found');
                 }
 
-                // Проверка прав владельца локации
                 if (shareData.locations.owner_id !== user.id) {
                     throw new Error('You can only delete shares for your own locations');
                 }
 
-                // Удаляем запись о совместном доступе
                 const { error: deleteError } = await supabase
                     .from('location_shares')
                     .delete()

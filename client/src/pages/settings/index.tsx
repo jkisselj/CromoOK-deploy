@@ -10,7 +10,6 @@ import { Info } from 'lucide-react';
 export default function SettingsPage() {
     const { user } = useAuthContext();
 
-    // Redirect to login if not authenticated
     if (!user) {
         return <Navigate to="/login" />;
     }

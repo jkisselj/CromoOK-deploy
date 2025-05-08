@@ -37,7 +37,6 @@ export function ShareLocationDialog({
 
     const createLocationShare = useCreateLocationShare();
 
-    // Обрабатываем создание ссылки в зависимости от выбранного уровня доступа
     const handleCreateShare = async () => {
         try {
             const share = await createLocationShare.mutateAsync({
@@ -46,8 +45,6 @@ export function ShareLocationDialog({
                 name: shareName
             });
 
-            // Создаем URL с токеном для совместного доступа
-            // Важно: убедитесь, что токен передается как параметр 'token'
             const url = `${window.location.origin}/locations/${locationId}?token=${share.shareToken}`;
             setShareUrl(url);
         } catch (error) {
@@ -66,7 +63,6 @@ export function ShareLocationDialog({
         }
     };
 
-    // Reset state when closing dialog
     const handleClose = () => {
         setShareUrl('');
         setCopied(false);
@@ -87,7 +83,6 @@ export function ShareLocationDialog({
                 </DialogHeader>
 
                 {!shareUrl ? (
-                    // Form for creating a link with access level selection
                     <>
                         <div className="space-y-4 my-2">
                             <div>
@@ -182,7 +177,6 @@ export function ShareLocationDialog({
                         </DialogFooter>
                     </>
                 ) : (
-                    // Display created link
                     <>
                         <div className="my-2">
                             <div className="flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">

@@ -12,7 +12,6 @@ export default function ProfilePage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('profile');
 
-    // Handle URL parameters for selecting the active tab
     useEffect(() => {
         const tabParam = searchParams.get('tab');
         if (tabParam === 'locations') {
@@ -22,11 +21,9 @@ export default function ProfilePage() {
         }
     }, [searchParams]);
 
-    // Update URL when changing tabs
     const handleTabChange = (value: string) => {
         setActiveTab(value);
         if (value === 'profile') {
-            // Remove tab parameter from URL for profile, as it's the default tab
             searchParams.delete('tab');
         } else {
             searchParams.set('tab', value);
@@ -34,7 +31,6 @@ export default function ProfilePage() {
         setSearchParams(searchParams);
     };
 
-    // Redirect to login page if user is not authenticated
     if (!user) {
         return <Navigate to="/auth/login" />;
     }

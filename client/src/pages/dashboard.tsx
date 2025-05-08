@@ -37,7 +37,6 @@ export default function DashboardPage() {
     };
   }, []);
 
-  // Load locations from Supabase when page loads
   useEffect(() => {
     async function fetchLocations() {
       try {
@@ -66,7 +65,6 @@ export default function DashboardPage() {
     fetchLocations();
   }, []);
 
-  // Prepare image array from loaded locations
   const locationImages = locations.length > 0 
     ? locations.map(location => location.images && location.images.length > 0 ? location.images[0] : null)
     : [
@@ -80,7 +78,6 @@ export default function DashboardPage() {
         "/locations/Kivioli-Tuhamagi_okt2023-EXT-1.jpg"
       ];
 
-  // Function to handle click on an image
   const handleImageClick = (index: number) => {
     if (locations.length > 0 && index < locations.length) {
       window.location.href = `/locations/${locations[index].id}`;

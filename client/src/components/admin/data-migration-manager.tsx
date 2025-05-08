@@ -18,7 +18,6 @@ export function DataMigrationManager() {
     const { user } = useAuthContext();
 
     const handleMigration = async () => {
-        // Ensure user is authenticated
         if (!user) {
             setError('You must be logged in to migrate data');
             toast({
@@ -63,7 +62,6 @@ export function DataMigrationManager() {
         }
     };
 
-    // Calculate stats if migration results exist
     const totalLocations = migrationResults ? migrationResults.success + migrationResults.failed + migrationResults.skipped : 0;
     const successPercentage = totalLocations > 0 ? (migrationResults.success / totalLocations) * 100 : 0;
 

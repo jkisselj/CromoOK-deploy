@@ -4,7 +4,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Location } from '@/types/location';
 import { useTheme } from '@/hooks/use-theme';
 
-// Custom styles for dark-themed map controls
 const mapControlStyles = `
   .mapboxgl-ctrl-group {
     background-color: #1f2937 !important;
@@ -76,7 +75,6 @@ export function LocationsMap({
     const { theme } = useTheme();
 
     useEffect(() => {
-        // Add custom styles for dark-themed map controls
         const styleEl = document.createElement('style');
         styleEl.innerHTML = mapControlStyles;
         document.head.appendChild(styleEl);
@@ -84,7 +82,6 @@ export function LocationsMap({
         return () => styleEl.remove();
     }, []);
 
-    // Update map style based on theme
     useEffect(() => {
         if (mapRef.current) {
             const targetStyle = theme === 'dark' ? 'dark' : 'streets';
@@ -98,20 +95,16 @@ export function LocationsMap({
     useEffect(() => {
         if (!mapContainerRef.current) return;
 
-        // Get token from environment variables
         const token = import.meta.env.VITE_MAPBOX_TOKEN;
         if (!token) {
             console.error('Mapbox token is missing');
             return;
         }
 
-        // Set the mapbox access token
         mapboxgl.accessToken = token;
 
-        // Initial style based on theme
         const initialStyleKey = theme === 'dark' ? 'dark' : 'streets';
 
-        // Initialize map
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: MAP_STYLES[initialStyleKey],
@@ -122,10 +115,8 @@ export function LocationsMap({
 
         setCurrentStyle(initialStyleKey);
 
-        // Disable scroll zoom initially
         mapRef.current.scrollZoom.disable();
 
-        // Create an overlay for initial control instruction
         const overlay = document.createElement('div');
         overlay.className = 'map-control-overlay';
         Object.assign(overlay.style, {
@@ -150,7 +141,6 @@ export function LocationsMap({
 
         setTimeout(() => (overlay.style.opacity = '0'), 3000);
 
-        // Enable map controls on click
         mapContainerRef.current.addEventListener('click', () => {
             if (mapRef.current && !mapRef.current.scrollZoom.isEnabled()) {
                 mapRef.current.scrollZoom.enable();
@@ -159,7 +149,6 @@ export function LocationsMap({
             }
         });
 
-        // Disable map controls when mouse leaves
         mapContainerRef.current.addEventListener('mouseleave', () => {
             if (mapRef.current && mapRef.current.scrollZoom.isEnabled()) {
                 mapRef.current.scrollZoom.disable();
@@ -167,13 +156,11 @@ export function LocationsMap({
             }
         });
 
-        // Add map controls
         const map = mapRef.current;
 
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        // Style switcher control
         class StyleSwitcherControl {
             private map: mapboxgl.Map;
             private container: HTMLElement;
@@ -241,13 +228,11 @@ export function LocationsMap({
 
         map.addControl(new StyleSwitcherControl(), 'top-right');
 
-        // Add markers when map is loaded
         map.on('load', () => {
             locations.forEach(createMarker);
         });
 
         return () => {
-            // Clean up resources when component unmounts
             Object.values(markersRef.current).forEach(marker => marker.remove());
             markersRef.current = {};
 
@@ -258,11 +243,9 @@ export function LocationsMap({
         };
     }, []);
 
-    // Update markers when locations change
     useEffect(() => {
         if (!mapRef.current) return;
 
-        // Remove markers for locations that are no longer in the list
         Object.keys(markersRef.current).forEach(id => {
             if (!locations.some(loc => loc.id === id)) {
                 markersRef.current[id].remove();
@@ -275,24 +258,20 @@ export function LocationsMap({
             }
         });
 
-        // Add/update markers for current locations
         locations.forEach(location => {
             if (!location.coordinates) return;
 
             if (markersRef.current[location.id]) {
-                // Update existing marker position
                 markersRef.current[location.id].setLngLat([
                     location.coordinates.longitude,
                     location.coordinates.latitude
                 ]);
             } else {
-                // Create new marker
                 createMarker(location);
             }
         });
     }, [locations]);
 
-    // Update map center when center prop changes
     useEffect(() => {
         if (!mapRef.current) return;
 
@@ -304,11 +283,9 @@ export function LocationsMap({
         });
     }, [center.latitude, center.longitude, center.zoom]);
 
-    // Create a marker for a location
     const createMarker = (location: Location) => {
         if (!mapRef.current || !location.coordinates) return;
 
-        // Create HTML element for marker with photo
         const el = document.createElement('div');
         el.className = 'location-marker';
         el.style.width = '50px';
@@ -322,7 +299,6 @@ export function LocationsMap({
         el.style.backgroundSize = 'cover';
         el.style.backgroundPosition = 'center';
 
-        // Add price tag
         const priceTag = document.createElement('div');
         priceTag.className = 'location-price-tag';
         priceTag.style.position = 'absolute';
@@ -338,7 +314,6 @@ export function LocationsMap({
         priceTag.textContent = `${location.price}€`;
         el.appendChild(priceTag);
 
-        // Create styles for popup that will adapt to theme
         const popupStyles = `
         .mapboxgl-popup-content {
             background-color: var(--card);
@@ -373,12 +348,10 @@ export function LocationsMap({
         }
         `;
 
-        // Add styles to document
         const styleElement = document.createElement('style');
         styleElement.innerHTML = popupStyles;
         document.head.appendChild(styleElement);
 
-        // Create popup with location info using styled HTML
         const popup = new mapboxgl.Popup({
             offset: 25,
             closeButton: false,
@@ -396,13 +369,11 @@ export function LocationsMap({
             </div>
         `);
 
-        // Create and add marker to map
         const marker = new mapboxgl.Marker(el)
             .setLngLat([location.coordinates.longitude, location.coordinates.latitude])
             .setPopup(popup)
             .addTo(mapRef.current);
 
-        // Add event handlers
         el.addEventListener('click', () => {
             onLocationClick(location);
         });
@@ -415,12 +386,10 @@ export function LocationsMap({
             popup.remove();
         });
 
-        // Store marker for later reference
         markersRef.current[location.id] = marker;
         popupsRef.current[location.id] = popup;
     };
 
-    // Display temporary message on the map
     function showTemporaryMessage(message: string) {
         if (!mapContainerRef.current) return;
 

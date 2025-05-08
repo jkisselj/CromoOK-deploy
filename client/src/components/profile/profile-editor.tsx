@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useAvatarUploader } from '@/hooks/useAvatarUploader';
-import { Edit, Upload, User, Camera, Loader2 } from 'lucide-react';
+import { Edit, Camera, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -65,7 +65,6 @@ export function ProfileEditor() {
 
         await uploadAvatar(file);
 
-        // Reset input to allow uploading the same file again if needed
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
