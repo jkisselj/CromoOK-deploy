@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import LocationForm from './LocationForm';
 import { useLocation, useLocationShareAccess } from '@/hooks/useLocations';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { Loader2 } from 'lucide-react';
-import type { ShareAccessLevel } from '@/types/location';
 
 export default function EditLocationPage() {
     const { id } = useParams<{ id: string }>();
