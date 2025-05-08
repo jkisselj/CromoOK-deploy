@@ -35,11 +35,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function NavUser() {
   const navigate = useNavigate();
   const { user, signOut } = useAuthContext();
-  const { isMobile } = useSidebar();
+  const { isMobile: sidebarIsMobile } = useSidebar();
+  const isMobile = useIsMobile();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogout = async () => {
@@ -54,6 +56,17 @@ export function NavUser() {
 
   const handleCancel = () => {
     setShowLogoutDialog(false);
+  };
+
+  const handleMobileNavigation = (path: string, event: React.MouseEvent) => {
+    if (isMobile) {
+      event.preventDefault();
+      document.body.click();
+      
+      setTimeout(() => {
+        navigate(path);
+      }, 50);
+    }
   };
 
   if (!user) {
@@ -128,7 +141,7 @@ export function NavUser() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-56 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
+                side={sidebarIsMobile ? "bottom" : "right"}
                 align="end"
                 sideOffset={4}
               >
@@ -158,21 +171,21 @@ export function NavUser() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer flex items-center">
+                  <Link to="/profile" className="cursor-pointer flex items-center" onClick={(e) => handleMobileNavigation('/profile', e)}>
                     <User className="mr-2 size-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                  <Link to="/profile?tab=locations" className="cursor-pointer flex items-center">
+                  <Link to="/profile?tab=locations" className="cursor-pointer flex items-center" onClick={(e) => handleMobileNavigation('/profile?tab=locations', e)}>
                     <MapPin className="mr-2 size-4" />
                     <span>My Locations</span>
                   </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                  <Link to="/settings" className="cursor-pointer flex items-center">
+                  <Link to="/settings" className="cursor-pointer flex items-center" onClick={(e) => handleMobileNavigation('/settings', e)}>
                     <Settings className="mr-2 size-4" />
                     <span>Settings</span>
                   </Link>

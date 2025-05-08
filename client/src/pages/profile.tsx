@@ -1,34 +1,64 @@
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { ProfileEditor } from '@/components/profile/profile-editor';
 import { UserLocations } from '@/components/profile/user-locations';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { UserCircle, MapPin } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function ProfilePage() {
     const { user } = useAuthContext();
     const [searchParams, setSearchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('profile');
+    const location = useLocation();
+    const isMobile = useIsMobile();
+    const initialLoad = useRef(true);
+    const previousPathRef = useRef<string | null>(null);
 
     useEffect(() => {
         const tabParam = searchParams.get('tab');
-        if (tabParam === 'locations') {
-            setActiveTab('locations');
+        
+        if (isMobile) {
+            const currentPath = location.pathname + location.search;
+            
+            if (initialLoad.current || previousPathRef.current !== currentPath) {
+                if (tabParam === 'locations') {
+                    setActiveTab('locations');
+                } else {
+                    setActiveTab('profile');
+                }
+                
+                previousPathRef.current = currentPath;
+                initialLoad.current = false;
+            }
         } else {
-            setActiveTab('profile');
+            if (tabParam === 'locations') {
+                setActiveTab('locations');
+            } else {
+                setActiveTab('profile');
+            }
         }
-    }, [searchParams]);
+    }, [searchParams, location, isMobile]);
 
     const handleTabChange = (value: string) => {
         setActiveTab(value);
+        
+        const newSearchParams = new URLSearchParams(searchParams);
         if (value === 'profile') {
-            searchParams.delete('tab');
+            newSearchParams.delete('tab');
         } else {
-            searchParams.set('tab', value);
+            newSearchParams.set('tab', value);
         }
-        setSearchParams(searchParams);
+        
+        if (isMobile) {
+            setTimeout(() => {
+                setSearchParams(newSearchParams);
+            }, 50);
+        } else {
+            setSearchParams(newSearchParams);
+        }
     };
 
     if (!user) {
