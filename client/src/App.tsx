@@ -5,7 +5,7 @@ import LoginPage from "./pages/login";
 import DashboardPage from "./pages/dashboard";
 import DashboardLayout from "./layout/dashboard-layout";
 import LocationsPage from "./pages/locations";
-import NewLocationPage from "./pages/locations/new";
+import NewLocationPage from "./pages/locations/forms/new";
 import LocationDetailsPage from "./pages/locations/details";
 import LocationsMapPage from "./pages/locations/map";
 import AuthLayout from "./layout/auth-layout";
@@ -14,6 +14,7 @@ import PublicRoute from "./components/auth/public-route";
 import { ThemeWatcher } from "./hooks/use-theme";
 import SettingsPage from "./pages/settings";
 import ProfilePage from "./pages/profile";
+import EditLocationPage from "./pages/locations/forms/edit";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
         >
           <Route path="locations">
             <Route path="new" element={<NewLocationPage />} />
+            <Route path="edit/:id" element={<EditLocationPage />} />
           </Route>
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />

@@ -121,10 +121,8 @@ export function MapView({
       .setLngLat([longitude, latitude])
       .addTo(map.current);
 
-    // Disable scroll zoom initially
     map.current.scrollZoom.disable();
 
-    // Create an overlay for initial control instruction
     const overlay = document.createElement('div');
     overlay.className = 'map-control-overlay';
     Object.assign(overlay.style, {

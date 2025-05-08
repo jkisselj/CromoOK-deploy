@@ -691,3 +691,123 @@ export function useDeleteLocationShare() {
         },
     });
 }
+
+export function useUpdateLocation() {
+    const queryClient = useQueryClient();
+    const { user } = useAuthContext();
+
+    return useMutation({
+        mutationFn: async ({ id, location }: { id: string; location: Partial<CreateLocationDTO> }) => {
+            const timestamp = new Date().toISOString();
+
+            if (!user) {
+                throw new Error('User is not authenticated. Please log in.');
+            }
+
+            try {
+                const { data: existingLocation, error: fetchError } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Error fetching location from Supabase:', fetchError);
+                    throw new Error(`Failed to fetch location: ${fetchError.message}`);
+                }
+
+                if (!existingLocation) {
+                    throw new Error('Location not found');
+                }
+
+                if (existingLocation.owner_id !== user.id) {
+                    throw new Error('You can only update your own locations');
+                }
+
+                let finalImages = existingLocation.images || [];
+                
+                if (location.images && location.images.length > 0) {
+                    const newImages = location.images.filter(img => 
+                        img.startsWith('blob:') || 
+                        (img.startsWith('http') && !existingLocation.images.includes(img))
+                    );
+                    
+                    if (newImages.length > 0) {
+                        try {
+                            const imagesFolderName = existingLocation.tempImageFolder || `loc-${Date.now().toString()}`;
+                            const uploadedImages = await uploadImagesFromUrls(newImages, imagesFolderName);
+                            
+                            finalImages = [...finalImages.filter((img: string) => !img.startsWith('blob:'))];
+                            
+                            const imageMap = new Map();
+                            uploadedImages.forEach((url, index) => {
+                                imageMap.set(newImages[index], url);
+                            });
+                            
+                            location.images.forEach(img => {
+                                if (existingLocation.images.includes(img)) {
+                                    if (!finalImages.includes(img)) {
+                                        finalImages.push(img);
+                                    }
+                                } else if (imageMap.has(img)) {
+                                    finalImages.push(imageMap.get(img));
+                                }
+                            });
+                        } catch (error) {
+                            console.error('Error uploading images:', error);
+                        }
+                    } else {
+                        finalImages = location.images.filter(img => !img.startsWith('blob:'));
+                    }
+                }
+
+                const updatedLocation = {
+                    title: location.title ?? existingLocation.title,
+                    description: location.description ?? existingLocation.description,
+                    address: location.address ?? existingLocation.address,
+                    price: location.price ?? existingLocation.price,
+                    area: location.area ?? existingLocation.area,
+                    images: finalImages,
+                    amenities: location.amenities ?? existingLocation.amenities,
+                    rules: location.rules ?? existingLocation.rules,
+                    updated_at: timestamp,
+                    status: location.status ?? existingLocation.status,
+                    features: location.features ?? existingLocation.features,
+                    coordinates: location.coordinates ?? existingLocation.coordinates,
+                    minimum_booking_hours: location.minimumBookingHours ?? existingLocation.minimum_booking_hours,
+                    tags: location.tags ?? existingLocation.tags,
+                    availability: location.availability ?? existingLocation.availability
+                };
+
+                const { data, error } = await supabase
+                    .from('locations')
+                    .update(updatedLocation)
+                    .eq('id', id)
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('Error updating location in Supabase:', error);
+                    throw new Error(`Failed to update location: ${error.message}`);
+                }
+
+                console.log('Location updated successfully:', data);
+
+                return data ? {
+                    ...data,
+                    ownerId: data.owner_id,
+                    createdAt: data.created_at,
+                    updatedAt: data.updated_at,
+                    minimumBookingHours: data.minimum_booking_hours
+                } as Location : {} as Location;
+            } catch (err) {
+                console.error('Failed to update location:', err);
+                throw err;
+            }
+        },
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({ queryKey: ['locations'] });
+            queryClient.invalidateQueries({ queryKey: ['location', result.id] });
+        },
+    });
+}

@@ -13,15 +13,15 @@ import {
     FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useCreateLocation } from "@/hooks/useLocations";
+import { useCreateLocation, useLocation, useUpdateLocation } from "@/hooks/useLocations";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-    ArrowLeft, 
-    Plus, 
-    X, 
-    Loader2, 
-    ArrowLeft as ArrowLeftIcon, 
+import {
+    ArrowLeft,
+    Plus,
+    X,
+    Loader2,
+    ArrowLeft as ArrowLeftIcon,
     ArrowRight,
     Home,
     MapPin,
@@ -47,6 +47,7 @@ import {
     Trash2,
     MoveHorizontal,
     Info,
+    Save,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
@@ -90,7 +91,7 @@ const schema = z.object({
         closeTime: z.string().optional(),
         daysAvailable: z.array(z.string()).default([])
     }).optional(),
-    status: z.enum(['draft', 'published']).default('draft'),
+    status: z.enum(['draft', 'published', 'archived']).default('draft'),
 });
 
 const COMMON_AMENITIES = [
@@ -108,10 +109,20 @@ const DAYS_OF_WEEK = [
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 ];
 
-export default function NewLocationPage() {
+interface LocationFormProps {
+    mode: 'create' | 'edit';
+    locationId?: string;
+}
+
+export default function LocationForm({ mode, locationId }: LocationFormProps) {
     const navigate = useNavigate();
     const { user } = useAuthContext();
+
     const { mutateAsync: createLocation, isPending: isCreatingLocation } = useCreateLocation();
+    const { mutateAsync: updateLocation, isPending: isUpdatingLocation } = useUpdateLocation();
+    const { data: existingLocation, isLoading: isLoadingLocation } =
+        mode === 'edit' && locationId ? useLocation(locationId) : { data: null, isLoading: false };
+
     const [activeTab, setActiveTab] = useState("basic");
     const [newAmenity, setNewAmenity] = useState("");
     const [newRule, setNewRule] = useState("");
@@ -120,21 +131,27 @@ export default function NewLocationPage() {
     const [actualImageFiles, setActualImageFiles] = useState<File[]>([]);
     const [mainImageIndex, setMainImageIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const [isFormReady, setIsFormReady] = useState(mode === 'create');
+
     const { toast } = useToast();
     const { isUploading, progress } = useImageUploader();
-    const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageLayoutRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!user) {
-            navigate("/auth/login", { state: { from: "/locations/new" } });
+            navigate("/auth/login", {
+                state: {
+                    from: mode === 'edit' ? `/locations/edit/${locationId}` : "/locations/new"
+                }
+            });
         } else {
             initializeStorage().catch(error => {
                 console.error("Storage initialization error:", error);
             });
         }
-    }, [user, navigate]);
+    }, [user, navigate, locationId, mode]);
 
     const form = useForm({
         resolver: zodResolver(schema),
@@ -160,9 +177,42 @@ export default function NewLocationPage() {
                 closeTime: "18:00",
                 daysAvailable: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
             },
-            status: 'published' as const,
+            status: mode === 'create' ? 'published' as const : 'draft' as const,
         },
     });
+
+    useEffect(() => {
+        if (mode === 'edit' && existingLocation && !isFormReady) {
+            form.reset({
+                title: existingLocation.title || "",
+                description: existingLocation.description || "",
+                address: existingLocation.address || "",
+                price: existingLocation.price || 0,
+                area: existingLocation.area || 0,
+                coordinates: existingLocation.coordinates || { latitude: 0, longitude: 0 },
+                images: existingLocation.images || [],
+                amenities: existingLocation.amenities || [],
+                rules: existingLocation.rules || [],
+                tags: existingLocation.tags || [],
+                features: existingLocation.features || {
+                    maxCapacity: 1,
+                    parkingSpots: 0,
+                    equipmentIncluded: false,
+                    accessibility: false,
+                },
+                minimumBookingHours: existingLocation.minimumBookingHours || 2,
+                availability: existingLocation.availability || {
+                    openTime: "09:00",
+                    closeTime: "18:00",
+                    daysAvailable: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+                },
+                status: existingLocation.status || 'published',
+            });
+
+            setUploadedImages(existingLocation.images || []);
+            setIsFormReady(true);
+        }
+    }, [existingLocation, form, isFormReady, mode]);
 
     const onSubmit = async (values: z.infer<typeof schema>) => {
         try {
@@ -182,8 +232,6 @@ export default function NewLocationPage() {
                 return;
             }
 
-            const tempImageFolder = `loc-${Date.now().toString()}`;
-
             const availability = values.availability ? {
                 openTime: values.availability.openTime || "09:00",
                 closeTime: values.availability.closeTime || "18:00",
@@ -194,29 +242,43 @@ export default function NewLocationPage() {
                 ...values,
                 ownerId: user.id,
                 images: uploadedImages,
-                tempImageFolder,
                 coordinates: values.coordinates || {
                     latitude: 0,
                     longitude: 0
                 },
-                status: 'published' as const,
                 availability
             };
 
-            await createLocation(locationData);
-
-            toast({
-                title: "Success!",
-                description: "Location created successfully",
-            });
-
-            navigate("/locations");
+            if (mode === 'create') {
+                await createLocation({
+                    ...locationData,
+                    status: 'published' as const
+                });
+                toast({
+                    title: "Success!",
+                    description: "Location created successfully",
+                });
+                navigate("/locations");
+            } else {
+                if (!locationId) {
+                    throw new Error("Location ID not provided");
+                }
+                await updateLocation({
+                    id: locationId,
+                    location: locationData
+                });
+                toast({
+                    title: "Success!",
+                    description: "Location updated successfully",
+                });
+                navigate(`/locations/${locationId}`);
+            }
 
         } catch (error: any) {
-            console.error("Error creating location:", error);
+            console.error(`Error ${mode === 'create' ? 'creating' : 'updating'} location:`, error);
             toast({
                 title: "Error",
-                description: error.message || "Failed to create location",
+                description: error.message || `Failed to ${mode === 'create' ? 'create' : 'update'} location`,
                 variant: "destructive"
             });
         } finally {
@@ -291,7 +353,7 @@ export default function NewLocationPage() {
     };
 
     const processFiles = (newFiles: File[]) => {
-        const imageFiles = newFiles.filter(file => 
+        const imageFiles = newFiles.filter(file =>
             file.type.startsWith('image/')
         );
 
@@ -319,7 +381,7 @@ export default function NewLocationPage() {
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (e.type === "dragenter" || e.type === "dragover") {
             setDragActive(true);
         } else if (e.type === "dragleave") {
@@ -331,7 +393,7 @@ export default function NewLocationPage() {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        
+
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             processFiles(Array.from(e.dataTransfer.files));
         }
@@ -361,7 +423,6 @@ export default function NewLocationPage() {
 
         form.setValue("images", updatedImages);
     };
-
 
     const moveImage = (fromIndex: number, toIndex: number) => {
         if (
@@ -417,19 +478,41 @@ export default function NewLocationPage() {
         return null;
     };
 
-    if (!user) {
+    if (mode === 'edit' && isLoadingLocation) {
+        return (
+            <div className="container max-w-3xl py-8 flex items-center justify-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!user || (mode === 'edit' && !existingLocation)) {
         return <div>Redirecting to login...</div>;
     }
+
+    if (mode === 'edit' && !isFormReady) {
+        return (
+            <div className="container max-w-3xl py-8 flex items-center justify-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <span className="ml-3">Loading location data...</span>
+            </div>
+        );
+    }
+
+    const backLink = mode === 'edit' ? `/locations/${locationId}` : "/locations";
+    const formTitle = mode === 'edit' ? "Edit Location" : "Add New Location";
+    const submitButtonText = mode === 'edit' ? "Save Changes" : "Create Location";
+    const isProcessing = mode === 'edit' ? isUpdatingLocation : isCreatingLocation;
 
     return (
         <div className="container max-w-3xl py-8">
             <div className="flex items-center gap-4 mb-8">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link to="/locations">
+                    <Link to={backLink}>
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <h1 className="text-3xl font-bold">Add New Location</h1>
+                <h1 className="text-3xl font-bold">{formTitle}</h1>
             </div>
 
             {renderUploadProgress()}
@@ -527,7 +610,7 @@ export default function NewLocationPage() {
                                     <MapPin size={16} />
                                     Location on Map
                                 </FormLabel>
-                                
+
                                 <LocationPicker
                                     onLocationSelect={handleLocationSelect}
                                     defaultAddress={form.getValues("address")}
@@ -593,10 +676,10 @@ export default function NewLocationPage() {
                                 </FormDescription>
                                 <div className="flex flex-wrap gap-2 mb-3">
                                     {LOCATION_TAGS.map((tag) => (
-                                        <Badge 
+                                        <Badge
                                             key={tag}
-                                            variant={form.watch("tags")?.includes(tag) ? "default" : "outline"} 
-                                            className="cursor-pointer" 
+                                            variant={form.watch("tags")?.includes(tag) ? "default" : "outline"}
+                                            className="cursor-pointer"
                                             onClick={() => {
                                                 const currentTags = form.getValues("tags") || [];
                                                 if (currentTags.includes(tag)) {
@@ -624,8 +707,8 @@ export default function NewLocationPage() {
                                             }
                                         }}
                                     />
-                                    <Button 
-                                        type="button" 
+                                    <Button
+                                        type="button"
                                         onClick={handleAddTag}
                                         disabled={!newTag.trim()}
                                     >
@@ -666,7 +749,7 @@ export default function NewLocationPage() {
                                 </FormDescription>
 
                                 {/* Drag and drop image upload area */}
-                                <div 
+                                <div
                                     className={`border-2 border-dashed rounded-lg p-6 mb-6 transition-colors
                                         ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-200'}
                                         ${!uploadedImages.length ? 'cursor-pointer' : ''}
@@ -677,7 +760,7 @@ export default function NewLocationPage() {
                                     onDrop={handleDrop}
                                     onClick={() => !uploadedImages.length && triggerFileInput()}
                                 >
-                                    <input 
+                                    <input
                                         type="file"
                                         ref={fileInputRef}
                                         accept="image/*"
@@ -685,7 +768,7 @@ export default function NewLocationPage() {
                                         onChange={handleImageUpload}
                                         className="hidden"
                                     />
-                                    
+
                                     {!uploadedImages.length ? (
                                         <div className="flex flex-col items-center justify-center py-4">
                                             <UploadCloud size={48} className="text-gray-400 mb-3" />
@@ -694,9 +777,9 @@ export default function NewLocationPage() {
                                                 or click to browse files<br />
                                                 (JPG, PNG, WebP - max 10MB per image)
                                             </p>
-                                            <Button 
-                                                type="button" 
-                                                variant="outline" 
+                                            <Button
+                                                type="button"
+                                                variant="outline"
                                                 onClick={triggerFileInput}
                                                 className="flex items-center gap-2"
                                             >
@@ -714,9 +797,9 @@ export default function NewLocationPage() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button 
-                                                    type="button" 
-                                                    variant="outline" 
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
                                                     size="sm"
                                                     onClick={triggerFileInput}
                                                     className="flex items-center gap-1"
@@ -724,9 +807,9 @@ export default function NewLocationPage() {
                                                     <ImagePlus size={14} />
                                                     Add More
                                                 </Button>
-                                                <Button 
-                                                    type="button" 
-                                                    variant="destructive" 
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
                                                     size="sm"
                                                     className="flex items-center gap-1"
                                                     onClick={() => {
@@ -759,11 +842,11 @@ export default function NewLocationPage() {
                                                 <span>Drag to reorder</span>
                                             </div>
                                         </div>
-                                        
+
                                         <div ref={imageLayoutRef} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                                             {uploadedImages.map((imageUrl, index) => (
-                                                <div 
-                                                    key={index} 
+                                                <div
+                                                    key={index}
                                                     className={`relative group border rounded-md overflow-hidden transition-all
                                                         ${index === 0 ? 'ring-2 ring-primary ring-offset-2' : ''}
                                                     `}
@@ -785,7 +868,7 @@ export default function NewLocationPage() {
                                                             className="w-full h-full object-cover"
                                                         />
                                                     </div>
-                                                    
+
                                                     {/* Overlay controls */}
                                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                                                         <div className="flex items-center justify-end gap-1">
@@ -799,7 +882,7 @@ export default function NewLocationPage() {
                                                                 <Trash2 size={14} />
                                                             </Button>
                                                         </div>
-                                                        
+
                                                         <div className="flex items-center justify-between w-full">
                                                             <Button
                                                                 type="button"
@@ -811,7 +894,7 @@ export default function NewLocationPage() {
                                                             >
                                                                 Set as Main
                                                             </Button>
-                                                            
+
                                                             <div className="flex gap-1">
                                                                 <Button
                                                                     type="button"
@@ -836,14 +919,14 @@ export default function NewLocationPage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     {/* Main image badge */}
                                                     {index === 0 && (
                                                         <div className="absolute top-2 left-2">
                                                             <Badge className="bg-primary/90 text-white">Main</Badge>
                                                         </div>
                                                     )}
-                                                    
+
                                                     {/* Image number */}
                                                     <div className="absolute bottom-2 right-2">
                                                         <Badge variant="outline" className="bg-black/50 text-white border-0">
@@ -852,7 +935,7 @@ export default function NewLocationPage() {
                                                     </div>
                                                 </div>
                                             ))}
-                                            
+
                                             {/* Add more images button */}
                                             <button
                                                 type="button"
@@ -863,7 +946,7 @@ export default function NewLocationPage() {
                                                 <span className="text-sm text-gray-500">Add More</span>
                                             </button>
                                         </div>
-                                        
+
                                         <p className="text-sm text-gray-500 mt-4">
                                             Tip: High-quality images with good lighting will attract more bookings
                                         </p>
@@ -1015,13 +1098,13 @@ export default function NewLocationPage() {
                                 <FormDescription className="mb-4">
                                     Select or add amenities that your location offers
                                 </FormDescription>
-                                
+
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {COMMON_AMENITIES.map((amenity) => (
-                                        <Badge 
+                                        <Badge
                                             key={amenity}
-                                            variant={form.watch("amenities")?.includes(amenity) ? "default" : "outline"} 
-                                            className="cursor-pointer" 
+                                            variant={form.watch("amenities")?.includes(amenity) ? "default" : "outline"}
+                                            className="cursor-pointer"
                                             onClick={() => {
                                                 const currentAmenities = form.getValues("amenities") || [];
                                                 if (currentAmenities.includes(amenity)) {
@@ -1218,20 +1301,51 @@ export default function NewLocationPage() {
                     </Tabs>
 
                     <div className="flex items-center justify-between pt-6 border-t">
-                        <div></div>
+                        <div>
+                            {mode === 'edit' && (
+                                <FormField
+                                    control={form.control}
+                                    name="status"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center gap-2">
+                                            <FormControl>
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        checked={field.value === 'published'}
+                                                        onCheckedChange={(checked) => {
+                                                            field.onChange(checked ? 'published' : 'draft');
+                                                        }}
+                                                        id="publish-status"
+                                                    />
+                                                    <label
+                                                        htmlFor="publish-status"
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                                    >
+                                                        {field.value === 'published' ? 'Published' : 'Draft'}
+                                                    </label>
+                                                </div>
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+                        </div>
 
                         <div className="flex gap-4">
                             <Button type="button" variant="outline" asChild>
-                                <Link to="/locations">Cancel</Link>
+                                <Link to={backLink}>Cancel</Link>
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={isSubmitting || isCreatingLocation || isUploading}
+                                disabled={isSubmitting || isProcessing || isUploading}
+                                className="flex items-center gap-2"
                             >
-                                {(isSubmitting || isCreatingLocation) && (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                Create Location
+                                {(isSubmitting || isProcessing) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : mode === 'edit' ? (
+                                    <Save className="h-4 w-4" />
+                                ) : null}
+                                {submitButtonText}
                             </Button>
                         </div>
                     </div>
