@@ -227,8 +227,11 @@ export function useLocation(id: string, shareToken?: string) {
         queryFn: async () => {
             let effectiveAccessLevel: ShareAccessLevel | null = null;
 
+            console.log('useLocation called with id:', id, 'shareToken:', shareToken);
+
             if (shareToken) {
                 try {
+                    console.log('Looking up share token:', shareToken);
                     const { data: shareData, error: shareError } = await supabase
                         .from('location_shares')
                         .select('*')
@@ -238,9 +241,9 @@ export function useLocation(id: string, shareToken?: string) {
 
                     if (!shareError && shareData) {
                         effectiveAccessLevel = shareData.access_level as ShareAccessLevel;
-                        console.log('Valid share token found with access level:', effectiveAccessLevel);
+                        console.log('Valid share token found with access level:', effectiveAccessLevel, 'Full share data:', shareData);
                     } else {
-                        console.log('Share token is invalid or not found:', shareError);
+                        console.log('Share token is invalid or not found. Error:', shareError);
                     }
                 } catch (err) {
                     console.error('Error checking share token:', err);
@@ -248,6 +251,7 @@ export function useLocation(id: string, shareToken?: string) {
             }
 
             try {
+                console.log('Fetching location with id:', id);
                 const { data: location, error } = await supabase
                     .from('locations')
                     .select('*')
@@ -260,6 +264,7 @@ export function useLocation(id: string, shareToken?: string) {
                 }
 
                 if (!location) {
+                    console.error('Location not found with id:', id);
                     throw new Error('Location not found');
                 }
 
@@ -267,10 +272,22 @@ export function useLocation(id: string, shareToken?: string) {
                 const isPublished = location.status === 'published';
                 const hasValidShareToken = !!effectiveAccessLevel;
 
+                console.log('Access check:', {
+                    isOwner,
+                    isPublished,
+                    hasValidShareToken,
+                    userID: user?.id,
+                    ownerID: location.owner_id,
+                    status: location.status,
+                    effectiveAccessLevel
+                });
+
                 if (!isPublished && !isOwner && !hasValidShareToken) {
+                    console.error('Access denied to location:', id);
                     throw new Error('This location is not available or you do not have access');
                 }
 
+                console.log('Access granted to location:', id);
                 return {
                     ...location,
                     ownerId: location.owner_id,
