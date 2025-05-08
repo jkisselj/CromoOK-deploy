@@ -27,7 +27,7 @@ export default function EditLocationPage() {
         isLoadingLocation,
         isLoadingAccess
     });
-
+//
     const canEdit =
         (user && locationData && locationData.ownerId === user.id) ||
         accessLevel === 'admin' ||
