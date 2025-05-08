@@ -37,7 +37,7 @@ export function ShareLocationDialog({
     
     const createLocationShare = useCreateLocationShare();
 
-    // Handle share link creation depending on the selected access level
+    // Обрабатываем создание ссылки в зависимости от выбранного уровня доступа
     const handleCreateShare = async () => {
         try {
             const share = await createLocationShare.mutateAsync({
@@ -46,12 +46,13 @@ export function ShareLocationDialog({
                 name: shareName
             });
             
-            // Create the URL with the token for sharing access
-            const url = `${window.location.origin}/locations/${locationId}?token=${share.shareToken}&access=${accessLevel}`;
+            // Создаем URL с токеном для совместного доступа
+            // Важно: убедитесь, что токен передается как параметр 'token'
+            const url = `${window.location.origin}/locations/${locationId}?token=${share.shareToken}`;
             setShareUrl(url);
         } catch (error) {
             console.error('Error creating share link:', error);
-            alert('Failed to create share link');
+            alert('Не удалось создать ссылку для совместного доступа');
         }
     };
 

@@ -253,9 +253,33 @@ export function useLocation(id: string, shareToken?: string) {
     return useQuery({
         queryKey: ['location', id, shareToken],
         queryFn: async () => {
-            // First try to get the location from Supabase
+            // Проверяем токен доступа если он предоставлен
+            let effectiveAccessLevel: ShareAccessLevel | null = null;
+            
+            if (shareToken) {
+                try {
+                    // Получаем информацию о токене доступа
+                    const { data: shareData, error: shareError } = await supabase
+                        .from('location_shares')
+                        .select('*')
+                        .eq('location_id', id)
+                        .eq('share_token', shareToken)
+                        .single();
+                    
+                    if (!shareError && shareData) {
+                        // Если токен действительный, сохраняем уровень доступа
+                        effectiveAccessLevel = shareData.access_level as ShareAccessLevel;
+                        console.log('Valid share token found with access level:', effectiveAccessLevel);
+                    } else {
+                        console.log('Share token is invalid or not found:', shareError);
+                    }
+                } catch (err) {
+                    console.error('Error checking share token:', err);
+                }
+            }
+
+            // Получаем локацию из Supabase
             try {
-                // Получаем локацию из Supabase
                 const { data: location, error } = await supabase
                     .from('locations')
                     .select('*')
@@ -274,7 +298,7 @@ export function useLocation(id: string, shareToken?: string) {
                 // Проверка доступа к локации
                 const isOwner = user && location.owner_id === user.id;
                 const isPublished = location.status === 'published';
-                const hasValidShareToken = shareToken && location.share_token === shareToken;
+                const hasValidShareToken = !!effectiveAccessLevel; // Токен действителен, если мы получили уровень доступа
 
                 // Пользователь может видеть локацию, если:
                 // 1. Она опубликована, или
@@ -291,7 +315,9 @@ export function useLocation(id: string, shareToken?: string) {
                     createdAt: location.created_at,
                     updatedAt: location.updated_at,
                     minimumBookingHours: location.minimum_booking_hours,
-                    shareToken: location.share_token
+                    shareToken: location.share_token,
+                    // Добавляем информацию об уровне доступа по ссылке, если она есть
+                    shareAccessLevel: effectiveAccessLevel || undefined
                 } as Location;
             } catch (err) {
                 console.error('Error loading location:', err);
